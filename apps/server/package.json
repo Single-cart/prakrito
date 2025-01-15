@@ -24,6 +24,7 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
+    "arctic": "3.1.2",
     "bcrypt": "^5.1.1",
     "compression": "^1.7.5",
     "cookie-parser": "^1.4.7",
@@ -45,7 +46,6 @@
     "morgan": "^1.10.0",
     "multer": "1.4.5-lts.1",
     "nodemailer": "^6.9.16",
-    "nodemon": "^3.1.7",
     "os": "0.1.2",
     "otp-generator": "^4.0.1",
     "redis": "^4.7.0",
@@ -57,9 +57,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.6.0",
-    "@commitlint/config-conventional": "^19.6.0",
-    "@commitlint/types": "^19.5.0",
     "@types/bcrypt": "^5.0.2",
     "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.8",
@@ -81,17 +78,14 @@
     "@types/swagger-ui-express": "^4.1.7",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
-    "commitizen": "^4.3.1",
-    "cz-conventional-changelog": "^3.3.0",
+    "@workspace/typescript-config": "workspace:*",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
-    "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "only-allow": "^1.2.1",
     "prettier": "^3.4.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.2",
-    "@workspace/typescript-config": "workspace:*"
+    "typescript": "^5.7.2"
   }
 }

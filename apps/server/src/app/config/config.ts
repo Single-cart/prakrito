@@ -13,7 +13,11 @@ const config = {
     mongoUri: env.MONGODB_URI || "mongodb://localhost:27017/your_database",
   },
   domains: {
-    clientSideURL: env.CLIENT_SIDE_URL || "http://localhost:3000",
+    origin: env.ALLOWED_ORIGINS?.split(",") || [
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ],
+    serverUrl: env.SERVER_URL || "http://localhost:4000",
   },
   security: {
     refreshTokenSecret: env.REFRESH_TOKEN_SECRET || "58439434343uy94334435748",
@@ -28,6 +32,12 @@ const config = {
     refreshTokenExpire: env.ACCESS_TOKEN_EXPIRES,
     mailVarificationTokenExpire: env.MAIL_VERIFICATION_TOKEN_EXPIRES,
     forgotPasswordTokenExpire: env.FORTGOT_PASSWORD_TOKEN_EXPIRES,
+  },
+  auth: {
+    google: {
+      clientID: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    },
   },
   cors: {
     allowedOrigins: (

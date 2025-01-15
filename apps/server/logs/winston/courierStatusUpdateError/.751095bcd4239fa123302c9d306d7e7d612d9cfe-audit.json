@@ -1,0 +1,40 @@
+{
+  "keep": {
+    "days": true,
+    "amount": 14
+  },
+  "auditLog": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\.751095bcd4239fa123302c9d306d7e7d612d9cfe-audit.json",
+  "files": [
+    {
+      "date": 1736870061602,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-14-21-error.log",
+      "hash": "5ab1e08a96598ebb80996eaef40cd21ae4a26ccfaae6475520a2b8916e570478"
+    },
+    {
+      "date": 1736871909996,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-14-22-error.log",
+      "hash": "0d31c00b8b272243b3cf8257da31a0cf0924df95f71b60ecf870105af53b980d"
+    },
+    {
+      "date": 1736916958753,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-10-error.log",
+      "hash": "490a6f4f8b77ec8f9e4c5f74c705b25b352660f28b1593d65dc9e20f1c685f88"
+    },
+    {
+      "date": 1736922138753,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-12-error.log",
+      "hash": "989865b0b40356530050ef0abba118e05ba95b14054e0cade609cde837969f1a"
+    },
+    {
+      "date": 1736924415657,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-13-error.log",
+      "hash": "fac246f8228c6eb58b8e2a821dad6d22c60eaeabdbaafb33913aa13d183715d5"
+    },
+    {
+      "date": 1736928081134,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-14-error.log",
+      "hash": "d173b239907eaafa04b450fe076f7a4de7e3514c0e19ebe79acba3cc49232bc4"
+    }
+  ],
+  "hashType": "sha256"
+}

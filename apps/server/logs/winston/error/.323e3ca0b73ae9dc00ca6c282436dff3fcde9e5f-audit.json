@@ -1,0 +1,40 @@
+{
+  "keep": {
+    "days": true,
+    "amount": 14
+  },
+  "auditLog": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\.323e3ca0b73ae9dc00ca6c282436dff3fcde9e5f-audit.json",
+  "files": [
+    {
+      "date": 1736870061594,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-14-21-error.log",
+      "hash": "aca46dd1685239b864e9c23e6726cf58525e63422544dcc99284fb2bdd217345"
+    },
+    {
+      "date": 1736871909990,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-14-22-error.log",
+      "hash": "15db1157970e74f83c4d36caea79256de58617845da6e7466fe9c5ed2c5b9f48"
+    },
+    {
+      "date": 1736916958746,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-15-10-error.log",
+      "hash": "519ca8e8915199075cce43833509b692773c8f5045bbe33298f432f348fd0bcd"
+    },
+    {
+      "date": 1736922138747,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-15-12-error.log",
+      "hash": "d24bfa2798e841510089cb70f3e3807796d31d094cb35b6127b7bd3e71b50d8e"
+    },
+    {
+      "date": 1736924415648,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-15-13-error.log",
+      "hash": "993e0c9e86e36007a5826ed0db0fd7e6a09a210eaa09ef90a0b28f86491577e6"
+    },
+    {
+      "date": 1736928081109,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-15-14-error.log",
+      "hash": "b5ac84579f8b415c6824e2ab50b25c48e158d644c17b2122fd4ec8d9c6fbea24"
+    }
+  ],
+  "hashType": "sha256"
+}
