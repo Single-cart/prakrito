@@ -18,6 +18,8 @@ const config = {
       "http://localhost:3001",
     ],
     serverUrl: env.SERVER_URL || "http://localhost:4000",
+    clientUrl: env.CLIENT_URL || "http://localhost:3000",
+    adminUrl: env.ADMIN_URL || "http://localhost:3001",
   },
   security: {
     refreshTokenSecret: env.REFRESH_TOKEN_SECRET || "58439434343uy94334435748",
@@ -32,6 +34,10 @@ const config = {
     refreshTokenExpire: env.ACCESS_TOKEN_EXPIRES,
     mailVarificationTokenExpire: env.MAIL_VERIFICATION_TOKEN_EXPIRES,
     forgotPasswordTokenExpire: env.FORTGOT_PASSWORD_TOKEN_EXPIRES,
+  },
+  cookieExpire: {
+    accessTokenCookieExpire: env.ACCESS_TOKEN_COOKIE_EXPIRES,
+    refreshTokenCookieExpire: env.REFRESH_TOKEN_COOKIE_EXPIRES,
   },
   auth: {
     google: {

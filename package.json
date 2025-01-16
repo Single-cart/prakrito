@@ -36,5 +36,10 @@
   "packageManager": "pnpm@9.12.3",
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.5.0",
+    "@t3-oss/env-nextjs": "^0.11.1",
+    "react-redux": "^9.2.0"
   }
 }

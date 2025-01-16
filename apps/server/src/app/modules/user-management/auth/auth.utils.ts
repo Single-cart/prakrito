@@ -1,6 +1,9 @@
 import { Google } from "arctic";
 import { CookieOptions, Response } from "express";
+import jwt from "jsonwebtoken";
 import config from "src/app/config/config";
+import { IActivationInfo } from "../users/user.interface";
+import { IActivation, ITokenOptions } from "./auth.interface";
 
 // Initialize Google OAuth with your credentials
 export const google = new Google(
@@ -10,26 +13,26 @@ export const google = new Google(
 );
 
 const accessTokenExpire = parseInt(
-  config.jwtExpires.accessTokenExpire || "1",
+  config.cookieExpire.accessTokenCookieExpire || "1",
   10
 );
 const refreshTokenExpire = parseInt(
-  config.jwtExpires.refreshTokenExpire || "1",
+  config.cookieExpire.refreshTokenCookieExpire || "1",
   10
 );
 
 //options for cookis
 export const accessTokenCookieOptions: CookieOptions = {
-  expires: new Date(Date.now() + accessTokenExpire * 60 * 1000),
+  expires: new Date(Date.now() + accessTokenExpire),
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: config.app.env === "production",
   sameSite: "strict",
 };
 
 export const refreshTokenCookieOptions: CookieOptions = {
-  expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
+  expires: new Date(Date.now() + refreshTokenExpire),
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: config.app.env === "production",
   sameSite: "strict",
 };
 
@@ -41,4 +44,32 @@ export const sendToken = (user: any, res: Response) => {
   res.cookie("refresh_token", refreshToken, refreshTokenCookieOptions);
 
   res.locals.user = user;
+
+  res.status(200).json({
+    success: true,
+    message: "User login successfully",
+    user,
+    accessToken,
+    refreshToken,
+  });
+};
+
+export const genarateJwtToken = ({
+  payload,
+  jwtSecret,
+  expireIn,
+}: ITokenOptions) => {
+  const token = jwt.sign(payload, jwtSecret, { expiresIn: expireIn });
+  return token;
+};
+
+export const createActivationToken = (user: IActivationInfo): IActivation => {
+  const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
+  const token = genarateJwtToken({
+    payload: { user, activationCode },
+    jwtSecret: config.security.mailVarificationTokenSecret,
+    expireIn: "5m",
+  });
+
+  return { activationCode, token };
 };

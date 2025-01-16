@@ -1,9 +1,15 @@
 "use client";
+import { env } from "@/lib/env";
 import { Button } from "@workspace/ui/components/button";
 
 export default function GoogleLoginBtn() {
-  const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+  const handleGoogleLogin = async () => {
+    try {
+      // Direct redirect to backend auth endpoint
+      window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
+    } catch (error) {
+      console.error("Error during Google login:", error);
+    }
   };
 
   return (

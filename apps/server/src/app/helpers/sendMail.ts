@@ -22,8 +22,8 @@ export const sendMail = async (options: IEmailOption): Promise<void> => {
   });
 
   const { email, subject, templete, data } = options;
-  const templetePath = path.join(__dirname, "../views", templete);
-
+  const templetePath = path.join(process.cwd(), "/src/views", templete);
+  console.log("templetePath", templetePath);
   //render the mail tamplete with ejs
   const html: string = await ejs.renderFile(templetePath, data);
 

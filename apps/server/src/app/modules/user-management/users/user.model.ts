@@ -111,6 +111,9 @@ userSchema.methods.refreshToken = function () {
 userSchema.methods.comparePassword = async function (
   entredPassword: string
 ): Promise<boolean> {
+  if (!this.password) {
+    throw new Error("Password is missing for this user");
+  }
   const isMatch = await bcrypt.compare(entredPassword, this.password);
   return isMatch;
 };

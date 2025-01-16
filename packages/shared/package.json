@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "prepare": "tsup",
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",

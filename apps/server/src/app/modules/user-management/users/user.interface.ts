@@ -18,6 +18,21 @@ export interface IUser extends Document {
   refreshToken: () => string;
 }
 
+export interface IUserInfo {
+  fullName: string;
+  email: string;
+  password: string;
+  isSocialAuth: boolean;
+  avatar: string;
+  role: "admin" | "user";
+  address: string;
+  phone: string;
+  reviewsInfo?: {
+    productId: String;
+    reviewsCounter?: Number;
+  }[];
+}
+
 export interface IActivationInfo {
   fullName: string;
   email: string;
