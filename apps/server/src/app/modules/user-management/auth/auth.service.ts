@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import ejs from "ejs";
 import { Response } from "express";
+import httpStatus from "http-status";
 import mongoose from "mongoose";
 import path from "path";
 import config from "src/app/config/config";
@@ -80,6 +81,14 @@ export const handleGoogleCallback = async (
   return user;
 };
 
+export const googleAuthVerifyService = async (userId: string) => {
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return user;
+};
 export class AuthOriginService {
   private allowedOrigins: string[];
 

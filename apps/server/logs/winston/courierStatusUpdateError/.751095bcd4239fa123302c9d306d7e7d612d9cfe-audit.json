@@ -94,6 +94,11 @@
       "date": 1737092104893,
       "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-17-11-error.log",
       "hash": "a8f0ad54826a6e8bbcff98bd27c222c60ea302adbc09637a97863c02d58abbdf"
+    },
+    {
+      "date": 1737094534469,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-17-12-error.log",
+      "hash": "f81804c1856211823f0950551eb289743bf45fad68b422a142db2f632122c354"
     }
   ],
   "hashType": "sha256"

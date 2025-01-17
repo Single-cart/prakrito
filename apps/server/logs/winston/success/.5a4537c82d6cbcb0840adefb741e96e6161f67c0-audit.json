@@ -94,6 +94,11 @@
       "date": 1737092104839,
       "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-17-11-success.log",
       "hash": "29de7bf0ec37505448feb337e9e30a0fc2692d94c37b7016dac9ff87ce3f3dbb"
+    },
+    {
+      "date": 1737094534452,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-17-12-success.log",
+      "hash": "8a020eefbb53686a69d3d70cd06e1fcf6b776c998be95a530d681169b69741e9"
     }
   ],
   "hashType": "sha256"

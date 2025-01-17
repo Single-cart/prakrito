@@ -5,6 +5,7 @@ import validateRequest from "src/app/middlewares/validateRequest";
 import {
   googleAuth,
   googleAuthCallback,
+  googleAuthVerify,
   loginUser,
   logout,
   socialAuth,
@@ -26,6 +27,8 @@ authRouter.get(
   validateRequest(googleAuthCallbackSchema),
   googleAuthCallback
 );
+
+authRouter.get("/google/verify", isAuthenticated, googleAuthVerify);
 
 authRouter.post("/login", validateRequest(loginSchema), loginUser);
 authRouter.post("/social-auth", validateRequest(socialAuthSchema), socialAuth);

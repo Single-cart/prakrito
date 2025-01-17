@@ -79,6 +79,22 @@ export const googleAuthCallback = catchAsync(
   }
 );
 
+export const googleAuthVerify = catchAsync(async (req, res) => {
+  const userId = res.locals.user?._id;
+  const accessToken = req.cookies.accessToken;
+
+  const user = await authService.googleAuthVerifyService(userId);
+
+  sendResponse(res, {
+    message: "google verify successfull",
+    statusCode: httpStatus.OK,
+    data: {
+      user,
+      accessToken,
+    },
+  });
+});
+
 // Register user
 export const registerUser = catchAsync(async (req: Request, res: Response) => {
   const userData = req.body as TRegisterUser;
