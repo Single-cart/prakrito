@@ -6,99 +6,14 @@
   "auditLog": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\.751095bcd4239fa123302c9d306d7e7d612d9cfe-audit.json",
   "files": [
     {
-      "date": 1736870061602,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-14-21-error.log",
-      "hash": "5ab1e08a96598ebb80996eaef40cd21ae4a26ccfaae6475520a2b8916e570478"
+      "date": 1737128070174,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-17-21-error.log",
+      "hash": "b31fe083b1814fb6caeda478c9432fba12ab247752136da1e1585bbad1e5aff4"
     },
     {
-      "date": 1736871909996,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-14-22-error.log",
-      "hash": "0d31c00b8b272243b3cf8257da31a0cf0924df95f71b60ecf870105af53b980d"
-    },
-    {
-      "date": 1736916958753,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-10-error.log",
-      "hash": "490a6f4f8b77ec8f9e4c5f74c705b25b352660f28b1593d65dc9e20f1c685f88"
-    },
-    {
-      "date": 1736922138753,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-12-error.log",
-      "hash": "989865b0b40356530050ef0abba118e05ba95b14054e0cade609cde837969f1a"
-    },
-    {
-      "date": 1736924415657,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-13-error.log",
-      "hash": "fac246f8228c6eb58b8e2a821dad6d22c60eaeabdbaafb33913aa13d183715d5"
-    },
-    {
-      "date": 1736928081134,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-14-error.log",
-      "hash": "d173b239907eaafa04b450fe076f7a4de7e3514c0e19ebe79acba3cc49232bc4"
-    },
-    {
-      "date": 1736946057423,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-19-error.log",
-      "hash": "9ee6b46590bdcf0ce023c6fd07142599a595031127ea1cd0725f2f2f5794cbce"
-    },
-    {
-      "date": 1736956355439,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-21-error.log",
-      "hash": "ac88296a6acecb9210aad34b1b22fad588e8ebe30fc4cf58661aed39263177c3"
-    },
-    {
-      "date": 1736957172134,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-22-error.log",
-      "hash": "b7bbc705dd3855901e7410f65f8d015c4a05dc657e34aa7ad6e017073ceb0305"
-    },
-    {
-      "date": 1736960605079,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-15-23-error.log",
-      "hash": "30574b99b1ac91a9f2e93a90b39c9765dda08a5cbf96fa4db3b659defb5d9f6f"
-    },
-    {
-      "date": 1737024578852,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-16-16-error.log",
-      "hash": "789ad3f978f6e245d08c1acfad3393473dca6b41f9f0ab0ee279a2437d4a6076"
-    },
-    {
-      "date": 1737025205091,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-16-17-error.log",
-      "hash": "c56e79313360f9c5af7ce58f03ee2096adeca30cfc64ce50acd22d91cbaa96e1"
-    },
-    {
-      "date": 1737039413580,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-16-20-error.log",
-      "hash": "5f50b6c2d680cab09515ce9c0dfc6c5365b4d90804879fac53b408bdaa63447b"
-    },
-    {
-      "date": 1737041848267,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-16-21-error.log",
-      "hash": "3b6a4dac41aa71da72655d52a08cc7904e2ac69e7e870345889acdf52cfcf72d"
-    },
-    {
-      "date": 1737043209064,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-16-22-error.log",
-      "hash": "d2bf0a247a9c690f82a3f86164df64c028cba18c3e864f08d607ea818da0fbb6"
-    },
-    {
-      "date": 1737085394208,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-17-09-error.log",
-      "hash": "61215a59414122157498bd0b489e4242c1795077dda682c8e19952d1261cbc58"
-    },
-    {
-      "date": 1737088047597,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-17-10-error.log",
-      "hash": "1da90f6205d11d11e75c25e5512c1f12ac8b0901892570ffd2a994116cb89cab"
-    },
-    {
-      "date": 1737092104893,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-17-11-error.log",
-      "hash": "a8f0ad54826a6e8bbcff98bd27c222c60ea302adbc09637a97863c02d58abbdf"
-    },
-    {
-      "date": 1737094534469,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-17-12-error.log",
-      "hash": "f81804c1856211823f0950551eb289743bf45fad68b422a142db2f632122c354"
+      "date": 1737130003555,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\courierStatusUpdateError\\ec-2025-01-17-22-error.log",
+      "hash": "2e1caf0656ac5eafa43b63c6f2227d8312126b8bc5e5f10242a995de642593fd"
     }
   ],
   "hashType": "sha256"

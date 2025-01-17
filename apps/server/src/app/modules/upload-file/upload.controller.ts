@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
-import ApiError from "src/app/errorHandlers/ApiError";
-import catchAsync from "src/app/middlewares/catchAsync";
-import sendResponse from "src/app/utils/sendResponse";
+import ApiError from "../../errorHandlers/ApiError";
+import catchAsync from "../../middlewares/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 import * as uploadService from "./upload.service";
 
 export const uploadFiles = catchAsync(async (req, res) => {

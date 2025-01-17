@@ -1,8 +1,8 @@
 import express from "express";
-import { createUploader } from "src/app/helpers/multer.config";
-import { isAuthenticated } from "src/app/middlewares/authGuards";
-import validateRequest from "src/app/middlewares/validateRequest";
 import { z } from "zod";
+import { createUploader } from "../../helpers/multer.config";
+import { isAuthenticated } from "../../middlewares/authGuards";
+import validateRequest from "../../middlewares/validateRequest";
 import {
   deleteUploadedFile,
   getUploads,

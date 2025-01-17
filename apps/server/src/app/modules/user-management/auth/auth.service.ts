@@ -4,11 +4,11 @@ import { Response } from "express";
 import httpStatus from "http-status";
 import mongoose from "mongoose";
 import path from "path";
-import config from "src/app/config/config";
-import ApiError from "src/app/errorHandlers/ApiError";
-import { deleteImage } from "src/app/helpers/deleteFile";
-import { verifyJwtToken } from "src/app/helpers/jwtHelper";
-import { sendMail } from "src/app/helpers/sendMail";
+import config from "../../../config/config";
+import ApiError from "../../../errorHandlers/ApiError";
+import { deleteImage } from "../../../helpers/deleteFile";
+import { verifyJwtToken } from "../../../helpers/jwtHelper";
+import { sendMail } from "../../../helpers/sendMail";
 import { IActivationInfo, IUser } from "../users/user.interface";
 import UserModel from "../users/user.model";
 import {

@@ -1,11 +1,11 @@
 // user.routes.ts
 import express from "express";
-import { fileUploder } from "src/app/middlewares/uploadFile";
-import validateRequest from "src/app/middlewares/validateRequest";
 import {
   authorizeUser,
   isAuthenticated,
 } from "../../../middlewares/authGuards";
+import { fileUploder } from "../../../middlewares/uploadFile";
+import validateRequest from "../../../middlewares/validateRequest";
 import {
   activateUser,
   deleteUser,

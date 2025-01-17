@@ -1,7 +1,7 @@
 // auth.routes.ts
 import express from "express";
-import { isAuthenticated } from "src/app/middlewares/authGuards";
-import validateRequest from "src/app/middlewares/validateRequest";
+import { isAuthenticated } from "../../../middlewares/authGuards";
+import validateRequest from "../../../middlewares/validateRequest";
 import {
   googleAuth,
   googleAuthCallback,
@@ -32,7 +32,7 @@ authRouter.get("/google/verify", isAuthenticated, googleAuthVerify);
 
 authRouter.post("/login", validateRequest(loginSchema), loginUser);
 authRouter.post("/social-auth", validateRequest(socialAuthSchema), socialAuth);
-authRouter.get("/logout", isAuthenticated, logout);
+authRouter.post("/logout", isAuthenticated, logout);
 authRouter.get("/refresh", updateAccessToken);
 
 export default authRouter;

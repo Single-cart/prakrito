@@ -1,7 +1,7 @@
 import { Google } from "arctic";
 import { CookieOptions, Response } from "express";
 import jwt from "jsonwebtoken";
-import config from "src/app/config/config";
+import config from "../../../config/config";
 import { IActivationInfo } from "../users/user.interface";
 import { IActivation, ITokenOptions } from "./auth.interface";
 
@@ -45,10 +45,20 @@ export const sendToken = (user: any, res: Response) => {
 
   res.locals.user = user;
 
+  const userInfo = {
+    fullName: user?.fullName,
+    email: user?.email,
+    phone: user?.phone,
+    isSocialAuth: user?.isSocialAuth,
+    role: user?.role,
+    address: user?.address,
+    _id: user?._id,
+  };
+
   res.status(200).json({
     success: true,
     message: "User login successfully",
-    user,
+    user: userInfo,
     accessToken,
     refreshToken,
   });

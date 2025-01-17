@@ -7,6 +7,10 @@
       "@workspace/ui/*": ["./src/*"]
     }
   },
-  "include": ["."],
+  "include": [
+    ".",
+    "../../apps/admin/components/sidebar.tsx",
+    "../../apps/admin/components/SubmitButton.tsx"
+  ],
   "exclude": ["node_modules", "dist"]
 }

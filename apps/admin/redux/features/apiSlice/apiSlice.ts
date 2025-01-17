@@ -78,7 +78,12 @@ export const apiSlice = createApi({
         }
       },
     }),
+
+    googleAuthVerify: builder.query({
+      query: () => "/auth/google/verify",
+      transformResponse: (response: { data: any }) => response.data,
+    }),
   }),
 });
 
-export const { useUserInfoQuery } = apiSlice;
+export const { useUserInfoQuery, useGoogleAuthVerifyQuery } = apiSlice;

@@ -1,9 +1,9 @@
 import { CookieOptions, NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
-import config from "src/app/config/config";
-import ApiError from "src/app/errorHandlers/ApiError";
-import catchAsync from "src/app/middlewares/catchAsync";
-import sendResponse from "src/app/utils/sendResponse";
+import config from "../../../config/config";
+import ApiError from "../../../errorHandlers/ApiError";
+import catchAsync from "../../../middlewares/catchAsync";
+import sendResponse from "../../../utils/sendResponse";
 import { TRegisterUser } from "./auth.interface";
 import * as authService from "./auth.service";
 import {
@@ -47,7 +47,13 @@ export const googleAuth = catchAsync(async (req: Request, res: Response) => {
   res.cookie("google_code_verifier", codeVerifier, cookieOptions);
   res.cookie("redirect_url", origin, cookieOptions);
 
-  res.redirect(authUrl);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: "Google auth URL generated successfully",
+    data: {
+      redirectUrl: authUrl,
+    },
+  });
 });
 
 export const googleAuthCallback = catchAsync(
@@ -173,8 +179,8 @@ export const updateUserInfo = catchAsync(
 // Forgot password
 export const forgotPassword = catchAsync(
   async (req: Request, res: Response) => {
-    const { email, userType } = req.body; // Add userType to identify client/admin
-
+    const { email, userType } = req.body;
+    console.log(userType);
     await authService.forgotPasswordService(email, userType);
     sendResponse(res, {
       statusCode: httpStatus.OK,

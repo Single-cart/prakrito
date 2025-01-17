@@ -29,10 +29,14 @@ const authSlice = createSlice({
     updateUser: (state, action: PayloadAction<{ user: IUser }>) => {
       state.user = action.payload.user;
     },
+    userRegister: (state, action: PayloadAction<{ token: string }>) => {
+      state.token = action.payload.token;
+    },
   },
 });
 
-export const { userLogin, userLogout, updateUser } = authSlice.actions;
+export const { userLogin, userLogout, updateUser, userRegister } =
+  authSlice.actions;
 export const authReducer = authSlice.reducer;
 
 // Add selectors

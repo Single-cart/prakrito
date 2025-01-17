@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import httpStatus from "http-status";
 import path from "path";
-import ApiError from "src/app/errorHandlers/ApiError";
+import ApiError from "../../errorHandlers/ApiError";
 import { IUpload } from "./upload.interface";
 import Upload from "./upload.model";
 

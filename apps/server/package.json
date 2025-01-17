@@ -10,7 +10,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "pnpm tsc",
     "start": "node dist/server.js",
     "update": "pnpm update",
@@ -24,6 +24,7 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
+    "@workspace/shared": "workspace:*",
     "arctic": "3.1.2",
     "bcrypt": "^5.1.1",
     "compression": "^1.7.5",

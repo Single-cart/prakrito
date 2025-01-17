@@ -2,7 +2,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Model, Schema, model } from "mongoose";
 
-import config from "src/app/config/config";
+import httpStatus from "http-status";
+import config from "../../../config/config";
+import ApiError from "../../../errorHandlers/ApiError";
 import { IUser } from "./user.interface";
 
 const userSchema: Schema<IUser> = new Schema(
@@ -112,7 +114,7 @@ userSchema.methods.comparePassword = async function (
   entredPassword: string
 ): Promise<boolean> {
   if (!this.password) {
-    throw new Error("Password is missing for this user");
+    throw new ApiError(httpStatus.NOT_FOUND, "Invalid Email or Password");
   }
   const isMatch = await bcrypt.compare(entredPassword, this.password);
   return isMatch;
