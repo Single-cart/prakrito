@@ -13,7 +13,7 @@ export const bannerApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           dispatch(topBanner({ topBanner: [...result.data.banner] as [] }));
-        } catch (error: any) {
+        } catch (error) {
           console.log(error);
         }
       },

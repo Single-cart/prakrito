@@ -1,68 +1,84 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { env } from "@/lib/env";
+import type { RefreshResponse } from "@/types/auth";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { userLogin } from "../auth/authSlice";
+import { Mutex } from "async-mutex";
+import type { RootState } from "../../store";
+import { userLogin, userLogout } from "../auth/authSlice";
+
+const mutex = new Mutex();
+
+const baseQuery = fetchBaseQuery({
+  baseUrl: env.NEXT_PUBLIC_API_URL,
+  credentials: "include",
+  prepareHeaders: (headers, { getState }) => {
+    const token = (getState() as RootState).auth.token;
+    if (token) {
+      headers.set("authorization", `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
+const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
+  await mutex.waitForUnlock();
+  let result = await baseQuery(args, api, extraOptions);
+
+  if (result.error && result.error.status === 401) {
+    if (!mutex.isLocked()) {
+      const release = await mutex.acquire();
+      try {
+        const refreshResult = (await baseQuery(
+          "/auth/refresh",
+          api,
+          extraOptions
+        )) as { data: RefreshResponse };
+
+        if (refreshResult.data?.data?.accessToken) {
+          // Store the new tokens
+          api.dispatch(
+            userLogin({
+              accessToken: refreshResult.data.data.accessToken,
+              user: refreshResult.data.data.user,
+            })
+          );
+          // Retry the initial query with new access token
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          api.dispatch(userLogout());
+        }
+      } catch (error) {
+        api.dispatch(userLogout());
+        console.log(error);
+      } finally {
+        release();
+      }
+    } else {
+      await mutex.waitForUnlock();
+      result = await baseQuery(args, api, extraOptions);
+    }
+  }
+  return result;
+};
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({
-    baseUrl: env.NEXT_PUBLIC_API_URL,
-  }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Orders", "Products", "Reviews", "Cart", "Users"],
   endpoints: (builder) => ({
-    refreshToken: builder.query({
-      query: () => ({
-        url: "/user/refresh",
-        method: "POST",
-        credentials: "include" as const,
-      }),
-    }),
     userInfo: builder.query({
-      query: () => ({
-        url: "/user/me",
-        method: "GET",
-        credentials: "include",
-      }),
-
+      query: () => "/user/me",
+      transformResponse: (response: { data: any }) => response.data,
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
-          const result = await queryFulfilled;
-          dispatch(
-            userLogin({
-              accessToken: result.data?.accessToken,
-              user: result.data.user,
-            })
-          );
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            console.log(error.message);
-          }
-        }
-      },
-    }),
-    loadUser: builder.query({
-      query: () => ({
-        url: "/user/me",
-        method: "GET",
-        credentials: "include" as const,
-      }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-          dispatch(
-            userLogin({
-              accessToken: result.data.accessToken,
-              user: result.data.user,
-            })
-          );
+          const { data } = await queryFulfilled;
+          dispatch(userLogin({ user: data }));
         } catch (error) {
-          if (error instanceof Error) {
-            console.log(error.message);
-          }
+          console.error("Error fetching user info:", error);
         }
       },
     }),
   }),
 });
 
-export const { useLoadUserQuery } = apiSlice;
+export const { useUserInfoQuery } = apiSlice;

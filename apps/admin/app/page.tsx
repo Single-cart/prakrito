@@ -1,3 +1,4 @@
+"use client";
 import GoogleLoginBtn from "@/components/GoogleLoginBtn";
 import { Button } from "@workspace/ui/components/button";
 

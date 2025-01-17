@@ -1,42 +1,41 @@
+import { RootState } from "@/redux/store";
+import { AuthState } from "@/types/store";
 import type { IUser } from "@/types/user";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = {
+const initialState: AuthState = {
   token: "",
-  user: {},
+  user: null,
+  isAuthenticated: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    userRegistretion: (state, action: PayloadAction<{ token: string }>) => {
-      state.token = action.payload.token;
-    },
-
     userLogin: (
       state,
-      action: PayloadAction<{ accessToken: string; user: IUser }>
+      action: PayloadAction<{ accessToken?: string; user: IUser }>
     ) => {
-      state.token = action.payload.accessToken;
+      state.token = action.payload.accessToken!;
       state.user = action.payload.user;
+      state.isAuthenticated = true;
     },
-
     userLogout: (state) => {
       state.token = "";
-      state.user = "";
+      state.user = null;
+      state.isAuthenticated = false;
     },
-
-    loadUser: (state, action) => {
-      state.user = action.payload;
-    },
-
-    updateUser: (state, action: PayloadAction<{ user: object }>) => {
+    updateUser: (state, action: PayloadAction<{ user: IUser }>) => {
       state.user = action.payload.user;
     },
   },
 });
 
-export const { userLogin, userLogout, userRegistretion, updateUser, loadUser } =
-  authSlice.actions;
-export default authSlice.reducer;
+export const { userLogin, userLogout, updateUser } = authSlice.actions;
+export const authReducer = authSlice.reducer;
+
+// Add selectors
+export const selectCurrentUser = (state: RootState) => state.auth.user;
+export const selectIsAuthenticated = (state: RootState) =>
+  state.auth.isAuthenticated;

@@ -1,140 +1,54 @@
+import { LoginRequest, LoginResponse } from "@/types/auth";
+import type { IUser } from "@/types/user";
 import { apiSlice } from "../apiSlice/apiSlice";
-import { loadUser, userLogin, userLogout, userRegistretion } from "./authSlice";
+import { userLogin, userLogout } from "./authSlice";
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
-    login: build.mutation({
-      query: ({ email, password }) => ({
+    login: build.mutation<LoginResponse, LoginRequest>({
+      query: (credentials) => ({
         url: "/user/login",
         method: "POST",
-        body: {
-          email,
-          password,
-        },
-        credentials: "include" as const,
+        body: credentials,
       }),
-
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
-          const result = await queryFulfilled;
-          dispatch(
-            userLogin({
-              accessToken: result.data.accessToken,
-              user: result.data.user,
-            })
-          );
+          const { data } = await queryFulfilled;
+          if (data.success && data.accessToken) {
+            dispatch(
+              userLogin({
+                accessToken: data.accessToken,
+                user: data.user,
+              })
+            );
+          }
         } catch (error) {
-          console.log(error);
+          console.error("Login failed:", error);
         }
       },
     }),
 
-    register: build.mutation({
-      query: (data) => ({
-        url: "/user/register",
-        method: "POST",
-        body: data,
-        credentials: "include" as const,
-      }),
-      invalidatesTags: ["Users"],
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-          dispatch(userRegistretion({ token: result.data.activationToken }));
-        } catch (error) {
-          console.error(error);
-        }
-      },
-    }),
-
-    activation: build.mutation({
-      query: (data) => ({
-        url: "/user/activate",
-        method: "POST",
-        body: data,
-        credentials: "include",
-      }),
-    }),
-
-    logout: build.query({
+    logout: build.mutation<void, void>({
       query: () => ({
         url: "/user/logout",
-        method: "GET",
-        credentials: "include",
+        method: "POST",
       }),
-
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           await queryFulfilled;
           dispatch(userLogout());
         } catch (error) {
-          console.log(error);
+          console.error("Logout failed:", error);
         }
       },
     }),
 
-    resetPassword: build.mutation({
-      query: (data) => ({
-        url: "/user/reset-password",
-        method: "PUT",
-        body: data,
-        credentials: "include",
-      }),
-    }),
-
-    forgotPassword: build.mutation({
-      query: ({ email }) => ({
-        url: "/user/forgot-password",
-        method: "POST",
-        body: { email: email },
-
-        credentials: "include",
-      }),
-    }),
-    getAllUsers: build.query({
-      query: () => ({
-        url: "/user/all-users",
-        method: "GET",
-        credentials: "include",
-      }),
+    getMe: build.query<{ data: IUser }, void>({
+      query: () => "/user/me",
       providesTags: ["Users"],
-    }),
-
-    updateUserRole: build.mutation({
-      query: ({ data }) => ({
-        url: "/user/update-role",
-        method: "PUT",
-        body: data,
-
-        credentials: "include",
-      }),
-      invalidatesTags: ["Users"],
-    }),
-
-    getMe: build.query({
-      query: () => ({
-        url: "/user/me",
-        method: "GET",
-        credentials: "include",
-      }),
-      providesTags: ["Users"],
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        const result = await queryFulfilled;
-        dispatch(loadUser(result?.data?.user));
-      },
+      transformResponse: (response: { data: IUser }) => response,
     }),
   }),
 });
 
-export const {
-  useLoginMutation,
-  useRegisterMutation,
-  useActivationMutation,
-  useLogoutQuery,
-  useForgotPasswordMutation,
-  useResetPasswordMutation,
-  useGetAllUsersQuery,
-  useUpdateUserRoleMutation,
-  useGetMeQuery,
-} = authApi;
+export const { useLoginMutation, useLogoutMutation, useGetMeQuery } = authApi;

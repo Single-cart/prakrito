@@ -8,24 +8,28 @@ import catchAsync from "./catchAsync";
 
 export const isAuthenticated = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const refresh_token = req.cookies.refresh_token as string;
+    const authHeader = req.headers.authorization;
 
-    if (!refresh_token) {
-      throw new ApiError(400, "Please login to access this recourse");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new ApiError(401, "Access token missing or malformed");
     }
+
+    const accessToken = authHeader.split(" ")[1];
+
+    // Verify the access token
     const decoded = verifyJwtToken(
-      refresh_token,
-      config.security.refreshTokenSecret
+      accessToken,
+      config.security.accessTokenSecret
     ) as JwtPayload;
 
     if (!decoded) {
-      throw new ApiError(400, "Invalid access token. please login");
+      throw new ApiError(401, "Invalid or expired access token. Please login.");
     }
 
     const user = await UserModel.findById(decoded._id);
 
     if (!user) {
-      throw new ApiError(404, "Please login to access this recourse");
+      throw new ApiError(404, "User not found. Please login again.");
     }
 
     res.locals.user = user;

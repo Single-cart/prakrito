@@ -1,7 +1,6 @@
 export interface IUser {
   fullName: string;
   email: string;
-  password?: string;
   isSocialAuth: boolean;
   avatar?: string;
   role: "admin" | "user";

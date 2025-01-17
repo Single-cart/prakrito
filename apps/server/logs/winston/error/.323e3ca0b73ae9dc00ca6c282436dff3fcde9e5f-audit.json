@@ -79,6 +79,21 @@
       "date": 1737043209057,
       "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-16-22-error.log",
       "hash": "efcf25c408ece62d049e97b9013550638e3690bea874dcf88289684f2cc61464"
+    },
+    {
+      "date": 1737085394199,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-17-09-error.log",
+      "hash": "3e75aabf153e376c68eb427fd5372cfc2c3a691bdb92587cfae761aa32746681"
+    },
+    {
+      "date": 1737088047586,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-17-10-error.log",
+      "hash": "73c00130c2811e2f37891ba2822efac5fa89a59a6ac4bcc65fe37b1862a541b0"
+    },
+    {
+      "date": 1737092104858,
+      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\error\\ec-2025-01-17-11-error.log",
+      "hash": "4df1de17c50811e52c0f8e828a39673bdf16fb11c8f637436fae1dcc16f96082"
     }
   ],
   "hashType": "sha256"
