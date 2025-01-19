@@ -22,18 +22,16 @@ const NavHeader = ({ bread }: { bread: IBread[] }) => {
         <Separator orientation="vertical" className="mr-2 h-4" />
 
         {bread.map((item) => (
-          <>
-            <Breadcrumb key={item?.text}>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href={item.href}>{item?.text}</BreadcrumbLink>
-                </BreadcrumbItem>
-                {!item?.last && (
-                  <BreadcrumbSeparator className="hidden md:block" />
-                )}
-              </BreadcrumbList>
-            </Breadcrumb>
-          </>
+          <Breadcrumb key={item.text}>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href={item.href}>{item?.text}</BreadcrumbLink>
+              </BreadcrumbItem>
+              {!item?.last && (
+                <BreadcrumbSeparator className="hidden md:block" />
+              )}
+            </BreadcrumbList>
+          </Breadcrumb>
         ))}
       </div>
     </header>

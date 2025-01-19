@@ -1,1 +1,5 @@
-export const hi = "taifu;r";
+export * as categoryType from "../src/types/category";
+export * as product from "../src/types/product";
+
+export * as categoryZodSchema from "../src/zodSchema/category.schema";
+export * as productZodSchema from "../src/zodSchema/product.schema";

@@ -14,25 +14,23 @@ interface QueryProps {
 const productApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     getAllProducts: build.query({
-      query: ({
-        page = "1",
-        limit = "10",
-        category = "",
-        subcategory = "",
-        search = "",
-        minPrice = "",
-        maxPrice = "",
-        ratings = "0",
-      }: QueryProps) => ({
-        url: `/product/all-products?page=${page}&ratings=${ratings}&limit=${limit}&category=${category}&subcategory=${subcategory}&search=${search}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
-        method: "GET",
-        credentials: "include",
-      }),
+      query: (params: QueryProps) => {
+        const queryString = Object.entries(params)
+          .filter(([, value]) => value !== "")
+          .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+          .join("&");
+
+        return {
+          url: `/product/all-products?${queryString}`,
+          method: "GET",
+          credentials: "include",
+        };
+      },
       providesTags: ["Products"] as never,
     }),
 
     getStockStatus: build.query({
-      query: ({}) => ({
+      query: () => ({
         url: "/product/stock-status",
         method: "GET",
         credentials: "include",
