@@ -1,4 +1,9 @@
 import { Router } from "express";
+import {
+  categoryRoute,
+  subcategoryRoute,
+} from "../modules/category/category.route";
+import productRoute from "../modules/product/product.route";
 import authRouter from "../modules/user-management/auth/auth.route";
 import userRouter from "../modules/user-management/users/user.route";
 
@@ -12,6 +17,18 @@ const moduleRoutes = [
   {
     path: "/user",
     route: userRouter,
+  },
+  {
+    path: "/product",
+    route: productRoute,
+  },
+  {
+    path: "/category",
+    route: categoryRoute,
+  },
+  {
+    path: "/subcategory",
+    route: subcategoryRoute,
   },
 ];
 

@@ -1,7 +1,7 @@
-// components/auth/ProtectedRoute.tsx
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
+import GlobalLoader from "@workspace/ui/components/GlobalLoader";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -31,7 +31,7 @@ export function ProtectedRoute({
   }, [isLoading, isAuthenticated, router, allowedRoles, user?.role]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <GlobalLoader />;
   }
 
   if (!isAuthenticated) {

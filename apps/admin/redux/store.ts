@@ -20,7 +20,6 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore these paths in the state
         ignoredActions: ["persist/PERSIST"],
       },
     }).concat(apiSlice.middleware),

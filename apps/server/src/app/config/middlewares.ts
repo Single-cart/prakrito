@@ -32,6 +32,7 @@ const middlewares = (app: Application) => {
   // Middlewares
   app.set("view engine", ejs);
   // app.use(session(sessionOptions));
+  app.use("/public", express.static("public"));
   app.use(cors(corsOptions));
   app.use(helmet());
   app.use(express.json({ limit: "50mb" }));

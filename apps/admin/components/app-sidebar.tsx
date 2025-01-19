@@ -26,58 +26,58 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/dashboard",
+      url: "/",
       icon: LayoutDashboard,
       isActive: true,
     },
     {
       title: "Products",
-      url: "/dashboard/products",
+      url: "/products",
       icon: ShoppingCart,
     },
     {
       title: "Reviews",
-      url: "/dashboard/reviews",
+      url: "/reviews",
       icon: MessageSquare,
       items: [
         {
           title: "All Reviews",
-          url: "/dashboard/reviews",
+          url: "/reviews",
         },
         {
           title: "Manage Reviews",
-          url: "/dashboard/manage-reviews",
+          url: "/manage-reviews",
         },
       ],
     },
     {
       title: "Orders",
-      url: "/dashboard/orders",
+      url: "/orders",
       icon: PackageSearch,
       items: [
         {
           title: "All Orders",
-          url: "/dashboard/orders",
+          url: "/orders",
         },
         {
           title: "Order Analytics",
-          url: "/dashboard/orderAnalytics",
+          url: "/orderAnalytics",
         },
       ],
     },
     {
       title: "Banners",
-      url: "/dashboard/banners",
+      url: "/banners",
       icon: ImagePlus,
     },
     {
       title: "Category",
-      url: "/dashboard/category",
+      url: "/category",
       icon: FolderTree,
     },
     {
       title: "Users",
-      url: "/dashboard/users",
+      url: "/users",
       icon: Users,
     },
   ],
