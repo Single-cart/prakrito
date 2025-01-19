@@ -75,7 +75,7 @@ const CreateProduct = () => {
       setLocalImages([]);
       dispatch(resetProductData());
       setFormStep(0);
-      router.push("/dashboard/products");
+      router.push("/products");
     } else if (error) {
       const errorData = error as any;
       toast.error(errorData?.data?.message);

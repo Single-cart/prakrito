@@ -31,7 +31,6 @@ const ProductAction: FC<Props> = ({ product }) => {
       router.refresh();
     } catch (err) {
       console.error("Failed to delete product:", err);
-      toast.error("Failed to delete product. Please try again.");
     }
   };
 
