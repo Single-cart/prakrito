@@ -46,6 +46,7 @@ const CreateProduct = () => {
       formData.append("category", productCreateData.category);
       formData.append("subcategory", productCreateData.subcategory);
       formData.append("price", productCreateData.price);
+      formData.append("order", productCreateData.order);
       formData.append("discountPrice", productCreateData.discountPrice);
       formData.append("stock", productCreateData.stock);
       formData.append("shipping", productCreateData.shipping);

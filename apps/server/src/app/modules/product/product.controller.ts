@@ -20,6 +20,7 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     description,
     colors,
     size,
+    order,
   } = req.body;
 
   if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
@@ -37,6 +38,7 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     shipping: parseInt(shipping),
     category,
     subcategory,
+    order: Number(order),
     images: (req.files as Express.Multer.File[]).map(
       (file: Express.Multer.File) => file.path
     ),
@@ -54,14 +56,27 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
 
 // Update product controller
 export const updateProduct = catchAsync(async (req: Request, res: Response) => {
-  const result = await productService.updateProductService({
-    ...req.body,
-    images: req.files
-      ? (req.files as Express.Multer.File[]).map(
+  const data = req.files
+    ? {
+        ...req.body,
+        colors: JSON.parse(req.body.colors || "[]"),
+        size: JSON.parse(req.body.size || "[]"),
+        images: (req.files as Express.Multer.File[]).map(
           (file: Express.Multer.File) => file.path
-        )
-      : undefined,
-  });
+        ),
+      }
+    : {
+        ...req.body,
+        // If no files, the data should already be parsed
+        colors: Array.isArray(req.body.colors)
+          ? req.body.colors
+          : JSON.parse(req.body.colors || "[]"),
+        size: Array.isArray(req.body.size)
+          ? req.body.size
+          : JSON.parse(req.body.size || "[]"),
+      };
+
+  const result = await productService.updateProductService(data);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

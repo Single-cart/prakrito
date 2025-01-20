@@ -113,6 +113,22 @@ const ProductTable = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns: ColumnDef<any>[] = [
     {
+      accessorKey: "order",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Order
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => <div>{row.getValue("order")}</div>,
+      sortingFn: "auto",
+    },
+    {
       accessorKey: "image",
       header: "Image",
       cell: ({ row }) => (
@@ -139,10 +155,7 @@ const ProductTable = () => {
         );
       },
       cell: ({ row }) => (
-        <Link
-          href={`/products/${row.original.slug}`}
-          className="hover:underline text-blue-600"
-        >
+        <Link href={`#`} className="hover:underline text-blue-600">
           {row.original.name}
         </Link>
       ),

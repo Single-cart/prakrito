@@ -2,6 +2,7 @@ import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { apiSlice } from "./features/apiSlice/apiSlice";
 import { authReducer } from "./features/auth/authSlice";
 import bannerSlice from "./features/banners/bannerSlice";
+import cartSlice from "./features/cart/cartSlice";
 import categorySlice from "./features/category/categorySlice";
 import orderSlice from "./features/orders/orderSlice";
 import porductSlice from "./features/product/productSlice";
@@ -13,6 +14,7 @@ export const store = configureStore({
     auth: authReducer,
     banner: bannerSlice,
     category: categorySlice,
+    cart: cartSlice,
     porductReviews: reviewSlice,
     order: orderSlice,
     product: porductSlice,

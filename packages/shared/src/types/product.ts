@@ -1,4 +1,5 @@
 import mongoose, { Document, Types } from "mongoose";
+import { ICategory, ISubCategory } from "./category";
 
 // Filters and Query Interfaces
 export interface IProductFilters {
@@ -38,17 +39,19 @@ export interface ICreateProductInput {
   discountPrice: string;
   stock: number;
   shipping: number;
+  order: number;
   category: Types.ObjectId;
   subcategory: Types.ObjectId;
-  description: string;
-  colors: Array<{ name: string; stock: boolean }>;
-  size: Array<{ name: string; available: boolean }>;
+  description: any;
+  colors?: Array<{ name: string; stock: boolean }>;
+  size?: Array<{ name: string; available: boolean }>;
   images: string[];
 }
 
 export interface IUpdateProductInput extends Partial<ICreateProductInput> {
   id: string;
   sold?: number;
+  [key: string]: any;
 }
 
 // Review Interfaces
@@ -92,8 +95,31 @@ export interface IProduct extends Document {
   price: number;
   discountPrice?: string;
   description: string;
-  colors: { name: string; stock: boolean }[];
-  size: { name: string; stock: boolean }[];
+  colors?: { name: string; stock: boolean }[];
+  size?: { name: string; stock: boolean }[];
+  stock: number;
+  sold: number;
+  soldAt: Date;
+  order: number;
+  shipping: number;
+  images: string[];
+  numOfReviews: number;
+  ratings?: number;
+  category: mongoose.Schema.Types.ObjectId;
+  subcategory?: string;
+  reviews?: IPorductReviews[];
+}
+
+export interface IProductRes {
+  _id: string;
+  name: string;
+  slug: string;
+  price: number;
+  order: number;
+  discountPrice?: string;
+  description: string;
+  colors?: { name: string; stock: boolean }[];
+  size?: { name: string; stock: boolean }[];
   stock: number;
   sold: number;
   soldAt: Date;
@@ -101,7 +127,7 @@ export interface IProduct extends Document {
   images: string[];
   numOfReviews: number;
   ratings?: number;
-  category: mongoose.Schema.Types.ObjectId;
-  subcategory?: string;
+  category: ICategory;
+  subcategory?: ISubCategory;
   reviews?: IPorductReviews[];
 }

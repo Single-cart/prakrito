@@ -4,21 +4,30 @@ export const ProductSchema = z.object({
   name: z.string({ required_error: "Product name is required" }),
   price: z.string({ required_error: "Product price is required" }),
   discountPrice: z.string().optional(),
-  colors: z.array(
-    z.object({
-      name: z.string({ required_error: "Color name is required" }),
-      stock: z.boolean({ required_error: "Color stock is required" }),
-    })
-  ),
-  size: z.array(
-    z.object({
-      name: z.string({ required_error: "Size name is required" }),
-      available: z.boolean({ required_error: "Size stock is required" }),
-    })
-  ),
+  colors: z
+    .array(
+      z
+        .object({
+          name: z.string().optional(),
+          stock: z.boolean().optional(),
+        })
+        .optional()
+    )
+    .optional(),
+  size: z
+    .array(
+      z
+        .object({
+          name: z.string(),
+          available: z.boolean().optional(),
+        })
+        .optional()
+    )
+    .optional(),
   stock: z.string({ required_error: "Product stock is required" }),
   sold: z.string().optional(),
   soldAt: z.date().optional(),
+  order: z.string().optional(),
   shipping: z.string({ required_error: "Product shipping is required" }),
   subcategory: z.string({ required_error: "subcategory required" }),
   category: z.string({ required_error: "product category is required" }),

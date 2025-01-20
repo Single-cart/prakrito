@@ -64,6 +64,7 @@ const ProductInfoForm: FC<Props> = ({
         shipping: "",
         colors: [],
         size: [],
+        order: "0",
       },
     });
 
@@ -141,6 +142,24 @@ const ProductInfoForm: FC<Props> = ({
                   <Input
                     type="number"
                     placeholder="Enter Product Discount Price"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="order"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product Order</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="Enter Product Order"
                     {...field}
                   />
                 </FormControl>

@@ -65,20 +65,18 @@ const productSchema: Schema<product.IProduct> = new Schema(
     colors: {
       type: [
         {
-          name: { type: String, required: true },
-          stock: { type: Boolean, required: true },
+          name: { type: String },
+          stock: { type: Boolean },
         },
       ],
-      required: [true, "Product colors are required"],
     },
     size: {
       type: [
         {
-          name: { type: String, required: true },
-          available: { type: Boolean, required: true },
+          name: { type: String },
+          available: { type: Boolean },
         },
       ],
-      required: [true, "Product size are required"],
     },
     stock: {
       type: Number,
@@ -100,7 +98,10 @@ const productSchema: Schema<product.IProduct> = new Schema(
       type: [String],
       required: [true, "Product images is required"],
     },
-
+    order: {
+      type: Number,
+      default: 0,
+    },
     subcategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory",

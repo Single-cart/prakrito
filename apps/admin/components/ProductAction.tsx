@@ -46,7 +46,7 @@ const ProductAction: FC<Props> = ({ product }) => {
   return (
     <div className="flex items-center gap-5">
       <div className="">
-        <Link href={`/dashboard/products/${product?.slug}`}>
+        <Link href={`/products/${product?.slug}`}>
           <Button size={"icon"}>
             <FilePenLine />
           </Button>

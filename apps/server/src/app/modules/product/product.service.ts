@@ -38,29 +38,21 @@ export const updateProductService = async (
     throw new ApiError(404, "Product not found");
   }
 
-  const productWithSameName = await ProductModel.findOne({
-    name: updateData.name,
-  });
-  if (
-    productWithSameName?._id &&
-    productWithSameName._id.toString() !== updateData.id
-  ) {
-    if (updateData.images?.length) {
-      await deleteMultipleImages(updateData.images);
-    }
-    throw new ApiError(400, "Product name should be unique");
-  }
-
-  // Handle image replacement
-  if (updateData.images?.length) {
-    if (existingProduct.images?.length) {
-      await deleteMultipleImages(existingProduct.images);
-    }
-  }
+  const sanitizedUpdateData = {
+    ...updateData,
+    colors: updateData.colors?.map((color) => ({
+      name: color.name,
+      stock: Boolean(color.stock),
+    })),
+    size: updateData.size?.map((size) => ({
+      name: size.name,
+      available: Boolean(size.available),
+    })),
+  };
 
   const updatedProductData = {
     ...existingProduct.toObject(),
-    ...updateData,
+    ...sanitizedUpdateData,
     slug: updateData.name ? slugify(updateData.name) : existingProduct.slug,
     images: updateData.images?.length
       ? updateData.images
@@ -156,10 +148,8 @@ export const getAllProductsService = async (
   const adjustedLimit = Math.min(50, Math.max(1, limit));
   const adjustedPage = Math.max(1, page);
 
-  // Initialize empty filter object
   const filter: FilterQuery = {};
 
-  // Only add conditions if they are provided
   if (search) {
     filter.$text = { $search: search };
   }
@@ -172,7 +162,6 @@ export const getAllProductsService = async (
     filter.subcategory = subcategory;
   }
 
-  // Handle price filter only if either minPrice or maxPrice is provided
   if (minPrice !== undefined || maxPrice !== undefined) {
     const priceFilter: any[] = [];
 
@@ -225,7 +214,7 @@ export const getAllProductsService = async (
       .populate(["category", "subcategory"])
       .skip((adjustedPage - 1) * adjustedLimit)
       .limit(adjustedLimit)
-      .sort({ createdAt: -1 }),
+      .sort({ order: 1 }),
     ProductModel.countDocuments(filter),
     ProductModel.distinct("category", filter),
   ]);
