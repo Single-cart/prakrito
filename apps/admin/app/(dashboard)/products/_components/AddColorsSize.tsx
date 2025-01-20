@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { productZodSchema } from "@workspace/shared/index";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -24,11 +24,11 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { FC } from "react";
-import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { z } from "zod";
+import { useFieldArray } from "react-hook-form";
 
 interface AddColorsSizeProps {
-  form: UseFormReturn<z.infer<typeof productZodSchema.ProductSchema>>;
+  // form: UseFormReturn<z.infer<typeof productZodSchema.ProductSchema>>;
+  form: any;
 }
 
 const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
@@ -49,6 +49,20 @@ const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
     control: form.control,
     name: "size",
   });
+
+  const addNewColor = () => {
+    appendColor({
+      name: "",
+      stock: true,
+    });
+  };
+
+  const addNewSize = () => {
+    appendSize({
+      name: "",
+      available: true,
+    });
+  };
 
   return (
     <div>
@@ -102,7 +116,7 @@ const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
                   )}
                 />
                 <Button
-                  size={"sm"}
+                  size="sm"
                   type="button"
                   onClick={() => removeColor(index)}
                 >
@@ -111,10 +125,10 @@ const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
               </div>
             ))}
             <Button
-              variant={"outline"}
+              variant="outline"
               className="w-full mt-4"
               type="button"
-              onClick={() => appendColor({ name: "", stock: true })}
+              onClick={addNewColor}
             >
               Add Color
             </Button>
@@ -161,7 +175,7 @@ const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
                   )}
                 />
                 <Button
-                  size={"sm"}
+                  size="sm"
                   type="button"
                   onClick={() => removeSize(index)}
                 >
@@ -170,10 +184,10 @@ const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
               </div>
             ))}
             <Button
-              variant={"outline"}
+              variant="outline"
               className="w-full mt-4"
               type="button"
-              onClick={() => appendSize({ name: "", available: true })}
+              onClick={addNewSize}
             >
               Add Size
             </Button>
