@@ -1,0 +1,151 @@
+import { Request, Response } from "express";
+import catchAsync from "../../middlewares/catchAsync";
+import { orderAnalyticsService, orderService } from "./order.service";
+
+export const createOrder = catchAsync(async (req: Request, res: Response) => {
+  const order = await orderService.createOrder(
+    req.body,
+    req.cookies.cart_session
+  );
+
+  if (!req.body.user) {
+    res.cookie(`orders-${order.orderId}`, JSON.stringify(order.orderId), {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    message: "Order placed successfully",
+    order,
+  });
+});
+
+export const getSingleOrder = catchAsync(
+  async (req: Request, res: Response) => {
+    const order = await orderService.getSingleOrder(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Order retrieved successfully",
+      order,
+    });
+  }
+);
+
+export const getUserOrders = catchAsync(async (req: Request, res: Response) => {
+  const userOrders = await orderService.getUserOrders(
+    req.query.userId as string,
+    req.cookies
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Your all orders here",
+    userOrders,
+  });
+});
+
+export const updateOrderStatus = catchAsync(
+  async (req: Request, res: Response) => {
+    const order = await orderService.updateOrderStatus(
+      req.params.id,
+      req.body.orderStatus
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Order status updated successfully",
+      order,
+    });
+  }
+);
+
+export const getAllOrders = catchAsync(async (req: Request, res: Response) => {
+  const { orders, pagination } = await orderService.getAllOrders(
+    parseInt(req.query.page as string),
+    parseInt(req.query.limit as string),
+    req.query.search as string,
+    req.query.orderStatus as string
+  );
+
+  res.status(200).json({
+    success: true,
+    orders,
+    pagination,
+  });
+});
+
+export const deleteOrder = catchAsync(async (req: Request, res: Response) => {
+  await orderService.deleteOrder(req.params.id);
+
+  res.status(200).json({
+    success: true,
+    message: "Order deleted successfully",
+  });
+});
+
+export const getSealesReport = catchAsync(
+  async (req: Request, res: Response) => {
+    const monthSales = await orderAnalyticsService.getSealesReport();
+    res.status(200).json({
+      success: true,
+      monthSales,
+    });
+  }
+);
+
+export const getOrderStatus = catchAsync(
+  async (req: Request, res: Response) => {
+    const orderSummary = await orderAnalyticsService.getOrderStatus();
+    res.status(200).json({
+      success: true,
+      orderSummary,
+    });
+  }
+);
+
+export const getDailyOrderStats = catchAsync(
+  async (req: Request, res: Response) => {
+    const data = await orderAnalyticsService.getDailyOrderStats();
+    res.json({ success: true, data });
+  }
+);
+
+export const getOrderStatusDistribution = catchAsync(
+  async (req: Request, res: Response) => {
+    const data = await orderAnalyticsService.getOrderStatusDistribution();
+    res.json({ success: true, data });
+  }
+);
+
+export const getPopularProducts = catchAsync(
+  async (req: Request, res: Response) => {
+    const data = await orderAnalyticsService.getPopularProducts();
+    res.json({ success: true, data });
+  }
+);
+
+export const getPaymentMethodStats = catchAsync(
+  async (req: Request, res: Response) => {
+    const data = await orderAnalyticsService.getPaymentMethodStats();
+    res.json({ success: true, data });
+  }
+);
+
+export const getProcessingTimeStats = catchAsync(
+  async (req: Request, res: Response) => {
+    const data = await orderAnalyticsService.getProcessingTimeStats();
+    res.json({ success: true, data });
+  }
+);
+
+export const getHourlyOrderDistribution = catchAsync(
+  async (req: Request, res: Response) => {
+    const data = await orderAnalyticsService.getHourlyOrderDistribution();
+    res.json({ success: true, data });
+  }
+);
