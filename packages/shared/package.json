@@ -29,12 +29,13 @@
     }
   },
   "dependencies": {
+    "mongoose": "^8.8.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/node": "^22.7.6",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "@types/node": "^22.7.6",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",

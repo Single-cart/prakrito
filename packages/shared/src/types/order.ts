@@ -1,11 +1,3 @@
-export interface OrderSummary {
-  totalPandingOrder: number;
-  totalDeliveredOrder: number;
-  totalCancelledOrder: number;
-  totalShippedOrder: number;
-  totalProcessingOrder: number;
-}
-
 export type OrderStatus =
   | "Pending"
   | "Processing"
@@ -26,19 +18,6 @@ export interface ShippingInfo {
   phone: string;
   fullName: string;
   address: string;
-}
-
-export interface OrderData {
-  phone: string;
-  fullName: string;
-  address: string;
-  orderNots: string;
-  paymentType: string;
-  itemsPrice: number;
-  shippingPrice: number;
-  orderItems: any[];
-  totalAmount: number;
-  user?: string;
 }
 
 export interface OrderSummary {

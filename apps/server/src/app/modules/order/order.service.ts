@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 import config from "../../config/config";
 import ApiError from "../../errorHandlers/ApiError";
 import { generateOrderId } from "../../helpers/generateId";
@@ -6,22 +6,18 @@ import { sendMail } from "../../helpers/sendMail";
 import CartModel from "../cart/cart.model";
 import ProductModel from "../product/product.model";
 import UserModel from "../user-management/users/user.model";
-import { OrderStatus, OrderSummary } from "./order.interface";
+import {
+  HourlyDistribution,
+  MonthlySales,
+  OrderData,
+  OrderStatus,
+  OrderSummary,
+  PaymentStats,
+  PopularProduct,
+  ProcessingTimeStats,
+} from "./order.interface";
 import OrderModel from "./order.model";
-
-interface OrderData {
-  phone: string;
-  fullName: string;
-  address: string;
-  orderNots: string;
-  paymentType: string;
-  itemsPrice: number;
-  shippingPrice: number;
-  orderItems: any[];
-  totalAmount: number;
-  user?: string;
-}
-
+console.log("first");
 export const orderService = {
   async createOrder(orderData: OrderData, sessionId?: string) {
     const order = await OrderModel.create({
@@ -236,52 +232,6 @@ export const updateReviewInfo = async (productId: string, userId: string) => {
 };
 
 export const orderAnalyticsService = {
-  async getSealesReport() {
-    const currentDate = new Date();
-    const lastYearDate = new Date();
-    lastYearDate.setFullYear(currentDate.getFullYear() - 1);
-
-    const yearlySales = await OrderModel.aggregate([
-      {
-        $match: {
-          deliveredAt: { $gte: lastYearDate, $lte: currentDate },
-          orderStatus: "Delivered",
-        },
-      },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$deliveredAt" },
-            month: { $month: "$deliveredAt" },
-          },
-          totalAmount: { $sum: "$totalAmount" },
-        },
-      },
-      {
-        $sort: {
-          "_id.year": 1,
-          "_id.month": 1,
-        },
-      },
-    ]);
-
-    return Array.from({ length: 12 }, (_, index) => {
-      const date = new Date();
-      date.setMonth(date.getMonth() - (11 - index));
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-
-      const totalMonth = yearlySales.find(
-        (item) => item._id.year === year && item._id.month === month
-      );
-
-      return {
-        name: date.toLocaleString("en-us", { month: "long" }),
-        total: totalMonth ? totalMonth.totalAmount : 0,
-      };
-    });
-  },
-
   async getOrderStatus(): Promise<OrderSummary> {
     const currentDate = new Date();
     const startMonth = new Date(
@@ -369,8 +319,59 @@ export const orderAnalyticsService = {
     ]);
   },
 
-  async getPopularProducts() {
+  async getSealesReport(): Promise<MonthlySales[]> {
+    const currentDate = new Date();
+    const lastYearDate = new Date();
+    lastYearDate.setFullYear(currentDate.getFullYear() - 1);
+
+    const pipeline: PipelineStage[] = [
+      {
+        $match: {
+          deliveredAt: { $gte: lastYearDate, $lte: currentDate },
+          orderStatus: "Delivered",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$deliveredAt" },
+            month: { $month: "$deliveredAt" },
+          },
+          totalAmount: { $sum: "$totalAmount" },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ];
+
+    const yearlySales = await OrderModel.aggregate(pipeline)
+      .hint({ orderStatus: 1, deliveredAt: 1 })
+      .allowDiskUse(true);
+
+    return Array.from({ length: 12 }, (_, index) => {
+      const date = new Date();
+      date.setMonth(date.getMonth() - (11 - index));
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+
+      const totalMonth = yearlySales.find(
+        (item) => item._id.year === year && item._id.month === month
+      );
+
+      return {
+        name: date.toLocaleString("en-us", { month: "long" }),
+        total: totalMonth?.totalAmount || 0,
+      };
+    });
+  },
+
+  async getPopularProducts(): Promise<PopularProduct[]> {
     return OrderModel.aggregate([
+      { $match: { orderStatus: "Delivered" } },
       { $unwind: "$orderItems" },
       {
         $group: {
@@ -379,30 +380,51 @@ export const orderAnalyticsService = {
           revenue: {
             $sum: { $multiply: ["$orderItems.price", "$orderItems.quantity"] },
           },
+          orderCount: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          totalOrders: 1,
+          revenue: 1,
+          averageOrderSize: { $divide: ["$totalOrders", "$orderCount"] },
         },
       },
       { $sort: { totalOrders: -1 } },
       { $limit: 10 },
-    ]);
+    ])
+      .hint({ orderStatus: 1 })
+      .allowDiskUse(true);
   },
 
-  async getPaymentMethodStats() {
+  async getPaymentMethodStats(): Promise<PaymentStats[]> {
     return OrderModel.aggregate([
       {
         $group: {
           _id: "$paymentType",
           count: { $sum: 1 },
           totalAmount: { $sum: "$totalAmount" },
+          amounts: { $push: "$totalAmount" },
         },
       },
-    ]);
+      {
+        $project: {
+          count: 1,
+          totalAmount: 1,
+          averageAmount: { $divide: ["$totalAmount", "$count"] },
+        },
+      },
+    ])
+      .hint({ paymentType: 1, totalAmount: 1 })
+      .allowDiskUse(true);
   },
 
-  async getProcessingTimeStats() {
+  async getProcessingTimeStats(): Promise<ProcessingTimeStats[]> {
     return OrderModel.aggregate([
       {
         $match: {
           deliveredAt: { $exists: true },
+          orderStatus: "Delivered",
         },
       },
       {
@@ -410,7 +432,7 @@ export const orderAnalyticsService = {
           processingTime: {
             $divide: [
               { $subtract: ["$deliveredAt", "$createdAt"] },
-              1000 * 60 * 60, // Convert to hours
+              1000 * 60 * 60,
             ],
           },
           orderStatus: 1,
@@ -422,21 +444,44 @@ export const orderAnalyticsService = {
           avgProcessingTime: { $avg: "$processingTime" },
           minProcessingTime: { $min: "$processingTime" },
           maxProcessingTime: { $max: "$processingTime" },
+          stdDev: { $stdDevPop: "$processingTime" },
         },
       },
-    ]);
+      {
+        $project: {
+          avgProcessingTime: { $round: ["$avgProcessingTime", 2] },
+          minProcessingTime: { $round: ["$minProcessingTime", 2] },
+          maxProcessingTime: { $round: ["$maxProcessingTime", 2] },
+          standardDeviation: { $round: ["$stdDev", 2] },
+        },
+      },
+    ])
+      .hint({ orderStatus: 1, createdAt: 1, deliveredAt: 1 })
+      .allowDiskUse(true);
   },
 
-  async getHourlyOrderDistribution() {
+  async getHourlyOrderDistribution(): Promise<HourlyDistribution[]> {
     return OrderModel.aggregate([
       {
         $group: {
           _id: { $hour: "$createdAt" },
           orderCount: { $sum: 1 },
           revenue: { $sum: "$totalAmount" },
+          totalAmount: { $sum: "$totalAmount" },
+        },
+      },
+      {
+        $project: {
+          orderCount: 1,
+          revenue: 1,
+          avgOrderValue: {
+            $round: [{ $divide: ["$totalAmount", "$orderCount"] }, 2],
+          },
         },
       },
       { $sort: { _id: 1 } },
-    ]);
+    ])
+      .hint({ createdAt: 1 })
+      .allowDiskUse(true);
   },
 };

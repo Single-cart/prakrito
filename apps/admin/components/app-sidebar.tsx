@@ -57,7 +57,7 @@ const data = {
       items: [
         {
           title: "All Orders",
-          url: "/orders",
+          url: "/order",
         },
         {
           title: "Order Analytics",

@@ -100,4 +100,18 @@ export const orderSchema = new Schema(
 );
 
 const OrderModel = model("Order", orderSchema);
+
+// Optimize for status-based queries
+orderSchema.index({ orderStatus: 1, createdAt: -1 });
+
+// Optimize for date-based queries
+orderSchema.index({ createdAt: 1 });
+orderSchema.index({ deliveredAt: 1 });
+
+// Optimize for payment analysis
+orderSchema.index({ paymentType: 1, totalAmount: 1 });
+
+// Compound index for date range + status queries
+orderSchema.index({ orderStatus: 1, createdAt: 1, deliveredAt: 1 });
+
 export default OrderModel;
