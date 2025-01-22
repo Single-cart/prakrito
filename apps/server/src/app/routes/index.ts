@@ -1,4 +1,5 @@
 import { Router } from "express";
+import bannerRoute from "../modules/banner/banner.route";
 import {
   categoryRoute,
   subcategoryRoute,
@@ -34,6 +35,10 @@ const moduleRoutes = [
   {
     path: "/order",
     route: orderRoute,
+  },
+  {
+    path: "/banner",
+    route: bannerRoute,
   },
 ];
 

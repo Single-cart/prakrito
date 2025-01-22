@@ -1,24 +1,31 @@
 import { apiSlice } from "../apiSlice/apiSlice";
-import { topBanner } from "./bannerSlice";
 
 export const bannerApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
-    getTopBanner: build.query({
+    // getTopBanner: build.query({
+    //   query: () => ({
+    //     url: "/banner/get-all-banners?bannerType=topBanner",
+    //     method: "GET",
+    //   }),
+
+    //   async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+    //     try {
+    //       const result = await queryFulfilled;
+    //       dispatch(topBanner({ topBanner: [...result.data.banner] as [] }));
+    //     } catch (error) {
+    //       console.log(error);
+    //     }
+    //   },
+    // }),
+
+    getBanners: build.query({
       query: () => ({
-        url: "/banner/get-all-banners?bannerType=topBanner",
+        url: `/banner/get-all-banners`,
         method: "GET",
+        credentials: "include",
       }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-          dispatch(topBanner({ topBanner: [...result.data.banner] as [] }));
-        } catch (error) {
-          console.log(error);
-        }
-      },
+      providesTags: ["Banner"],
     }),
-
     createBanner: build.mutation({
       query: ({ data }) => ({
         url: "/banner/create-banner",
@@ -27,6 +34,7 @@ export const bannerApi = apiSlice.injectEndpoints({
 
         credentials: "include",
       }),
+      invalidatesTags: ["Banner"],
     }),
     deleteBanner: build.mutation({
       query: ({ id }) => ({
@@ -34,12 +42,32 @@ export const bannerApi = apiSlice.injectEndpoints({
         method: "DELETE",
         credentials: "include",
       }),
+      invalidatesTags: ["Banner"],
+    }),
+    updateBanner: build.mutation({
+      query: ({ id, body }) => {
+        if (!(body instanceof FormData)) {
+          throw new Error("Body must be FormData");
+        }
+        return {
+          url: `/banner/update-banner/${id}`,
+          method: "PUT",
+          body,
+          credentials: "include",
+          formData: true,
+          headers: {
+            "Content-Type": undefined,
+          },
+        };
+      },
+      invalidatesTags: ["Banner"],
     }),
   }),
 });
 
 export const {
-  useGetTopBannerQuery,
   useCreateBannerMutation,
   useDeleteBannerMutation,
+  useGetBannersQuery,
+  useUpdateBannerMutation,
 } = bannerApi;
