@@ -119,7 +119,7 @@ const UsersTable = () => {
   const firstItemIndex = lastItemIndex - itemsPerPage;
 
   const users = data?.data?.users || [];
-  console.log(data);
+
   const filteredUsers = filterData(users);
   const sortedUsers = sortData(filteredUsers);
   const currentUsers = sortedUsers.slice(firstItemIndex, lastItemIndex);
