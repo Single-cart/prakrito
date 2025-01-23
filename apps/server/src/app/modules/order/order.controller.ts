@@ -91,6 +91,7 @@ export const deleteOrder = catchAsync(async (req: Request, res: Response) => {
 export const getSealesReport = catchAsync(
   async (req: Request, res: Response) => {
     const monthSales = await orderAnalyticsService.getSealesReport();
+
     res.status(200).json({
       success: true,
       monthSales,

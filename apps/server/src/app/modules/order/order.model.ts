@@ -103,6 +103,7 @@ const OrderModel = model("Order", orderSchema);
 
 // Optimize for status-based queries
 orderSchema.index({ orderStatus: 1, createdAt: -1 });
+orderSchema.index({ orderStatus: 1, deliveredAt: 1 });
 
 // Optimize for date-based queries
 orderSchema.index({ createdAt: 1 });

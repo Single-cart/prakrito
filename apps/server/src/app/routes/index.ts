@@ -4,6 +4,7 @@ import {
   categoryRoute,
   subcategoryRoute,
 } from "../modules/category/category.route";
+import customerReviewRoute from "../modules/customar-review/review.route";
 import orderRoute from "../modules/order/order.route";
 import productRoute from "../modules/product/product.route";
 import authRouter from "../modules/user-management/auth/auth.route";
@@ -39,6 +40,10 @@ const moduleRoutes = [
   {
     path: "/banner",
     route: bannerRoute,
+  },
+  {
+    path: "/review",
+    route: customerReviewRoute,
   },
 ];
 

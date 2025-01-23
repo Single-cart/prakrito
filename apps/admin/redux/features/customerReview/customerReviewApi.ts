@@ -29,8 +29,18 @@ export const customerReviewApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+    deleteReview: build.mutation({
+      query: (id) => ({
+        url: `/review/delete-customer-review/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
-export const { useGetAllCustomerReviewQuery, useCreateReviewMutation } =
-  customerReviewApi;
+export const {
+  useGetAllCustomerReviewQuery,
+  useCreateReviewMutation,
+  useDeleteReviewMutation,
+} = customerReviewApi;

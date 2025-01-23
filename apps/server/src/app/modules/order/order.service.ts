@@ -211,7 +211,7 @@ export const updateProductStockSold = async (
 export const updateReviewInfo = async (productId: string, userId: string) => {
   const user = await UserModel.findById(userId);
   if (!user) {
-    throw new Error("User not found");
+    return;
   }
 
   const isReviewdBefore = user?.reviewsInfo?.find(
@@ -348,9 +348,8 @@ export const orderAnalyticsService = {
       },
     ];
 
-    const yearlySales = await OrderModel.aggregate(pipeline)
-      .hint({ orderStatus: 1, deliveredAt: 1 })
-      .allowDiskUse(true);
+    // Remove the hint since we've created the proper index
+    const yearlySales = await OrderModel.aggregate(pipeline).allowDiskUse(true);
 
     return Array.from({ length: 12 }, (_, index) => {
       const date = new Date();
