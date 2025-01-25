@@ -10,7 +10,7 @@ const reviewApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
-      invalidatesTags: ["Reviews"] as any,
+      invalidatesTags: ["Reviews"],
     }),
 
     getReviews: build.query({
@@ -23,24 +23,24 @@ const reviewApi = apiSlice.injectEndpoints({
         },
         credentials: "include",
       }),
-      providesTags: ["Reviews"] as any,
+      providesTags: ["Reviews"],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
           dispatch(getProductReviews(result.data));
-        } catch (error: any) {
-          console.log(error.message);
+        } catch (error) {
+          console.log(error);
         }
       },
     }),
 
     getAllProductReviews: build.query({
-      query: ({}) => ({
+      query: () => ({
         url: "/product/all-product-reviews",
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Reviews"] as any,
+      providesTags: ["Reviews"],
     }),
 
     updateReviewStatus: build.mutation({
@@ -50,7 +50,7 @@ const reviewApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
-      invalidatesTags: ["Reviews"] as any,
+      invalidatesTags: ["Reviews"],
     }),
     deleteReview: build.mutation({
       query: ({ reviewId, productId }) => ({
@@ -62,7 +62,7 @@ const reviewApi = apiSlice.injectEndpoints({
         },
         credentials: "include",
       }),
-      invalidatesTags: ["Reviews"] as any,
+      invalidatesTags: ["Reviews"],
     }),
   }),
 });
