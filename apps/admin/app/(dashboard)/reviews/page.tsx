@@ -17,7 +17,7 @@ type IReviews = {
 };
 
 const Page = async () => {
-  const { data } = await getAllCustomerReviews();
+  const data = await getAllCustomerReviews();
 
   return (
     <div className="p-6 space-y-8">
@@ -33,8 +33,8 @@ const Page = async () => {
           All Customer Reviews
         </h1>
         <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-          {data &&
-            data?.customerReview?.map((item: IReviews) => (
+          {data?.data &&
+            data?.data?.customerReview?.map((item: IReviews) => (
               <div key={item._id} className="relative break-inside-avoid mb-4">
                 <div className="absolute top-2 right-2 z-20">
                   <ReviewDeleteBtn id={item._id} />

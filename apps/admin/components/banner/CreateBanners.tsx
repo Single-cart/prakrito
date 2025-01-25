@@ -61,7 +61,7 @@ const CreateBanners = () => {
     defaultValues: {
       bannerType: "mainBanner",
       category: "",
-      order: 0,
+      order: "0",
       isActive: true,
     },
     mode: "onChange",
@@ -139,7 +139,7 @@ const CreateBanners = () => {
       form.reset({
         bannerType: "mainBanner",
         category: "",
-        order: 0,
+        order: "0",
         isActive: true,
       });
       setSelectedImage(null);

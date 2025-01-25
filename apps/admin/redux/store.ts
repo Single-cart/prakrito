@@ -37,12 +37,12 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 >;
 
 // Initialize app with proper error handling
-const initialize = async () => {
-  try {
-    await store.dispatch(apiSlice.endpoints.userInfo.initiate(undefined));
-  } catch (error) {
-    console.error("Failed to initialize app:", error);
-  }
-};
+// const initialize = async () => {
+//   try {
+//     await store.dispatch(apiSlice.endpoints.userInfo.initiate(undefined));
+//   } catch (error) {
+//     console.error("Failed to initialize app:", error);
+//   }
+// };
 
-initialize();
+// initialize();

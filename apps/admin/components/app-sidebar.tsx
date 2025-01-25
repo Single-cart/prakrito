@@ -45,8 +45,8 @@ const data = {
           url: "/reviews",
         },
         {
-          title: "Manage Reviews",
-          url: "/manage-reviews",
+          title: "Product Reviews",
+          url: "/product-reviews",
         },
       ],
     },
