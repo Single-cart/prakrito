@@ -1,5 +1,5 @@
 import httpStatus from "http-status";
-import jwt, { Secret } from "jsonwebtoken";
+import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import ApiError from "../errorHandlers/ApiError";
 
 export const createJwtToken = (
@@ -9,7 +9,7 @@ export const createJwtToken = (
 ) => {
   const token = jwt.sign(payload, secret, {
     expiresIn: expiresIn,
-  });
+  } as SignOptions);
 
   return token;
 };

@@ -7,7 +7,7 @@ import path from "path";
 import config from "../../../config/config";
 import ApiError from "../../../errorHandlers/ApiError";
 import { deleteImage } from "../../../helpers/deleteFile";
-import { verifyJwtToken } from "../../../helpers/jwtHelper";
+import { createJwtToken, verifyJwtToken } from "../../../helpers/jwtHelper";
 import { sendMail } from "../../../helpers/sendMail";
 import { IActivationInfo, IUser } from "../users/user.interface";
 import UserModel from "../users/user.model";
@@ -19,7 +19,6 @@ import {
 import {
   accessTokenCookieOptions,
   createActivationToken,
-  genarateJwtToken,
   google,
   refreshTokenCookieOptions,
 } from "./auth.utils";
@@ -216,11 +215,11 @@ export const forgotPasswordService = async (
 
   const userId = user._id?.toString();
 
-  const token = genarateJwtToken({
-    payload: { id: user._id, userType },
-    jwtSecret: config.security.forgotPasswordTokenSecret,
-    expireIn: "15m",
-  });
+  const token = createJwtToken(
+    { id: user._id, userType },
+    config.security.forgotPasswordTokenSecret,
+    "15m"
+  );
 
   const forgotPasswordLink = `${config.domains.serverUrl}/api/v1/user/forgot-password-link-validation/${userId}/${token}/${userType}`;
 
@@ -273,17 +272,17 @@ export const updateAccessTokenService = async (
     throw new ApiError(404, "User not found");
   }
 
-  const accessToken = genarateJwtToken({
-    payload: { _id: user._id },
-    jwtSecret: config.security.accessTokenSecret,
-    expireIn: config.jwtExpires.accessTokenExpire,
-  });
+  const accessToken = createJwtToken(
+    { _id: user._id },
+    config.security.accessTokenSecret,
+    config.jwtExpires.accessTokenExpire!
+  );
 
-  const newRefreshToken = genarateJwtToken({
-    payload: { _id: user._id },
-    jwtSecret: config.security.refreshTokenSecret,
-    expireIn: config.jwtExpires.refreshTokenExpire,
-  });
+  const newRefreshToken = createJwtToken(
+    { _id: user._id },
+    config.security.refreshTokenSecret,
+    config.jwtExpires.refreshTokenExpire!
+  );
 
   res.locals.user = user;
 

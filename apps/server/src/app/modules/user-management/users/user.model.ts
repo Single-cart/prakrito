@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { Model, Schema, model } from "mongoose";
 
 import httpStatus from "http-status";
 import config from "../../../config/config";
 import ApiError from "../../../errorHandlers/ApiError";
+import { createJwtToken } from "../../../helpers/jwtHelper";
 import { IUser } from "./user.interface";
 
 const userSchema: Schema<IUser> = new Schema(
@@ -89,23 +89,27 @@ userSchema.pre<IUser>("save", async function (next) {
 
 //access token
 userSchema.methods.accessToken = function () {
-  return jwt.sign(
+  return createJwtToken(
     { _id: this._id },
     config.security.accessTokenSecret as string,
-    {
-      expiresIn: config.jwtExpires.accessTokenExpire,
-    }
+    config.jwtExpires.accessTokenExpire!
+  );
+};
+
+userSchema.methods.accessToken = function () {
+  return createJwtToken(
+    { _id: this._id },
+    config.security.accessTokenSecret as string,
+    config.jwtExpires.accessTokenExpire!
   );
 };
 
 //refresh token
 userSchema.methods.refreshToken = function () {
-  return jwt.sign(
+  return createJwtToken(
     { _id: this._id },
     config.security.refreshTokenSecret as string,
-    {
-      expiresIn: config.jwtExpires.refreshTokenExpire,
-    }
+    config.jwtExpires.refreshTokenExpire!
   );
 };
 

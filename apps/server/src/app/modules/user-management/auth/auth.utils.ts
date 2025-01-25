@@ -1,9 +1,9 @@
 import { Google } from "arctic";
 import { CookieOptions, Response } from "express";
-import jwt from "jsonwebtoken";
 import config from "../../../config/config";
+import { createJwtToken } from "../../../helpers/jwtHelper";
 import { IActivationInfo } from "../users/user.interface";
-import { IActivation, ITokenOptions } from "./auth.interface";
+import { IActivation } from "./auth.interface";
 
 // Initialize Google OAuth with your credentials
 export const google = new Google(
@@ -64,22 +64,13 @@ export const sendToken = (user: any, res: Response) => {
   });
 };
 
-export const genarateJwtToken = ({
-  payload,
-  jwtSecret,
-  expireIn,
-}: ITokenOptions) => {
-  const token = jwt.sign(payload, jwtSecret, { expiresIn: expireIn });
-  return token;
-};
-
 export const createActivationToken = (user: IActivationInfo): IActivation => {
   const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
-  const token = genarateJwtToken({
-    payload: { user, activationCode },
-    jwtSecret: config.security.mailVarificationTokenSecret,
-    expireIn: "5m",
-  });
+  const token = createJwtToken(
+    { user, activationCode },
+    config.security.mailVarificationTokenSecret,
+    "5m"
+  );
 
   return { activationCode, token };
 };
