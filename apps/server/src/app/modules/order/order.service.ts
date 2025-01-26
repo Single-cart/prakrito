@@ -368,6 +368,64 @@ export const orderAnalyticsService = {
     });
   },
 
+  async getDalySealesReport(
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<MonthlySales[]> {
+    const currentDate = endDate || new Date();
+    const defaultStartDate = new Date();
+    defaultStartDate.setFullYear(currentDate.getFullYear() - 1);
+    const queryStartDate = startDate || defaultStartDate;
+
+    const pipeline: PipelineStage[] = [
+      {
+        $match: {
+          deliveredAt: { $gte: queryStartDate, $lte: currentDate },
+          orderStatus: "Delivered",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$deliveredAt" },
+            month: { $month: "$deliveredAt" },
+          },
+          totalAmount: { $sum: "$totalAmount" },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ];
+
+    const yearlySales = await OrderModel.aggregate(pipeline).allowDiskUse(true);
+
+    // Calculate number of months between dates
+    const monthDiff =
+      (currentDate.getFullYear() - queryStartDate.getFullYear()) * 12 +
+      (currentDate.getMonth() - queryStartDate.getMonth()) +
+      1;
+
+    return Array.from({ length: monthDiff }, (_, index) => {
+      const date = new Date(queryStartDate);
+      date.setMonth(queryStartDate.getMonth() + index);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+
+      const totalMonth = yearlySales.find(
+        (item) => item._id.year === year && item._id.month === month
+      );
+
+      return {
+        name: date.toLocaleString("en-us", { month: "long" }),
+        total: totalMonth?.totalAmount || 0,
+      };
+    });
+  },
+
   async getPopularProducts(): Promise<PopularProduct[]> {
     return OrderModel.aggregate([
       { $match: { orderStatus: "Delivered" } },

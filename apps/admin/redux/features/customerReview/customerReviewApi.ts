@@ -1,24 +1,13 @@
 import { apiSlice } from "../apiSlice/apiSlice";
-import { allCustomerReviews } from "./customerReviewSlice";
 
 export const customerReviewApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     getAllCustomerReview: build.query({
       query: () => ({
         method: "GET",
-        url: "/review/create-customer-review",
+        url: "/review/get-customer-review",
       }),
-
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const result = await queryFulfilled;
-          dispatch(allCustomerReviews({ customerReview: result }));
-        } catch (error) {
-          if (error instanceof Error) {
-            console.log(error);
-          }
-        }
-      },
+      providesTags: ["customerReview"],
     }),
 
     createReview: build.mutation({
@@ -35,6 +24,7 @@ export const customerReviewApi = apiSlice.injectEndpoints({
         method: "DELETE",
         credentials: "include",
       }),
+      invalidatesTags: ["customerReview"],
     }),
   }),
 });

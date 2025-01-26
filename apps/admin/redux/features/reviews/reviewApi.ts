@@ -24,14 +24,6 @@ const reviewApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
       providesTags: ["Reviews"],
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const result = await queryFulfilled;
-          dispatch(getProductReviews(result.data));
-        } catch (error) {
-          console.log(error);
-        }
-      },
     }),
 
     getAllProductReviews: build.query({

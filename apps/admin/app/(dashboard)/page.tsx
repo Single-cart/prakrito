@@ -1,3 +1,4 @@
+import DalySalesChart from "@/components/DalySalesChart";
 import NavHeader from "@/components/nav-header";
 import OrderChart from "@/components/OrderChart";
 import ProductStockChart from "@/components/ProductStockChart";
@@ -16,6 +17,10 @@ export default function Page() {
     <div className="">
       <NavHeader bread={bread} />
       <div className="p-4">
+        <div className="space-y-3 mb-5">
+          <h1 className="font-semibold text-2xl">Daly Sales Report</h1>
+          <DalySalesChart />
+        </div>
         <div className="space-y-4">
           <h1 className="font-semibold text-2xl">Total Revenue</h1>
           <SalesChart />

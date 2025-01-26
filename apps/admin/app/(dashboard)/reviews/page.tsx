@@ -1,13 +1,16 @@
+"use client";
+
 import CreateReviews from "@/components/CreateReviews";
 import ReviewDeleteBtn from "@/components/ReviewDeleteBtn";
-import { getAllCustomerReviews } from "@/lib/fetch/customer-review.data";
 import { getImgUrl } from "@/lib/getImgPath";
+import { useGetAllCustomerReviewQuery } from "@/redux/features/customerReview/customerReviewApi";
 import { Card } from "@workspace/ui/components/card";
 import {
   Dialog,
   DialogContent,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ZoomIn } from "lucide-react";
 import Image from "next/image";
 
@@ -16,8 +19,8 @@ type IReviews = {
   image: string;
 };
 
-const Page = async () => {
-  const data = await getAllCustomerReviews();
+const Page = () => {
+  const { data, isLoading } = useGetAllCustomerReviewQuery({});
 
   return (
     <div className="p-6 space-y-8">
@@ -33,7 +36,17 @@ const Page = async () => {
           All Customer Reviews
         </h1>
         <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-          {data?.data &&
+          {isLoading ? (
+            <>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="relative break-inside-avoid mb-4">
+                  <Card className="relative overflow-hidden">
+                    <Skeleton className="w-full aspect-[5/3]" />
+                  </Card>
+                </div>
+              ))}
+            </>
+          ) : (
             data?.data?.customerReview?.map((item: IReviews) => (
               <div key={item._id} className="relative break-inside-avoid mb-4">
                 <div className="absolute top-2 right-2 z-20">
@@ -70,7 +83,8 @@ const Page = async () => {
                   </DialogContent>
                 </Dialog>
               </div>
-            ))}
+            ))
+          )}
         </div>
       </section>
     </div>

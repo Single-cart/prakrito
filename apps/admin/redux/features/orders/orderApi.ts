@@ -41,6 +41,18 @@ const orderApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Orders"],
     }),
+    getDalySalesReport: build.query({
+      query: ({ startDate, endDate }) => ({
+        url: `/order/daly-sales`,
+        params: {
+          startDate,
+          endDate,
+        },
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Orders"],
+    }),
     getOrderStatus: build.query({
       query: () => ({
         url: "/order/order-status",
@@ -160,4 +172,5 @@ export const {
   useGetPaymentMethodStatsQuery,
   useGetProcessingTimeStatsQuery,
   useGetHourlyDistributionQuery,
+  useGetDalySalesReportQuery,
 } = orderApi;
