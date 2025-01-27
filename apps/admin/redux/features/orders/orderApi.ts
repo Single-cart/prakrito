@@ -12,13 +12,13 @@ const orderApi = apiSlice.injectEndpoints({
         },
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
           dispatch(getUserOrders(result.data));
-        } catch (error: any) {
-          console.log(error.message);
+        } catch (error) {
+          console.log(error);
         }
       },
     }),
@@ -30,24 +30,36 @@ const orderApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
-      invalidatesTags: ["Orders"] as any,
+      invalidatesTags: ["Orders"],
     }),
 
     getSalesReport: build.query({
-      query: ({}) => ({
+      query: () => ({
         url: "/order/monthly-sales",
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
+    }),
+    getDalySalesReport: build.query({
+      query: ({ startDate, endDate }) => ({
+        url: `/order/daly-sales`,
+        params: {
+          startDate,
+          endDate,
+        },
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Orders"],
     }),
     getOrderStatus: build.query({
-      query: ({}) => ({
+      query: () => ({
         url: "/order/order-status",
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
     getAllOrders: build.query({
       query: ({ orderStatus, page, search }) => ({
@@ -60,7 +72,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-      invalidatesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
 
     getSingleOrders: build.query({
@@ -69,7 +81,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
     updateOrderStatus: build.mutation({
       query: ({ id, data }) => ({
@@ -78,7 +90,7 @@ const orderApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      invalidatesTags: ["Orders"],
     }),
     deleteOrder: build.mutation({
       query: ({ id }) => ({
@@ -86,7 +98,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "DELETE",
         credentials: "include",
       }),
-      invalidatesTags: ["Orders"] as any,
+      invalidatesTags: ["Orders"],
     }),
 
     getDailyOrderStats: build.query({
@@ -95,7 +107,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
 
     getOrderStatusDistribution: build.query({
@@ -104,7 +116,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
 
     getPopularProducts: build.query({
@@ -113,7 +125,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
 
     getPaymentMethodStats: build.query({
@@ -122,7 +134,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
 
     getProcessingTimeStats: build.query({
@@ -131,7 +143,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
 
     getHourlyDistribution: build.query({
@@ -140,7 +152,7 @@ const orderApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-      providesTags: ["Orders"] as any,
+      providesTags: ["Orders"],
     }),
   }),
 });
@@ -160,4 +172,5 @@ export const {
   useGetPaymentMethodStatsQuery,
   useGetProcessingTimeStatsQuery,
   useGetHourlyDistributionQuery,
+  useGetDalySalesReportQuery,
 } = orderApi;

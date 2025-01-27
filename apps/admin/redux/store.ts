@@ -2,6 +2,7 @@ import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { apiSlice } from "./features/apiSlice/apiSlice";
 import { authReducer } from "./features/auth/authSlice";
 import bannerSlice from "./features/banners/bannerSlice";
+import cartSlice from "./features/cart/cartSlice";
 import categorySlice from "./features/category/categorySlice";
 import orderSlice from "./features/orders/orderSlice";
 import porductSlice from "./features/product/productSlice";
@@ -13,6 +14,7 @@ export const store = configureStore({
     auth: authReducer,
     banner: bannerSlice,
     category: categorySlice,
+    cart: cartSlice,
     porductReviews: reviewSlice,
     order: orderSlice,
     product: porductSlice,
@@ -20,7 +22,6 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore these paths in the state
         ignoredActions: ["persist/PERSIST"],
       },
     }).concat(apiSlice.middleware),
@@ -36,12 +37,12 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 >;
 
 // Initialize app with proper error handling
-const initialize = async () => {
-  try {
-    await store.dispatch(apiSlice.endpoints.userInfo.initiate(undefined));
-  } catch (error) {
-    console.error("Failed to initialize app:", error);
-  }
-};
+// const initialize = async () => {
+//   try {
+//     await store.dispatch(apiSlice.endpoints.userInfo.initiate(undefined));
+//   } catch (error) {
+//     console.error("Failed to initialize app:", error);
+//   }
+// };
 
-initialize();
+// initialize();

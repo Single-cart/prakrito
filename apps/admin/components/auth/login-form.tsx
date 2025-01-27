@@ -1,7 +1,6 @@
 "use client";
 import SubmitButton from "@/components/SubmitButton";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
-import { selectIsAuthenticated } from "@/redux/features/auth/authSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Card,
@@ -24,7 +23,6 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
 import { z } from "zod";
 import { GoogleLoginButton } from "./GoogleLoginBtn";
 
@@ -40,7 +38,6 @@ type LoginFormValues = z.infer<typeof loginFormSchema>;
 
 export function LoginForm({ className }: { className?: string }) {
   const router = useRouter();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -66,10 +63,8 @@ export function LoginForm({ className }: { className?: string }) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errorData = error as any;
       toast.error(errorData.data?.message);
-    } else if (isAuthenticated) {
-      router.replace("/");
     }
-  }, [error, isSuccess, router, isAuthenticated, data?.user?.role]);
+  }, [error, isSuccess, router, data?.user?.role]);
 
   return (
     <div className={cn("flex flex-col gap-6", className)}>

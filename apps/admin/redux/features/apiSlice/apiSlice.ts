@@ -64,16 +64,32 @@ const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Orders", "Products", "Reviews", "Cart", "Users"],
+  tagTypes: [
+    "Orders",
+    "Products",
+    "Reviews",
+    "Cart",
+    "Users",
+    "Banner",
+    "customerReview",
+  ],
   endpoints: (builder) => ({
     userInfo: builder.query({
       query: () => "/user/me",
       transformResponse: (response: { data: any }) => response.data,
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      async onQueryStarted(arg, { queryFulfilled, dispatch, getState }) {
         try {
+          const state = getState() as RootState;
+          if (!state.auth.token) {
+            return;
+          }
+
           const { data } = await queryFulfilled;
           dispatch(userLogin({ user: data }));
-        } catch (error) {
+        } catch (error: any) {
+          if (error?.error?.status === 401) {
+            dispatch(userLogout());
+          }
           console.error("Error fetching user info:", error);
         }
       },

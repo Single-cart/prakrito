@@ -1,25 +1,30 @@
 {
-  "keep": {
-    "days": true,
-    "amount": 14
-  },
-  "auditLog": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\.5a4537c82d6cbcb0840adefb741e96e6161f67c0-audit.json",
-  "files": [
-    {
-      "date": 1737128070157,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-17-21-success.log",
-      "hash": "bb7bc5f531b67f5c1bfd6b254da3bc923ae8a8cd4baaad2896fbcac1108f24c3"
+    "keep": {
+        "days": true,
+        "amount": 14
     },
-    {
-      "date": 1737130003542,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-17-22-success.log",
-      "hash": "32ea7eb9f89594ba1c1eec896af28338cfa4a7b02bbe5ead93564d40412e13bc"
-    },
-    {
-      "date": 1737993575086,
-      "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-27-21-success.log",
-      "hash": "4d509758c58e6f02d6fd2b3aab9447edf4147e356fac58b553b4008a6c7a10d4"
-    }
-  ],
-  "hashType": "sha256"
+    "auditLog": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\.5a4537c82d6cbcb0840adefb741e96e6161f67c0-audit.json",
+    "files": [
+        {
+            "date": 1737128070157,
+            "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-17-21-success.log",
+            "hash": "bb7bc5f531b67f5c1bfd6b254da3bc923ae8a8cd4baaad2896fbcac1108f24c3"
+        },
+        {
+            "date": 1737130003542,
+            "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-17-22-success.log",
+            "hash": "32ea7eb9f89594ba1c1eec896af28338cfa4a7b02bbe5ead93564d40412e13bc"
+        },
+        {
+            "date": 1737993575086,
+            "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-27-21-success.log",
+            "hash": "4d509758c58e6f02d6fd2b3aab9447edf4147e356fac58b553b4008a6c7a10d4"
+        },
+        {
+            "date": 1737993696234,
+            "name": "C:\\Users\\taifu\\OneDrive\\Desktop\\WorkSpace\\singlecart-core\\apps\\server\\logs\\winston\\success\\ec-2025-01-27-22-success.log",
+            "hash": "c9a6d86a0a3d189eb04a9793d39dd40dfc2df921c546baad2d1be29db5b245c8"
+        }
+    ],
+    "hashType": "sha256"
 }

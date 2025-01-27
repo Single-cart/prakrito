@@ -7,7 +7,7 @@ export type IEmailOption = {
   email: string;
   subject: string;
   templete: string;
-  data: { [key: string]: unknown };
+  data: any;
 };
 
 export const sendMail = async (options: IEmailOption): Promise<void> => {

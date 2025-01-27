@@ -5,6 +5,9 @@ node_modules
 .pnp
 .pnp.js
 uploads
+logs*
+apps/server/logs/
+
 
 # Local env files
 .env
