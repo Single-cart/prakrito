@@ -44,7 +44,7 @@ const ForgotPassword = () => {
   ) => {
     await forgotPassword({
       email: data.email,
-      userType: "admin",
+      userType: "client",
     });
   };
 

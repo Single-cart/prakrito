@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import ReduxProvider from "@/providers/ReduxProvider";
 import "@workspace/ui/globals.css";
+import { Toaster } from "react-hot-toast";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -25,7 +26,10 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
         <ReduxProvider>
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            <Toaster />
+          </Providers>
         </ReduxProvider>
       </body>
     </html>

@@ -180,7 +180,7 @@ export const updateUserInfo = catchAsync(
 export const forgotPassword = catchAsync(
   async (req: Request, res: Response) => {
     const { email, userType } = req.body;
-    console.log(userType);
+
     await authService.forgotPasswordService(email, userType);
     sendResponse(res, {
       statusCode: httpStatus.OK,
