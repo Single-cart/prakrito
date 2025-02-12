@@ -5,6 +5,7 @@ export * as product from "../src/types/product";
 export * as reviews from "../src/types/reviews";
 
 export * as bannerZodSchema from "../src/zodSchema/banner.schema";
+export * as cartZodSchema from "../src/zodSchema/cart.schema";
 export * as categoryZodSchema from "../src/zodSchema/category.schema";
 export * as orderZodSchema from "../src/zodSchema/order.schema";
 export * as productZodSchema from "../src/zodSchema/product.schema";

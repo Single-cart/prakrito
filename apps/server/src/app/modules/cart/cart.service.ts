@@ -1,4 +1,5 @@
 import httpStatus from "http-status";
+import { Types } from "mongoose";
 import ApiError from "../../errorHandlers/ApiError";
 import { generateOrderId } from "../../helpers/generateId";
 import ProductModel from "../product/product.model";
@@ -16,19 +17,41 @@ export const addCartItemService = async (
   }
 
   if (cartSession) {
-    return handleExistingCart(cartSession, productId, colors, size, product);
+    try {
+      return await handleExistingCart(
+        cartSession,
+        productId,
+        colors,
+        size,
+        product
+      );
+    } catch (error) {
+      // If cart is not found, create a new one instead of throwing error
+      if (
+        error instanceof ApiError &&
+        error.statusCode === httpStatus.NOT_FOUND
+      ) {
+        return await createNewCart(productId, colors, size, product);
+      }
+      throw error;
+    }
   }
-  return createNewCart(productId, colors, size, product);
+
+  return await createNewCart(productId, colors, size, product);
 };
 
-const handleExistingCart = async (
-  sessionId: string,
+export const handleExistingCart = async (
+  cartSession: string,
   productId: string,
   colors: string,
   size: string,
   product: any
 ) => {
-  const cart = await CartModel.findOne({ sessionId });
+  // Find the existing cart
+  const cart = await CartModel.findOne({
+    sessionId: cartSession,
+  });
+
   if (!cart) {
     throw new ApiError(httpStatus.NOT_FOUND, "Cart not found");
   }
@@ -36,30 +59,37 @@ const handleExistingCart = async (
   const existingItem = cart.cartItem.find(
     (item) =>
       item.productId.toString() === productId &&
-      item.size === size &&
-      item.colors === colors
+      item.colors === colors &&
+      item.size === size
   );
 
   if (existingItem) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Product already in cart");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Product Already In Cart");
   }
 
   const updatedCart = await CartModel.findOneAndUpdate(
-    { sessionId },
+    { sessionId: cartSession },
     {
       $push: {
         cartItem: {
-          productId,
+          productId: new Types.ObjectId(productId),
           colors,
           size,
           price: product.price,
-          discountPrice: parseInt(product.discountPrice),
+          discountPrice: product.discountPrice
+            ? parseInt(product.discountPrice.toString())
+            : "0",
+          selected: true,
           quantity: 1,
         },
       },
     },
-    { new: true, runValidators: true }
-  );
+    { runValidators: true, new: true }
+  ).lean();
+
+  if (!updatedCart) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Cart update failed");
+  }
 
   return updatedCart;
 };
@@ -71,21 +101,26 @@ const createNewCart = async (
   product: any
 ) => {
   const sessionId = generateOrderId();
+
   const newCart = await CartModel.create({
     sessionId,
-    cartItem: {
-      productId,
-      colors,
-      size,
-      price: product.price,
-      discountPrice: parseInt(product.discountPrice),
-      quantity: 1,
-    },
+    cartItem: [
+      {
+        productId,
+        colors,
+        size,
+        price: product.price,
+        discountPrice: product.discountPrice
+          ? parseInt(product.discountPrice.toString())
+          : product.price,
+        quantity: 1,
+        selected: true,
+      },
+    ],
   });
 
   return { cart: newCart, sessionId };
 };
-
 export const getCartItemService = async (sessionId?: string) => {
   if (!sessionId) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid cart session");
@@ -151,7 +186,7 @@ export const getCartItemService = async (sessionId?: string) => {
 
   return {
     cartItem: cart[0].cartItem,
-    selectAll: cart[0].selectAll,
+    selectAll: cart.length > 0 ? cart[0].selectAll : null,
   };
 };
 

@@ -1,0 +1,56 @@
+"use client";
+
+import { env } from "@/lib/env";
+import { CircleUserRound } from "lucide-react";
+import Image from "next/image";
+import { useSelector } from "react-redux";
+
+import { RootState } from "@/redux/store";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import defaultAvater from "../public/default-avater.jpg";
+
+const Profile = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [isMounded, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounded) {
+    return (
+      <Link href={"/login"}>
+        <CircleUserRound size={30} />
+      </Link>
+    );
+  }
+
+  const avatar = user?.avatar?.includes("googleusercontent")
+    ? user?.avatar
+    : `${env.NEXT_PUBLIC_SERVER_URL}/${user?.avatar}`;
+
+  return (
+    <div className="">
+      {user?.fullName ? (
+        <Link href={"/profile"}>
+          <div className="cursor-pointer rounded-full m-auto w-[40px] h-[40px]">
+            <Image
+              className="rounded-full object-cover"
+              src={user?.avatar ? avatar : defaultAvater}
+              alt="default avater"
+              height={40}
+              width={40}
+            />
+          </div>
+        </Link>
+      ) : (
+        <Link href={"/login"}>
+          <CircleUserRound size={30} />
+        </Link>
+      )}
+    </div>
+  );
+};
+
+export default Profile;

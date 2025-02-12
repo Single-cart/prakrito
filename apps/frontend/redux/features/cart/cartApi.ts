@@ -49,7 +49,7 @@ const cartApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          dispatch(allCartItems(result.data));
+          dispatch(allCartItems(result?.data?.data));
         } catch (error) {
           console.log(error);
         }
@@ -67,7 +67,7 @@ const cartApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          dispatch(totalPrice(result.data));
+          dispatch(totalPrice(result.data?.data));
         } catch (error) {
           console.log(error);
         }

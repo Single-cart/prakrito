@@ -65,7 +65,7 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
   >(null);
   const [images, setImages] = useState<FileList | null>(null);
   const router = useRouter();
-
+  console.log("product stock", product?.stock);
   const { refetch } = useGetCartItemQuery({});
   const { refetch: totalPriceRefetch } = useTotalPriceQuery({});
   const { data } = useGetAllCategoryQuery({});

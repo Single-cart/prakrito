@@ -96,7 +96,7 @@ export interface IProduct extends Document {
   discountPrice?: string;
   description: string;
   colors?: { name: string; stock: boolean }[];
-  size?: { name: string; stock: boolean }[];
+  size?: { name: string; available: boolean }[];
   stock: number;
   sold: number;
   soldAt: Date;
@@ -119,7 +119,7 @@ export interface IProductRes {
   discountPrice?: string;
   description: string;
   colors?: { name: string; stock: boolean }[];
-  size?: { name: string; stock: boolean }[];
+  size?: { name: string; available: boolean }[];
   stock: number;
   sold: number;
   soldAt: Date;

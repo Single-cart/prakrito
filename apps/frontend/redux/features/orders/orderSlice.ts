@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   allOrders: {},
-  userOrders: {},
+  userOrders: [],
 };
 
 const orderSlice = createSlice({
