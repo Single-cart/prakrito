@@ -1,4 +1,4 @@
-import { serverApi } from "../utils";
+import { env } from "../env";
 
 interface QueryProps {
   orderStatus?: string;
@@ -12,7 +12,7 @@ export const getAllOrders = async ({
   refresh_token,
 }: QueryProps) => {
   const res = await fetch(
-    `${serverApi}/order/all-orders?page=${page}&orderStatus=${orderStatus}`,
+    `${env.NEXT_PUBLIC_API_URL}/order/all-orders?page=${page}&orderStatus=${orderStatus}`,
     {
       credentials: "include",
       cache: "no-store",

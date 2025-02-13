@@ -4,7 +4,6 @@ import { useCreateReviewMutation } from "@/redux/features/customerReview/custome
 import { Card } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
 import { Upload } from "lucide-react";
-import { revalidateTag } from "next/cache";
 import { useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
@@ -32,7 +31,7 @@ const CreateReviews = () => {
         await createReview({
           data: formData,
         });
-        revalidateTag("customerReview");
+        await customRevalidate("customerReview");
       },
     });
 

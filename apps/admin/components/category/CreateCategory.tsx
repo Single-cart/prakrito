@@ -1,6 +1,7 @@
 "use client";
 
 import { LoadingButton } from "@/components/LoaderButton";
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import {
   useCreateCategoryMutation,
   useGetAllCategoryQuery,
@@ -48,6 +49,7 @@ const CreateCategory = ({ onSuccess }: CreateCategoryProps) => {
     await createCategory({
       data: value,
     });
+    await customRevalidate("Category");
     await refetch();
   };
 

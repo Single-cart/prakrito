@@ -57,7 +57,7 @@ export const singleProduct = async (slug: string) => {
     const res = await fetch(
       `${env.NEXT_PUBLIC_API_URL}/product/single-product/${slug}`,
       {
-        next: { tags: ["getAllProducts"] },
+        next: { tags: ["getAllProducts", "singleProduct"] },
         cache: "force-cache",
       }
     );

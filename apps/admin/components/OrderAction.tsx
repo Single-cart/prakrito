@@ -29,7 +29,7 @@ const OrderAction: FC<Props> = ({ id }) => {
       await refetchOrderStatus();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete order");
+      console.error(error?.data?.message || "Failed to delete order");
     }
   }, [deleteOrder, id, refetchAllOrders, refetchOrderStatus]);
 

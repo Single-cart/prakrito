@@ -42,7 +42,10 @@ const ProductFormPreview: FC<Props> = ({ localImages }) => {
       <div className="flex items-center space-x-6">
         <span className="text-gray-700">Stock: {productCreateData?.stock}</span>
         <span className="text-gray-700">
-          Shipping: ${productCreateData?.shipping}
+          inside Dhaka: ${productCreateData?.insideDhaka}
+        </span>
+        <span className="text-gray-700">
+          outside Dhaka: ${productCreateData?.outsideDhaka}
         </span>
       </div>
 

@@ -14,7 +14,8 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     price,
     discountPrice,
     stock,
-    shipping,
+    insideDhaka,
+    outsideDhaka,
     category,
     subcategory,
     description,
@@ -35,7 +36,8 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     stock: parseInt(stock),
     colors: JSON.parse(colors),
     size: JSON.parse(size),
-    shipping: parseInt(shipping),
+    insideDhaka: parseInt(insideDhaka),
+    outsideDhaka: parseInt(outsideDhaka),
     category,
     subcategory,
     order: Number(order),
@@ -174,7 +176,7 @@ export const createReview = catchAsync(async (req: Request, res: Response) => {
     },
   };
 
-  const result = await productService.createReviewService(reviewData);
+  const result = await productService.createReviewService(reviewData, user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

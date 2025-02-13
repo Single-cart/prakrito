@@ -17,7 +17,7 @@ import {
   ProcessingTimeStats,
 } from "./order.interface";
 import OrderModel from "./order.model";
-console.log("first");
+
 export const orderService = {
   async createOrder(orderData: OrderData, sessionId?: string) {
     const order = await OrderModel.create({

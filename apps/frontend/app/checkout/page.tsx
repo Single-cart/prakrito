@@ -20,6 +20,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 
+import ShippingPriceSelection from "@/components/ShippingPrice";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useGetCartItemQuery,
@@ -33,7 +34,7 @@ import {
 import { RootState } from "@/redux/store";
 import { ListOrdered, Receipt } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -45,6 +46,9 @@ const orderSchema = z.object({
     .min(1, "Enter Your Phone Number")
     .regex(/^(\+88)?(01[3-9]\d{8})$/, "Invalid Phone Number"),
   address: z.string().min(1, "Enter Shipping Address"),
+  shippingLocation: z.enum(["inside", "outside"], {
+    required_error: "Please select a delivery location",
+  }),
   orderNots: z.string().optional(),
 });
 
@@ -54,6 +58,8 @@ const Checkout = () => {
 
   const { refetch } = useGetCartItemQuery({});
   const { refetch: orderStatusRefetch } = useGetOrderStatusQuery({});
+  const [selectedShippingPrice, setSelectedShippingPrice] = useState(0);
+  const [calculatedAmount, setCalculatedAmount] = useState(0);
 
   useTotalPriceQuery({});
   const [createOrder, { isLoading, error, isError, isSuccess }] =
@@ -69,15 +75,33 @@ const Checkout = () => {
   );
 
   //find lowest shipping charge
-  const minShippingPrice = selectItem?.reduce((min: any, item: any) => {
-    const shipping = parseInt(item?.product?.shipping);
-    return shipping < min ? shipping : min;
+
+  const minInsideDhakaPrice = selectItem?.reduce((min, item) => {
+    const insidePrice = parseInt(item?.product?.insideDhaka) || Infinity;
+    return insidePrice < min ? insidePrice : min;
   }, Infinity);
 
-  const totalAmount = totalPriceData?.totalDiscountPrice + minShippingPrice;
+  const minOutsideDhakaPrice = selectItem?.reduce((min, item) => {
+    const outsidePrice = parseInt(item?.product?.outsideDhaka) || Infinity;
+    return outsidePrice < min ? outsidePrice : min;
+  }, Infinity);
+
+  // If no valid prices found, default to 0
+  const finalInsidePrice =
+    minInsideDhakaPrice === Infinity ? 0 : minInsideDhakaPrice;
+  const finalOutsidePrice =
+    minOutsideDhakaPrice === Infinity ? 0 : minOutsideDhakaPrice;
 
   const form = useForm<z.infer<typeof orderSchema>>({
     resolver: zodResolver(orderSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phone: "",
+      address: "",
+      orderNots: "",
+      shippingLocation: "outside",
+    },
   });
 
   const handleSubmit = async (value: z.infer<typeof orderSchema>) => {
@@ -98,13 +122,34 @@ const Checkout = () => {
       paymentType: "Cash on delivery",
       orderItems,
       itemsPrice: totalPriceData?.totalDiscountPrice,
-      shippingPrice: minShippingPrice,
-      totalAmount: totalAmount,
+      shippingPrice: selectedShippingPrice,
+      totalAmount: calculatedAmount,
     };
 
     await createOrder(data);
     await orderStatusRefetch();
     await refetch();
+  };
+
+  useEffect(() => {
+    // Set initial shipping price to outside Dhaka by default
+    const initialShippingPrice = finalOutsidePrice;
+    setSelectedShippingPrice(initialShippingPrice);
+
+    // Calculate initial total amount
+    if (totalPriceData?.totalDiscountPrice) {
+      const initialTotal =
+        totalPriceData.totalDiscountPrice + initialShippingPrice;
+      setCalculatedAmount(initialTotal);
+    }
+  }, [finalOutsidePrice, totalPriceData?.totalDiscountPrice]);
+
+  const handleShippingChange = (shippingPrice: number) => {
+    if (totalPriceData?.totalDiscountPrice) {
+      const newTotal = totalPriceData.totalDiscountPrice + shippingPrice;
+      setCalculatedAmount(newTotal);
+      setSelectedShippingPrice(shippingPrice);
+    }
   };
 
   useEffect(() => {
@@ -223,6 +268,16 @@ const Checkout = () => {
                   </FormItem>
                 )}
               />
+
+              <div className="">
+                <ShippingPriceSelection
+                  form={form}
+                  insideDhaka={finalInsidePrice}
+                  outsideDhaka={finalOutsidePrice}
+                  onShippingChange={handleShippingChange}
+                  // initialPrice={selectedShippingPrice}
+                />
+              </div>
             </div>
           </div>
 
@@ -232,10 +287,10 @@ const Checkout = () => {
             </h2>
             <Suspense fallback={<ComponentLoader />}>
               <Orders
-                minShippingPrice={minShippingPrice}
+                minShippingPrice={selectedShippingPrice}
                 selectItem={selectItem}
                 totalPrice={totalPrice}
-                totalAmount={totalAmount}
+                totalAmount={calculatedAmount}
                 isLoading={isLoading}
               />
             </Suspense>

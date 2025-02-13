@@ -11,7 +11,7 @@ export const isAuthenticated = catchAsync(
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new ApiError(401, "Access token missing or malformed");
+      throw new ApiError(401, "Please login to access this resource");
     }
 
     const accessToken = authHeader.split(" ")[1];
@@ -23,7 +23,7 @@ export const isAuthenticated = catchAsync(
     ) as JwtPayload;
 
     if (!decoded) {
-      throw new ApiError(401, "Invalid or expired access token. Please login.");
+      throw new ApiError(401, "Please login to access this resource.");
     }
 
     const user = await UserModel.findById(decoded._id);

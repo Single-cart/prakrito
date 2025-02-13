@@ -90,9 +90,13 @@ const productSchema: Schema<product.IProduct> = new Schema(
       type: Date,
       default: Date.now(),
     },
-    shipping: {
+    insideDhaka: {
       type: Number,
-      required: [true, "Product shipping price is required"],
+      required: [true, "Product inside dhaka shipping is required"],
+    },
+    outsideDhaka: {
+      type: Number,
+      required: [true, "Product outside dhaka shipping is required"],
     },
     images: {
       type: [String],

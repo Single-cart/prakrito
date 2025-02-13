@@ -1,5 +1,6 @@
 "use client";
 
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import { useCreateBannerMutation } from "@/redux/features/banners/bannerApi";
 import { useGetAllCategoryQuery } from "@/redux/features/category/categoryApi";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -132,8 +133,8 @@ const CreateBanners = () => {
         formData.append("category", values.category);
       }
 
-      const response = await createBanner({ data: formData }).unwrap();
-      console.log("Banner created successfully:", response);
+      await createBanner({ data: formData }).unwrap();
+      await customRevalidate("Banner");
 
       // Reset form state
       form.reset({

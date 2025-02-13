@@ -1,6 +1,7 @@
 "use client";
 
 import { env } from "@/lib/env";
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import { useUpdateBannerMutation } from "@/redux/features/banners/bannerApi";
 import { useGetAllCategoryQuery } from "@/redux/features/category/categoryApi";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,7 +25,6 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
-import { revalidateTag } from "next/cache";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -110,7 +110,7 @@ const UpdateBanner = ({ banner }: UpdateBannerProps) => {
         id: banner._id,
         body: formData,
       }).unwrap();
-      await revalidateTag("Banner");
+      await customRevalidate("Banner");
     } catch (err) {
       console.error("Failed to update banner:", err);
     }

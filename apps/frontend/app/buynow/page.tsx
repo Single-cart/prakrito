@@ -20,6 +20,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 
+import ShippingPriceSelection from "@/components/ShippingPrice";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useCreateOrderMutation,
@@ -41,12 +42,16 @@ const orderSchema = z.object({
     .regex(/^(\+88)?(01[3-9]\d{8})$/, "Invalid Phone Number"),
   address: z.string().min(1, "Enter Shipping Address"),
   orderNots: z.string().optional(),
+  shippingLocation: z.enum(["inside", "outside"], {
+    required_error: "Please select a delivery location",
+  }),
 });
 
 const ByNowCheckout = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [calculatedAmount, setCalculatedAmount] = useState(0);
+  const [selectedShippingPrice, setSelectedShippingPrice] = useState(0);
 
   const [createOrder, { isLoading, error, isError, isSuccess }] =
     useCreateOrderMutation();
@@ -56,7 +61,7 @@ const ByNowCheckout = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cartBuyNowItem = buyNowItem as any;
-
+  console.log(cartBuyNowItem);
   // const totalAmount =
   //   parseInt(buyNowItem?.price) + parseInt(buyNowItem?.shippingPrice);
   const orderItems = [
@@ -66,6 +71,8 @@ const ByNowCheckout = () => {
       quantity: cartBuyNowItem?.quantity,
       image: cartBuyNowItem?.image,
       product: cartBuyNowItem?.product,
+      colors: cartBuyNowItem?.colors,
+      size: cartBuyNowItem?.size,
     },
   ];
 
@@ -81,7 +88,7 @@ const ByNowCheckout = () => {
         paymentType: "Cash on delivery",
         orderItems,
         itemsPrice: parseInt(cartBuyNowItem?.price),
-        shippingPrice: parseInt(cartBuyNowItem?.shippingPrice),
+        shippingPrice: selectedShippingPrice,
         totalAmount: calculatedAmount,
       };
 
@@ -92,13 +99,21 @@ const ByNowCheckout = () => {
     }
   };
 
-  useEffect(() => {
-    if (cartBuyNowItem?.price && cartBuyNowItem?.shippingPrice) {
-      const amount =
-        parseInt(cartBuyNowItem.price) + parseInt(cartBuyNowItem.shippingPrice);
-      setCalculatedAmount(amount);
+  const handleShippingChange = (shippingPrice: number) => {
+    if (cartBuyNowItem?.price) {
+      const newTotal = parseInt(cartBuyNowItem.price) + shippingPrice;
+      setCalculatedAmount(newTotal);
+      setSelectedShippingPrice(shippingPrice);
     }
-  }, [cartBuyNowItem]);
+  };
+
+  // useEffect(() => {
+  //   if (cartBuyNowItem?.price && cartBuyNowItem?.shippingPrice) {
+  //     const amount =
+  //       parseInt(cartBuyNowItem.price) + parseInt(cartBuyNowItem.shippingPrice);
+  //     setCalculatedAmount(amount);
+  //   }
+  // }, [cartBuyNowItem]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -121,7 +136,14 @@ const ByNowCheckout = () => {
     form.setValue("phone", user?.phone || "");
     form.setValue("address", user?.address || "");
     form.setValue("orderNots", "");
-  }, [form, user?.address, user?.email, user?.fullName, user?.phone]);
+  }, [
+    form,
+    user?.address,
+    user?.email,
+    user?.fullName,
+    cartBuyNowItem,
+    user?.phone,
+  ]);
 
   // lg:mt-[140px] mt-[80px]
   return (
@@ -226,6 +248,15 @@ const ByNowCheckout = () => {
                   </FormItem>
                 )}
               />
+
+              <div className="">
+                <ShippingPriceSelection
+                  form={form}
+                  insideDhaka={cartBuyNowItem?.insideDhaka}
+                  outsideDhaka={cartBuyNowItem?.outsideDhaka}
+                  onShippingChange={handleShippingChange}
+                />
+              </div>
             </div>
           </div>
 
@@ -235,7 +266,7 @@ const ByNowCheckout = () => {
             </h2>
             <Suspense fallback={<ComponentLoader />}>
               <BuyNowOrder
-                minShippingPrice={cartBuyNowItem?.shippingPrice}
+                minShippingPrice={selectedShippingPrice}
                 selectItem={orderItems}
                 totalPrice={cartBuyNowItem?.price}
                 totalAmount={calculatedAmount}

@@ -30,7 +30,9 @@ const BuyNow = ({
           quantity: 1,
           image: product?.images[0],
           product: product?._id,
-          shippingPrice: product?.shipping,
+
+          insideDhaka: product?.insideDhaka,
+          outsideDhaka: product?.outsideDhaka,
           colors,
           size,
         })

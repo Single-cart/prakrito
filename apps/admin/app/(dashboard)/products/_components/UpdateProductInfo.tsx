@@ -39,6 +39,7 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import {
   useGetCartItemQuery,
   useTotalPriceQuery,
@@ -46,7 +47,6 @@ import {
 import { useGetAllCategoryQuery } from "@/redux/features/category/categoryApi";
 import { useUpdateProductMutation } from "@/redux/features/product/productApi";
 import { InfoIcon, PackageIcon, TagIcon } from "lucide-react";
-import { revalidateTag } from "next/cache";
 
 const UpdateDescForm = dynamic(() => import("../_components/UpdateDescForm"), {
   ssr: false,
@@ -65,7 +65,7 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
   >(null);
   const [images, setImages] = useState<FileList | null>(null);
   const router = useRouter();
-  console.log("product stock", product?.stock);
+  console.log("product stock", product);
   const { refetch } = useGetCartItemQuery({});
   const { refetch: totalPriceRefetch } = useTotalPriceQuery({});
   const { data } = useGetAllCategoryQuery({});
@@ -77,7 +77,10 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
       name: product?.name || "",
       price: product?.price?.toString() || "",
       discountPrice: product?.discountPrice?.toString() || "",
-      shipping: product?.shipping === 0 ? "0" : product?.shipping?.toString(),
+      insideDhaka:
+        product?.insideDhaka === 0 ? "0" : product?.insideDhaka?.toString(),
+      outsideDhaka:
+        product?.outsideDhaka === 0 ? "0" : product?.outsideDhaka?.toString(),
       stock: product?.stock === 0 ? "0" : product?.stock?.toString(),
       description: product?.description || "",
       category: product?.category?._id || "",
@@ -96,7 +99,8 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
         name: value.name,
         price: Number(value.price),
         discountPrice: value.discountPrice.toString(),
-        shipping: Number(value.shipping),
+        insideDhaka: Number(value.insideDhaka),
+        outsideDhaka: Number(value.outsideDhaka),
         stock: Number(value.stock),
         description: value.description,
         category: value.category,
@@ -142,7 +146,8 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
       }
 
       await Promise.all([
-        revalidateTag("getAllProducts"),
+        await customRevalidate("getAllProducts"),
+        await customRevalidate("singleProduct"),
         await refetch(),
         await totalPriceRefetch(),
       ]);
@@ -336,22 +341,21 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
                     )}
                   />
                 </div>
-
-                <FormField
-                  name="order"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Order</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="1,2" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    name="order"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Product Order</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="1,2" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     name="stock"
                     control={form.control}
@@ -365,13 +369,29 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
                       </FormItem>
                     )}
                   />
+                </div>
 
+                <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    name="shipping"
+                    name="insideDhaka"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Shipping Charge</FormLabel>
+                        <FormLabel>Inside Dhaka</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    name="outsideDhaka"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Outside Dhaka</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="0.00" {...field} />
                         </FormControl>

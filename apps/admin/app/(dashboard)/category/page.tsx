@@ -4,6 +4,7 @@ import { AlertPopup } from "@/components/AlertPopup";
 import CreateCategory from "@/components/category/CreateCategory";
 import CreateSubcategory from "@/components/category/CreateSubategory";
 import NavHeader from "@/components/nav-header";
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import {
   useDeleteCategoryMutation,
   useDeleteSubcategoryMutation,
@@ -33,7 +34,7 @@ const CategorySubcategory = () => {
   const [showCreateSubcategory, setShowCreateSubcategory] = useState(false);
 
   const { data, refetch } = useGetAllCategoryQuery({});
-  console.log(data);
+
   const [
     deleteCategory,
     {
@@ -60,11 +61,13 @@ const CategorySubcategory = () => {
   const handleDeleteCategory = async (id: string) => {
     await deleteCategory({ id });
     await refetch();
+    await customRevalidate("Category");
   };
 
   const handleDeletesubCategory = async (id: string) => {
     await deletesubCategory({ id });
     await refetch();
+    await customRevalidate("Category");
   };
 
   useEffect(() => {

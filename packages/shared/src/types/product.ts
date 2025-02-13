@@ -38,7 +38,8 @@ export interface ICreateProductInput {
   price: number;
   discountPrice: string;
   stock: number;
-  shipping: number;
+  insideDhaka: number;
+  outsideDhaka: number;
   order: number;
   category: Types.ObjectId;
   subcategory: Types.ObjectId;
@@ -101,7 +102,8 @@ export interface IProduct extends Document {
   sold: number;
   soldAt: Date;
   order: number;
-  shipping: number;
+  insideDhaka: number;
+  outsideDhaka: number;
   images: string[];
   numOfReviews: number;
   ratings?: number;
@@ -123,7 +125,8 @@ export interface IProductRes {
   stock: number;
   sold: number;
   soldAt: Date;
-  shipping: number;
+  insideDhaka: number;
+  outsideDhaka: number;
   images: string[];
   numOfReviews: number;
   ratings?: number;

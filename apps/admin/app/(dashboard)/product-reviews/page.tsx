@@ -46,9 +46,9 @@ import {
 import { CheckCircle2, MoreVertical, Trash2, XCircle } from "lucide-react";
 import Image from "next/image";
 
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import { getImgUrl } from "@/lib/getImgPath";
 import { reviews } from "@workspace/shared/index";
-import { revalidateTag } from "next/cache";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
@@ -69,8 +69,8 @@ const ProductReviews = () => {
       await updateReviewStatus({
         data: { productId, reviewId, approved },
       });
-      revalidateTag("getSingleProduct");
-      revalidateTag("getAllProducts");
+      await customRevalidate("getSingleProduct");
+      await customRevalidate("getAllProducts");
     } catch (err) {
       console.error("Status update failed:", err);
     }
@@ -79,8 +79,8 @@ const ProductReviews = () => {
   const handleDelete = async (reviewId: string, productId: string) => {
     try {
       await deleteReview({ reviewId, productId });
-      revalidateTag("getSingleProduct");
-      revalidateTag("getAllProducts");
+      await customRevalidate("getSingleProduct");
+      await customRevalidate("getAllProducts");
     } catch (err) {
       console.error("Delete failed:", err);
     }

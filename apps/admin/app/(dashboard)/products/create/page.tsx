@@ -18,7 +18,7 @@ import ProductFormStep from "../_components/ProductFormStep";
 import ProductInfoForm from "../_components/ProductInfoForm";
 
 import { LoadingButton } from "@/components/LoaderButton";
-import { revalidateTag } from "next/cache";
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,7 +49,8 @@ const CreateProduct = () => {
       formData.append("order", productCreateData.order);
       formData.append("discountPrice", productCreateData.discountPrice);
       formData.append("stock", productCreateData.stock);
-      formData.append("shipping", productCreateData.shipping);
+      formData.append("insideDhaka", productCreateData.insideDhaka);
+      formData.append("outsideDhaka", productCreateData.outsideDhaka);
       formData.append("description", productCreateData.description);
       formData.append("colors", JSON.stringify(productCreateData.colors));
       formData.append("size", JSON.stringify(productCreateData.size));
@@ -63,7 +64,7 @@ const CreateProduct = () => {
         data: formData,
       });
 
-      revalidateTag("getAllProducts");
+      await customRevalidate("getAllProducts");
     } catch (error) {
       // Handle errors
       console.error("Error creating product:", error);

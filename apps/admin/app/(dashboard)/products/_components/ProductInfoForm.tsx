@@ -61,7 +61,8 @@ const ProductInfoForm: FC<Props> = ({
         price: "",
         discountPrice: "",
         stock: "",
-        shipping: "",
+        insideDhaka: "",
+        outsideDhaka: "",
         colors: [],
         size: [],
         order: "0",
@@ -114,175 +115,200 @@ const ProductInfoForm: FC<Props> = ({
             )}
           />
 
-          <FormField
-            name="price"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Enter Product Price"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="discountPrice"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Discount Price</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Enter Product Discount Price"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="order"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Order</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Enter Product Order"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="stock"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Stock</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Enter Product Stock"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="shipping"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Shipping Charge</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Enter Shipping Charge"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="category"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <Select
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    const selectedCategory = categoryData?.find(
-                      (item) => item._id === value
-                    );
-                    setSubcategory(selectedCategory?.subcategory || null);
-                  }}
-                  defaultValue={field.value}
-                >
+          <div className="grid grid-cols-2 gap-5">
+            <FormField
+              name="price"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
+                    <Input
+                      type="number"
+                      placeholder="Enter Product Price"
+                      {...field}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    {data && categoryData ? (
-                      categoryData?.map((item) =>
-                        // Make sure item._id is never empty
-                        item?._id ? (
-                          <SelectItem key={item._id} value={item._id}>
-                            {item.name}
-                          </SelectItem>
-                        ) : null
-                      )
-                    ) : (
-                      // Use a non-empty placeholder value
-                      <SelectItem value="no-categories" disabled>
-                        No categories available
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            name="subcategory"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Subcategory</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+            <FormField
+              name="discountPrice"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Discount Price</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Subcategory" />
-                    </SelectTrigger>
+                    <Input
+                      type="number"
+                      placeholder="Enter Product Discount Price"
+                      {...field}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    {subcategory && subcategory.length > 0 ? (
-                      subcategory.map((item) =>
-                        item?._id ? (
-                          <SelectItem key={item._id} value={item._id}>
-                            {item.name}
-                          </SelectItem>
-                        ) : null
-                      )
-                    ) : (
-                      <SelectItem value="no-subcategories" disabled>
-                        No subcategories available
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-5">
+            <FormField
+              name="order"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Order</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter Product Order"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              name="stock"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stock</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter Product Stock"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-5">
+            <FormField
+              name="insideDhaka"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Inside Dhaka</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter Inside Dhaka Shipping Charge"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="outsideDhaka"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Outside Dhaka</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter Outside Dhaka Shipping Charge"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-5">
+            <FormField
+              name="category"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      const selectedCategory = categoryData?.find(
+                        (item) => item._id === value
+                      );
+                      setSubcategory(selectedCategory?.subcategory || null);
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {data && categoryData ? (
+                        categoryData?.map((item) =>
+                          // Make sure item._id is never empty
+                          item?._id ? (
+                            <SelectItem key={item._id} value={item._id}>
+                              {item.name}
+                            </SelectItem>
+                          ) : null
+                        )
+                      ) : (
+                        // Use a non-empty placeholder value
+                        <SelectItem value="no-categories" disabled>
+                          No categories available
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              name="subcategory"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Subcategory</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Subcategory" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {subcategory && subcategory.length > 0 ? (
+                        subcategory.map((item) =>
+                          item?._id ? (
+                            <SelectItem key={item._id} value={item._id}>
+                              {item.name}
+                            </SelectItem>
+                          ) : null
+                        )
+                      ) : (
+                        <SelectItem value="no-subcategories" disabled>
+                          No subcategories available
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <AddColorsSize form={form} />
           <div className="">

@@ -151,6 +151,7 @@ export const getCartItemService = async (sessionId?: string) => {
         "cartItem.colors": 1,
         "cartItem.size": 1,
         "cartItem._id": 1,
+
         "cartItem.product": {
           name: { $arrayElemAt: ["$product.name", 0] },
           image: {
@@ -162,7 +163,9 @@ export const getCartItemService = async (sessionId?: string) => {
           size: {
             $arrayElemAt: ["$product.size", 0],
           },
-          shipping: { $arrayElemAt: ["$product.shipping", 0] },
+          // shipping: { $arrayElemAt: ["$product.shipping", 0] },
+          insideDhaka: { $arrayElemAt: ["$product.insideDhaka", 0] },
+          outsideDhaka: { $arrayElemAt: ["$product.outsideDhaka", 0] },
           slug: { $arrayElemAt: ["$product.slug", 0] },
         },
         selectAll: "$selectAll",

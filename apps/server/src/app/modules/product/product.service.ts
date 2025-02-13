@@ -244,10 +244,31 @@ export const getAllProductsService = async (
 };
 
 // Create review service
-export const createReviewService = async (reviewData: product.IReviewInput) => {
+export const createReviewService = async (
+  reviewData: product.IReviewInput,
+  user: any
+) => {
   const product = await ProductModel.findById(reviewData.productId);
   if (!product) {
     throw new ApiError(404, "Product not found");
+  }
+
+  if (product?.reviews) {
+    const reviewValidity = product?.reviews.filter(
+      (value) => value.user.toString() === user?._id.toString()
+    );
+
+    const reviewCount = user?.reviewsInfo?.find(
+      (item: any) => item?.productId === reviewData?.productId
+    );
+
+    if (reviewCount?.reviewsCounter === undefined) {
+      throw new ApiError(400, "You have to buy this item");
+    }
+
+    if (reviewValidity.length >= reviewCount?.reviewsCounter) {
+      throw new ApiError(400, "You have to buy this item");
+    }
   }
 
   const review: product.IPorductReviews = {

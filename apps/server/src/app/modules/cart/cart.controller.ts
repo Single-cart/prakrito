@@ -152,7 +152,7 @@ export const syncCart = catchAsync(async (req, res) => {
 
   if (cartQuantity && cartItemId) {
     // Update product quantity
-    const pro = await CartModel.findOneAndUpdate(
+    await CartModel.findOneAndUpdate(
       {
         sessionId,
         "cartItem._id": cartItemId,

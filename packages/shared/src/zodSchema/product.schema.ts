@@ -28,7 +28,12 @@ export const ProductSchema = z.object({
   sold: z.string().optional(),
   soldAt: z.date().optional(),
   order: z.string().optional(),
-  shipping: z.string({ required_error: "Product shipping is required" }),
+  insideDhaka: z.string({
+    required_error: "Product inside dhaka shipping is required",
+  }),
+  outsideDhaka: z.string({
+    required_error: "Product outside dhaka shipping is required",
+  }),
   subcategory: z.string({ required_error: "subcategory required" }),
   category: z.string({ required_error: "product category is required" }),
 });
