@@ -7,7 +7,7 @@ import {
   deleteOrder,
   getAllOrders,
   getDailyOrderStats,
-  getDalySealesReport,
+  getDailySalesReport,
   getHourlyOrderDistribution,
   getOrderStatus,
   getOrderStatusDistribution,
@@ -61,7 +61,7 @@ orderRoute.get(
   "/daly-sales",
   isAuthenticated,
   authorizeUser("admin"),
-  getDalySealesReport
+  getDailySalesReport
 );
 orderRoute.get(
   "/order-status",

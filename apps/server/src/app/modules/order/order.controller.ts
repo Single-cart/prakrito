@@ -99,7 +99,7 @@ export const getSealesReport = catchAsync(
   }
 );
 
-export const getDalySealesReport = catchAsync(
+export const getDailySalesReport = catchAsync(
   async (req: Request, res: Response) => {
     const startDate = req.query.startDate
       ? new Date(req.query.startDate as string)
@@ -108,24 +108,16 @@ export const getDalySealesReport = catchAsync(
       ? new Date(req.query.endDate as string)
       : undefined;
 
-    const monthlySales = await orderAnalyticsService.getDalySealesReport(
+    const salesData = await orderAnalyticsService.getDailySalesReport(
       startDate,
       endDate
     );
 
-    const chartData = monthlySales.map((sale, index) => {
-      const date = new Date();
-      if (startDate) {
-        date.setTime(startDate.getTime());
-        date.setMonth(startDate.getMonth() + index);
-      } else {
-        date.setMonth(date.getMonth() - (11 - index));
-      }
-      date.setDate(1);
-      date.setHours(0, 0, 0, 0);
-
-      return [date.getTime(), sale.total];
-    });
+    // Transform data for ApexCharts format: [timestamp, value]
+    const chartData = salesData.map((item) => [
+      item.date.getTime(),
+      item.total,
+    ]);
 
     res.status(200).json({
       success: true,

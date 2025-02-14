@@ -368,10 +368,10 @@ export const orderAnalyticsService = {
     });
   },
 
-  async getDalySealesReport(
+  async getDailySalesReport(
     startDate?: Date,
     endDate?: Date
-  ): Promise<MonthlySales[]> {
+  ): Promise<{ date: Date; total: number }[]> {
     const currentDate = endDate || new Date();
     const defaultStartDate = new Date();
     defaultStartDate.setFullYear(currentDate.getFullYear() - 1);
@@ -401,7 +401,8 @@ export const orderAnalyticsService = {
       },
     ];
 
-    const yearlySales = await OrderModel.aggregate(pipeline).allowDiskUse(true);
+    const monthlySales =
+      await OrderModel.aggregate(pipeline).allowDiskUse(true);
 
     // Calculate number of months between dates
     const monthDiff =
@@ -409,19 +410,23 @@ export const orderAnalyticsService = {
       (currentDate.getMonth() - queryStartDate.getMonth()) +
       1;
 
+    // Format data for chart
     return Array.from({ length: monthDiff }, (_, index) => {
       const date = new Date(queryStartDate);
       date.setMonth(queryStartDate.getMonth() + index);
+      date.setDate(1); // First day of the month
+      date.setHours(0, 0, 0, 0);
+
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
 
-      const totalMonth = yearlySales.find(
+      const monthData = monthlySales.find(
         (item) => item._id.year === year && item._id.month === month
       );
 
       return {
-        name: date.toLocaleString("en-us", { month: "long" }),
-        total: totalMonth?.totalAmount || 0,
+        date,
+        total: monthData?.totalAmount || 0,
       };
     });
   },
