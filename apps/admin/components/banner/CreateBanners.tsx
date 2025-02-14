@@ -40,10 +40,24 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
 
+// Extended schema for multiple images
+const extendedBannerSchema = bannerZodSchema.bannerSchema;
+
 const CreateBanners = () => {
-  // State management
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // State management for desktop image
+  const [selectedDesktopImage, setSelectedDesktopImage] = useState<File | null>(
+    null
+  );
+  const [desktopPreviewUrl, setDesktopPreviewUrl] = useState<string | null>(
+    null
+  );
+
+  // State management for mobile image
+  const [selectedMobileImage, setSelectedMobileImage] = useState<File | null>(
+    null
+  );
+  const [mobilePreviewUrl, setMobilePreviewUrl] = useState<string | null>(null);
+
   const [formError, setFormError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -57,8 +71,8 @@ const CreateBanners = () => {
   const categories = categoryData?.data as categoryType.ICategorySubcategory[];
 
   // Form initialization with validation
-  const form = useForm<z.infer<typeof bannerZodSchema.bannerSchema>>({
-    resolver: zodResolver(bannerZodSchema.bannerSchema),
+  const form = useForm<z.infer<typeof extendedBannerSchema>>({
+    resolver: zodResolver(extendedBannerSchema),
     defaultValues: {
       bannerType: "mainBanner",
       category: "",
@@ -70,51 +84,85 @@ const CreateBanners = () => {
 
   const bannerType = form.watch("bannerType");
 
-  // Dropzone configuration
-  const { getRootProps, getInputProps, isDragAccept, isDragReject, isFocused } =
-    useDropzone({
-      accept: {
-        "image/png": [".png"],
-        "image/jpg": [".jpg", ".jpeg"],
-        "image/webp": [".webp"],
-      },
-      maxFiles: 1,
-      maxSize: 5000000,
-      onDrop: (acceptedFiles) => {
-        if (acceptedFiles?.[0]) {
-          if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-          }
-          const file = acceptedFiles[0];
-          setSelectedImage(file);
-          setPreviewUrl(URL.createObjectURL(file));
-          setFormError(null);
+  // Desktop image dropzone configuration
+  const desktopDropzone = useDropzone({
+    accept: {
+      "image/png": [".png"],
+      "image/jpg": [".jpg", ".jpeg"],
+      "image/webp": [".webp"],
+    },
+    maxFiles: 1,
+    maxSize: 5000000,
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles?.[0]) {
+        if (desktopPreviewUrl) {
+          URL.revokeObjectURL(desktopPreviewUrl);
         }
-      },
-      onDropRejected: (fileRejections) => {
-        const error = fileRejections[0]?.errors[0];
-        if (error) {
-          switch (error.code) {
-            case "file-too-large":
-              setFormError("Image must be smaller than 5MB");
-              break;
-            case "file-invalid-type":
-              setFormError("Please upload a PNG, JPG, or WEBP file");
-              break;
-            default:
-              setFormError(error.message);
-          }
+        const file = acceptedFiles[0];
+        setSelectedDesktopImage(file);
+        setDesktopPreviewUrl(URL.createObjectURL(file));
+        setFormError(null);
+      }
+    },
+    onDropRejected: (fileRejections) => {
+      const error = fileRejections[0]?.errors[0];
+      if (error) {
+        switch (error.code) {
+          case "file-too-large":
+            setFormError("Desktop image must be smaller than 5MB");
+            break;
+          case "file-invalid-type":
+            setFormError("Please upload a PNG, JPG, or WEBP file for desktop");
+            break;
+          default:
+            setFormError(error.message);
         }
-      },
-    });
+      }
+    },
+  });
+
+  // Mobile image dropzone configuration
+  const mobileDropzone = useDropzone({
+    accept: {
+      "image/png": [".png"],
+      "image/jpg": [".jpg", ".jpeg"],
+      "image/webp": [".webp"],
+    },
+    maxFiles: 1,
+    maxSize: 5000000,
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles?.[0]) {
+        if (mobilePreviewUrl) {
+          URL.revokeObjectURL(mobilePreviewUrl);
+        }
+        const file = acceptedFiles[0];
+        setSelectedMobileImage(file);
+        setMobilePreviewUrl(URL.createObjectURL(file));
+        setFormError(null);
+      }
+    },
+    onDropRejected: (fileRejections) => {
+      const error = fileRejections[0]?.errors[0];
+      if (error) {
+        switch (error.code) {
+          case "file-too-large":
+            setFormError("Mobile image must be smaller than 5MB");
+            break;
+          case "file-invalid-type":
+            setFormError("Please upload a PNG, JPG, or WEBP file for mobile");
+            break;
+          default:
+            setFormError(error.message);
+        }
+      }
+    },
+  });
 
   // Form submission handler
-  const onSubmit = async (
-    values: z.infer<typeof bannerZodSchema.bannerSchema>
-  ) => {
+  const onSubmit = async (values: z.infer<typeof extendedBannerSchema>) => {
     try {
-      if (!selectedImage) {
-        setFormError("Please select an image");
+      if (!selectedDesktopImage) {
+        setFormError("Please select a desktop image");
         return;
       }
 
@@ -124,7 +172,12 @@ const CreateBanners = () => {
       }
 
       const formData = new FormData();
-      formData.append("image", selectedImage);
+      formData.append("desktopImage", selectedDesktopImage);
+
+      if (selectedMobileImage) {
+        formData.append("mobileImage", selectedMobileImage);
+      }
+
       formData.append("bannerType", values.bannerType);
       formData.append("order", (values.order ?? "0").toString());
       formData.append("isActive", (values.isActive ?? true).toString());
@@ -133,7 +186,7 @@ const CreateBanners = () => {
         formData.append("category", values.category);
       }
 
-      await createBanner({ data: formData }).unwrap();
+      await createBanner({ data: formData });
       await customRevalidate("Banner");
 
       // Reset form state
@@ -143,8 +196,10 @@ const CreateBanners = () => {
         order: "0",
         isActive: true,
       });
-      setSelectedImage(null);
-      setPreviewUrl(null);
+      setSelectedDesktopImage(null);
+      setDesktopPreviewUrl(null);
+      setSelectedMobileImage(null);
+      setMobilePreviewUrl(null);
       setFormError(null);
     } catch (err) {
       console.error("Failed to create banner:", err);
@@ -155,11 +210,14 @@ const CreateBanners = () => {
   // Cleanup effect
   useEffect(() => {
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
+      if (desktopPreviewUrl) {
+        URL.revokeObjectURL(desktopPreviewUrl);
+      }
+      if (mobilePreviewUrl) {
+        URL.revokeObjectURL(mobilePreviewUrl);
       }
     };
-  }, [previewUrl]);
+  }, [desktopPreviewUrl, mobilePreviewUrl]);
 
   // Toast notifications
   useEffect(() => {
@@ -179,9 +237,9 @@ const CreateBanners = () => {
     }
   }, [isMounted]);
 
-  // Image preview renderer
-  const renderImagePreview = () => {
-    if (!previewUrl) {
+  // Image preview renderers
+  const renderDesktopImagePreview = () => {
+    if (!desktopPreviewUrl) {
       return (
         <div className="p-8 text-center">
           <div className="mx-auto h-12 w-12 text-gray-400">
@@ -200,7 +258,7 @@ const CreateBanners = () => {
             </svg>
           </div>
           <p className="mt-2 text-sm text-gray-600">
-            Drag and drop your banner image here, or click to select
+            Drag and drop desktop banner image here, or click to select
           </p>
           <p className="mt-1 text-xs text-gray-500">PNG, JPG, WEBP up to 5MB</p>
         </div>
@@ -209,11 +267,11 @@ const CreateBanners = () => {
 
     return (
       <div className="relative w-full h-48">
-        {previewUrl && (
+        {desktopPreviewUrl && (
           <>
             <Image
-              src={previewUrl}
-              alt="Banner preview"
+              src={desktopPreviewUrl}
+              alt="Desktop banner preview"
               fill
               className="object-cover rounded-lg"
             />
@@ -221,11 +279,68 @@ const CreateBanners = () => {
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                if (previewUrl) {
-                  URL.revokeObjectURL(previewUrl);
+                if (desktopPreviewUrl) {
+                  URL.revokeObjectURL(desktopPreviewUrl);
                 }
-                setSelectedImage(null);
-                setPreviewUrl(null);
+                setSelectedDesktopImage(null);
+                setDesktopPreviewUrl(null);
+              }}
+              className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg hover:bg-gray-100"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  const renderMobileImagePreview = () => {
+    if (!mobilePreviewUrl) {
+      return (
+        <div className="p-8 text-center">
+          <div className="mx-auto h-12 w-12 text-gray-400">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+          </div>
+          <p className="mt-2 text-sm text-gray-600">
+            Drag and drop mobile banner image here, or click to select
+          </p>
+          <p className="mt-1 text-xs text-gray-500">PNG, JPG, WEBP up to 5MB</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="relative w-full h-48">
+        {mobilePreviewUrl && (
+          <>
+            <Image
+              src={mobilePreviewUrl}
+              alt="Mobile banner preview"
+              fill
+              className="object-cover rounded-lg"
+            />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (mobilePreviewUrl) {
+                  URL.revokeObjectURL(mobilePreviewUrl);
+                }
+                setSelectedMobileImage(null);
+                setMobilePreviewUrl(null);
               }}
               className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg hover:bg-gray-100"
             >
@@ -376,21 +491,40 @@ const CreateBanners = () => {
               />
             </div>
 
-            {/* Image Upload */}
+            {/* Desktop Image Upload */}
             <div className="space-y-4">
-              <FormLabel>Banner Image</FormLabel>
+              <FormLabel>Desktop Banner Image (Required)</FormLabel>
               <div
-                {...getRootProps()}
+                {...desktopDropzone.getRootProps()}
                 className={cn(
                   "border-2 border-dashed rounded-lg transition-all",
-                  isDragAccept && "border-green-500 bg-green-50",
-                  isDragReject && "border-red-500 bg-red-50",
-                  isFocused && "border-blue-500",
+                  desktopDropzone.isDragAccept &&
+                    "border-green-500 bg-green-50",
+                  desktopDropzone.isDragReject && "border-red-500 bg-red-50",
+                  desktopDropzone.isFocused && "border-blue-500",
                   "cursor-pointer"
                 )}
               >
-                <input {...getInputProps()} />
-                {renderImagePreview()}
+                <input {...desktopDropzone.getInputProps()} />
+                {renderDesktopImagePreview()}
+              </div>
+            </div>
+
+            {/* Mobile Image Upload */}
+            <div className="space-y-4">
+              <FormLabel>Mobile Banner Image (Optional)</FormLabel>
+              <div
+                {...mobileDropzone.getRootProps()}
+                className={cn(
+                  "border-2 border-dashed rounded-lg transition-all",
+                  mobileDropzone.isDragAccept && "border-green-500 bg-green-50",
+                  mobileDropzone.isDragReject && "border-red-500 bg-red-50",
+                  mobileDropzone.isFocused && "border-blue-500",
+                  "cursor-pointer"
+                )}
+              >
+                <input {...mobileDropzone.getInputProps()} />
+                {renderMobileImagePreview()}
               </div>
             </div>
 

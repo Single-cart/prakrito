@@ -1,6 +1,6 @@
 import express from "express";
 import { authorizeUser, isAuthenticated } from "../../middlewares/authGuards";
-import { fileUploder } from "../../middlewares/uploadFile";
+import { fileUploader } from "../../middlewares/uploadFile";
 import {
   createBanner,
   deleteBanner,
@@ -16,14 +16,20 @@ bannerRoute.post(
   "/create-banner",
   isAuthenticated,
   authorizeUser("admin"),
-  fileUploder("public/uploads/banners", true, "image"),
+  fileUploader("public/uploads/banners", "fields", [
+    { name: "desktopImage", maxCount: 1 },
+    { name: "mobileImage", maxCount: 1 },
+  ]),
   createBanner
 );
 bannerRoute.put(
   "/update-banner/:id",
   isAuthenticated,
   authorizeUser("admin"),
-  fileUploder("public/uploads/banners", true, "image"),
+  fileUploader("public/uploads/banners", "fields", [
+    { name: "desktopImage", maxCount: 1 },
+    { name: "mobileImage", maxCount: 1 },
+  ]),
   updateBanner
 );
 bannerRoute.get(

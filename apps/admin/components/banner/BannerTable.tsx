@@ -39,7 +39,7 @@ const BannerTable = ({
   };
 
   const Icon = icons[type];
-
+  console.log(banners);
   return (
     <Card>
       <CardHeader>
@@ -52,7 +52,8 @@ const BannerTable = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Image</TableHead>
+              <TableHead>Desktop Banner</TableHead>
+              <TableHead>Mobile Banner</TableHead>
               {showCategory && <TableHead>Category</TableHead>}
               <TableHead>Order</TableHead>
               <TableHead>Status</TableHead>

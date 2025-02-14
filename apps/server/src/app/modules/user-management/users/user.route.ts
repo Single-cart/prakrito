@@ -4,7 +4,7 @@ import {
   authorizeUser,
   isAuthenticated,
 } from "../../../middlewares/authGuards";
-import { fileUploder } from "../../../middlewares/uploadFile";
+import { fileUploader } from "../../../middlewares/uploadFile";
 import validateRequest from "../../../middlewares/validateRequest";
 import {
   activateUser,
@@ -47,7 +47,7 @@ userRouter.put(
 userRouter.put(
   "/update-avatar",
   isAuthenticated,
-  fileUploder("public/uploads/users", true, "avatar"),
+  fileUploader("public/uploads/users", "single", "avatar"),
   updateUserAvatar
 );
 

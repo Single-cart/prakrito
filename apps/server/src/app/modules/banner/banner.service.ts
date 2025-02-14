@@ -1,30 +1,40 @@
-import { merge } from "lodash";
 import ApiError from "../../errorHandlers/ApiError";
 import { deleteImage } from "../../helpers/deleteFile";
 import { SubCategoryModel } from "../category/category.model";
 import BannerModel from "./banner.model";
 
+interface BannerImages {
+  desktopImage?: string;
+  mobileImage?: string;
+}
+
 export const createBannerService = async (
   bannerType: string,
   category: string,
-  image?: string,
+  images: BannerImages,
   isActive?: boolean,
   order?: number
 ) => {
-  if (!image) {
-    throw new ApiError(400, "Banner image is required");
+  if (!images.desktopImage && !images.mobileImage) {
+    throw new ApiError(400, "At least one banner image is required");
   }
 
   if (bannerType === "categoryBanner" && !category) {
-    if (image) {
-      await deleteImage(image);
+    if (images.desktopImage) {
+      await deleteImage(images.desktopImage);
+    }
+    if (images.mobileImage) {
+      await deleteImage(images.mobileImage);
     }
     throw new ApiError(400, "Category is required");
   }
 
   if (category && bannerType !== "categoryBanner") {
-    if (image) {
-      await deleteImage(image);
+    if (images.desktopImage) {
+      await deleteImage(images.desktopImage);
+    }
+    if (images.mobileImage) {
+      await deleteImage(images.mobileImage);
     }
     throw new ApiError(400, "Your banner type should be categoryBanner");
   }
@@ -32,14 +42,14 @@ export const createBannerService = async (
   const banner = await BannerModel.create({
     bannerType,
     category,
-    image,
+    desktopImage: images.desktopImage,
+    mobileImage: images.mobileImage,
     isActive,
     order,
   });
 
   return banner;
 };
-
 export const getAllBannersService = async (
   bannerType?: string,
   category?: string
@@ -111,8 +121,9 @@ export const deleteBannerService = async (id: string) => {
     throw new ApiError(404, "Banner not found");
   }
 
-  if (banner.image) {
-    await deleteImage(banner.image);
+  if (banner.mobileImage || banner.desktopImage) {
+    await deleteImage(banner.mobileImage);
+    await deleteImage(banner.desktopImage);
   }
 
   return banner;
@@ -122,39 +133,52 @@ export const updateBannerService = async ({
   id,
   bannerType,
   category,
-  image,
+  mobileImage,
+  desktopImage,
   isActive,
   order,
 }: {
   id: string;
-  bannerType: string;
+  bannerType?: string;
   category?: string;
-  image?: string;
+  mobileImage?: string;
+  desktopImage?: string;
   isActive?: boolean;
   order?: number;
 }) => {
-  // First, get the existing banner
   const existingBanner = await BannerModel.findById(id);
 
   if (!existingBanner) {
     throw new ApiError(404, "Banner not found");
   }
 
-  const updateData: any = {
-    bannerType,
-    category,
-    isActive,
-    order,
-  };
+  const updateData: any = {};
 
-  if (image) {
-    updateData.image = image;
-    await deleteImage(existingBanner.image);
+  if (bannerType !== undefined) updateData.bannerType = bannerType;
+  if (category !== undefined) updateData.category = category;
+  if (isActive !== undefined) updateData.isActive = isActive;
+  if (order !== undefined) updateData.order = order;
+
+  // Handle desktop image update
+  if (desktopImage) {
+    updateData.desktopImage = desktopImage;
+    // Delete previous desktop image if it exists
+    if (existingBanner.desktopImage) {
+      await deleteImage(existingBanner.desktopImage);
+    }
   }
 
-  const mergedData = merge({}, existingBanner.toObject(), updateData);
+  // Handle mobile image update
+  if (mobileImage) {
+    updateData.mobileImage = mobileImage;
+    // Delete previous mobile image if it exists
+    if (existingBanner.mobileImage) {
+      await deleteImage(existingBanner.mobileImage);
+    }
+  }
 
-  const updatedBanner = await BannerModel.findByIdAndUpdate(id, mergedData, {
+  // Apply updates
+  const updatedBanner = await BannerModel.findByIdAndUpdate(id, updateData, {
     new: true,
   });
 

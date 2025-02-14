@@ -11,7 +11,11 @@ const bannerSchema = new mongoose.Schema<banner.IBanners>({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
   },
-  image: {
+  desktopImage: {
+    type: String,
+    required: true,
+  },
+  mobileImage: {
     type: String,
     required: true,
   },

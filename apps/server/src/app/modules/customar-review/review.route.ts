@@ -1,6 +1,6 @@
 import express from "express";
 import { authorizeUser, isAuthenticated } from "../../middlewares/authGuards";
-import { fileUploder } from "../../middlewares/uploadFile";
+import { fileUploader } from "../../middlewares/uploadFile";
 import {
   createCustomerReview,
   deleteCustomerReview,
@@ -13,7 +13,7 @@ customerReviewRoute.post(
   "/create-customer-review",
   isAuthenticated,
   authorizeUser("admin"),
-  fileUploder("public/uploads/customerReview", true, "image"),
+  fileUploader("public/uploads/customerReview", "single", "image"),
   createCustomerReview
 );
 customerReviewRoute.get("/get-customer-review", getAllCustomerReview);

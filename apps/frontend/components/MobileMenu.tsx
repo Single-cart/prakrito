@@ -4,10 +4,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGetAllCategoryQuery } from "@/redux/features/category/categoryApi";
 import { categoryType } from "@workspace/shared/index";
 import { Button } from "@workspace/ui/components/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@workspace/ui/components/collapsible";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@workspace/ui/components/sheet";
 import {
@@ -17,183 +25,198 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { cn } from "@workspace/ui/lib/utils";
-import { ChevronRight, Menu, ShoppingCart } from "lucide-react";
+import {
+  ChevronDown,
+  Home,
+  Info,
+  Menu,
+  MessageCircle,
+  Phone,
+  ShoppingBag,
+  ShoppingCart,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Profile from "./Profile";
 
 const MobileMenu = () => {
-  const [hoveredCategory, setHoveredCategory] = useState<null | string>(null);
-  const { data, isLoading, error } = useGetAllCategoryQuery({});
+  const [openCategories, setOpenCategories] = useState<string[]>([]);
+  const { data, isLoading } = useGetAllCategoryQuery({});
   const { isAuthenticated } = useAuth();
 
-  const handleCategoryHover = (categoryId: string | null) => {
-    setHoveredCategory(categoryId);
+  const toggleCategory = (categoryId: string) => {
+    setOpenCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
   };
 
-  // Handle loading state
-  if (isLoading) {
-    return (
-      <div className="overflow-y-auto">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button size={"icon"} variant="outline">
-              <Menu />
-            </Button>
-          </SheetTrigger>
-        </Sheet>
-      </div>
-    );
-  }
-
-  // Handle error state
-  if (error) {
-    return (
-      <div className="overflow-y-auto">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button size={"icon"} variant="outline">
-              <Menu />
-            </Button>
-          </SheetTrigger>
-        </Sheet>
-      </div>
-    );
-  }
+  const menuItems = [
+    { icon: <Home className="h-4 w-4" />, label: "Home", href: "/" },
+    { icon: <Info className="h-4 w-4" />, label: "About Us", href: "/about" },
+    {
+      icon: <MessageCircle className="h-4 w-4" />,
+      label: "Blog",
+      href: "/blog",
+    },
+    { icon: <Phone className="h-4 w-4" />, label: "Contact", href: "/contact" },
+  ];
 
   return (
-    <div className="overflow-y-auto">
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button size={"icon"} variant="outline">
-            <Menu />
-          </Button>
-        </SheetTrigger>
-        <SheetContent className="overflow-y-auto" side={"left"}>
-          <div className="mt-4">
-            <Tabs defaultValue="category" className="">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="category">Category</TabsTrigger>
-                <TabsTrigger value="menu">Menu</TabsTrigger>
-              </TabsList>
-              <TabsContent value="category">
-                <ul className="space-y-2">
-                  {data?.category?.map(
-                    (item: categoryType.ICategorySubcategory) => (
-                      <li
-                        className={cn(
-                          hoveredCategory === item._id
-                            ? "bg-gray-200"
-                            : "bg-gray-100",
-                          "transition-all duration-500 p-2"
-                        )}
-                        key={item._id}
-                        onMouseEnter={() => handleCategoryHover(item._id)}
-                        onMouseLeave={() => handleCategoryHover(null)}
-                      >
-                        <div className="flex items-center justify-between ">
-                          <div className="font-semibold">{item.name}</div>
-                          {item?.subcategory.length > 0 && (
-                            <span>
-                              <ChevronRight
-                                className={cn(
-                                  "h-5 w-5 my-auto transition-all",
-                                  hoveredCategory === item._id
-                                    ? "rotate-90"
-                                    : ""
-                                )}
-                              />
-                            </span>
-                          )}
-                        </div>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button size="icon" variant="outline" className="hover:bg-primary/10">
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-[300px] p-0">
+        <SheetHeader className="p-4 border-b">
+          <SheetTitle>Menu</SheetTitle>
+        </SheetHeader>
 
-                        <ul
-                          className={cn(
-                            hoveredCategory === item._id ? "block" : "hidden",
-                            "mt-1 ml-1 space-y-2"
-                          )}
-                        >
-                          {item?.subcategory.length > 0 &&
-                            item.subcategory.map(
-                              (subItem: categoryType.ISubCategory) => (
-                                <li
-                                  key={subItem._id}
-                                  className="hover:underline hover:text-blue-500"
-                                >
-                                  <Link
-                                    className="block"
-                                    href={`/products?subcategory=${subItem._id}`}
-                                  >
-                                    {subItem.name}
-                                  </Link>
-                                </li>
-                              )
+        <Tabs defaultValue="category" className="h-full">
+          <TabsList className="w-full rounded-none border-b grid grid-cols-2">
+            <TabsTrigger
+              value="category"
+              className="rounded-none data-[state=active]:border-b-2"
+            >
+              Categories
+            </TabsTrigger>
+            <TabsTrigger
+              value="menu"
+              className="rounded-none data-[state=active]:border-b-2"
+            >
+              Menu
+            </TabsTrigger>
+          </TabsList>
+
+          <ScrollArea className="h-[calc(100vh-8rem)]">
+            <TabsContent value="category" className="p-4 m-0">
+              {isLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="h-12 bg-gray-100 animate-pulse rounded"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {data?.data?.map(
+                    (category: categoryType.ICategorySubcategory) => (
+                      <Collapsible
+                        key={category._id}
+                        open={openCategories.includes(category._id)}
+                        onOpenChange={() => toggleCategory(category._id)}
+                      >
+                        <CollapsibleTrigger className="w-full">
+                          <div
+                            className={cn(
+                              "flex items-center justify-between p-3 rounded-lg",
+                              "hover:bg-primary/5 transition-colors",
+                              openCategories.includes(category._id)
+                                ? "bg-primary/5"
+                                : "bg-gray-50"
                             )}
-                        </ul>
-                      </li>
+                          >
+                            <span className="font-medium">{category.name}</span>
+                            <ChevronDown
+                              className={cn(
+                                "h-4 w-4 transition-transform",
+                                openCategories.includes(category._id) &&
+                                  "rotate-180"
+                              )}
+                            />
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pl-4 py-2 space-y-1">
+                          {category.subcategory.map(
+                            (sub: categoryType.ISubCategory) => (
+                              <Link
+                                key={sub._id}
+                                href={`/products?subcategory=${sub._id}`}
+                                className="block p-2 rounded-md hover:bg-primary/5 transition-colors"
+                              >
+                                {sub.name}
+                              </Link>
+                            )
+                          )}
+                        </CollapsibleContent>
+                      </Collapsible>
                     )
                   )}
-                </ul>
-              </TabsContent>
+                </div>
+              )}
+            </TabsContent>
 
-              <TabsContent value="menu" className="space-y-4">
-                <div className="">
-                  <ul className="space-y-3">
-                    <li>
-                      <Link href={"/"}>Home</Link>
-                    </li>
-                    <li>
-                      <Link href={"/"}>About Us</Link>
-                    </li>
-                    <li>
-                      <Link href={"/"}>Blog</Link>
-                    </li>
-                    <li>
-                      <Link href={"/"}>Contact</Link>
-                    </li>
-                  </ul>
+            <TabsContent value="menu" className="m-0">
+              <div className="p-4 space-y-6">
+                {/* Navigation Links */}
+                <nav className="space-y-1">
+                  {menuItems.map((item, index) => (
+                    <Link
+                      key={index}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-3 p-3 rounded-lg",
+                        "hover:bg-primary/5 transition-colors"
+                      )}
+                    >
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </nav>
+
+                <Separator />
+
+                {/* Cart Section */}
+                <div>
+                  <Link
+                    href="/cart"
+                    className={cn(
+                      "flex items-center justify-between p-3 rounded-lg",
+                      "hover:bg-primary/5 transition-colors"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <ShoppingCart className="h-4 w-4" />
+                      <span>Shopping Cart</span>
+                    </div>
+                    <ShoppingBag className="h-4 w-4" />
+                  </Link>
                 </div>
 
                 <Separator />
 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between border pl-2 rounded-md">
-                    <h1 className="font-semibold">Cart Items</h1>
-                    <Button variant={"outline"}>
-                      <Link href={"/cart"}>
-                        <ShoppingCart />
-                      </Link>
+                {/* Auth Section */}
+                {isAuthenticated ? (
+                  <div className="flex items-center justify-between p-3 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <User className="h-4 w-4" />
+                      <span>Your Profile</span>
+                    </div>
+                    <Profile />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <Button className="w-full" asChild>
+                      <Link href="/login">Sign In</Link>
+                    </Button>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link href="/register">Create Account</Link>
                     </Button>
                   </div>
-                </div>
-
-                <Separator />
-
-                <div className="">
-                  {isAuthenticated ? (
-                    <div className="flex items-center justify-between border pl-2 rounded-md">
-                      <h1 className="font-semibold">Your Profile</h1>
-                      <Profile />
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2">
-                      {" "}
-                      <Button className="w-full">
-                        <Link href={"/login"}>Login</Link>
-                      </Button>
-                      <h1>OR</h1>
-                      <Button variant={"outline"} className="w-full">
-                        <Link href={"/register"}>Register</Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </SheetContent>
-      </Sheet>
-    </div>
+                )}
+              </div>
+            </TabsContent>
+          </ScrollArea>
+        </Tabs>
+      </SheetContent>
+    </Sheet>
   );
 };
 

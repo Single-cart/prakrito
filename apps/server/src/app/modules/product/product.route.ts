@@ -5,7 +5,7 @@ import {
 } from "@workspace/shared/zodSchema/product.schema";
 import express from "express";
 import { authorizeUser, isAuthenticated } from "../../middlewares/authGuards";
-import { fileUploder } from "../../middlewares/uploadFile";
+import { fileUploader } from "../../middlewares/uploadFile";
 import validator from "../../middlewares/validateRequest";
 import {
   createProduct,
@@ -30,14 +30,14 @@ productRoute.post(
   // validator(ProductSchema),
   isAuthenticated,
   authorizeUser("admin"),
-  fileUploder("public/uploads/products", false, "images"),
+  fileUploader("public/uploads/products", "single", "images"),
   createProduct
 );
 productRoute.put(
   "/update-product",
   isAuthenticated,
   authorizeUser("admin"),
-  fileUploder("public/uploads/products", false, "images"),
+  fileUploader("public/uploads/products", "single", "images"),
   updateProduct
 );
 

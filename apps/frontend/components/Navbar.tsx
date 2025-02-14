@@ -19,56 +19,89 @@ import Search from "./Search";
 
 const Navbar = async () => {
   const banners = await getBanners("topBanner");
+  const latestBanner = banners?.data?.[banners.data.length - 1];
 
-  const topBannerImg = banners?.banner?.[banners.banner.length - 1]?.image
+  const topBannerDesktopImg = latestBanner?.desktopImage
     ? new URL(
-        banners.banner[banners.banner.length - 1].image,
+        latestBanner.desktopImage,
+        process.env.NEXT_PUBLIC_SERVER_URL || ""
+      ).toString()
+    : null;
+
+  const topBannerMobileImg = latestBanner?.mobileImage
+    ? new URL(
+        latestBanner.mobileImage,
         process.env.NEXT_PUBLIC_SERVER_URL || ""
       ).toString()
     : null;
 
   return (
     <div className="overflow-x-hidden">
-      {/* top banner */}
-      <div className="sticky hidden lg:block xl:block 2xl:block">
-        {topBannerImg && (
-          <Image
-            className="h-[50px] object-fill"
-            src={topBannerImg}
-            alt="banner image"
-            width={1400}
-            height={100}
-          />
-        )}
-      </div>
+      {/* Top banner - Desktop */}
+      {topBannerDesktopImg && (
+        <div className="sticky hidden lg:block">
+          <div className="relative w-full h-[50px]">
+            <Image
+              src={topBannerDesktopImg}
+              alt="Top banner"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover w-full"
+              quality={90}
+            />
+          </div>
+        </div>
+      )}
 
+      {/* Top banner - Mobile */}
+      {topBannerMobileImg && (
+        <div className="sticky block lg:hidden">
+          <div className="relative w-full h-[40px]">
+            <Image
+              src={topBannerMobileImg}
+              alt="Top banner"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover w-full"
+              quality={90}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Navigation */}
       <div className="sticky hidden lg:block top-0 z-50 bg-slate-100">
-        {/* middle nav */}
         <div
           className={cn(
             styles.paddingX,
-            "flex items-center justify-center py-5 w-full"
+            "flex items-center justify-between py-5 w-full"
           )}
         >
-          <div className="">
-            <Link href={"/"}>
-              <Image
-                src={"/logo.png"}
-                alt="shop logo"
-                width={200}
-                height={120}
-              />
+          <div className="flex-shrink-0">
+            <Link href="/">
+              <div className="relative w-[200px] h-[60px]">
+                <Image
+                  src="/logo.png"
+                  alt="shop logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </Link>
           </div>
-          <Search searchRoute="/products" />
-          <div className="flex items-center justify-center gap-7">
+          <div className="flex-grow mx-8">
+            <Search searchRoute="/products" />
+          </div>
+          <div className="flex items-center gap-7">
             <Cart />
             <Profile />
           </div>
         </div>
       </div>
 
-      {/* mobile navbar */}
+      {/* Mobile Navigation */}
       <div
         className={cn(
           styles.paddingX,
@@ -77,20 +110,22 @@ const Navbar = async () => {
       >
         <div className="flex items-center justify-between">
           <MobileMenu />
-          <div className="">
-            <Link href={"/"}>
-              <Image
-                src={"/logo.png"}
-                alt="shop logo"
-                width={130}
-                height={100}
-              />
+          <div className="flex-shrink-0">
+            <Link href="/">
+              <div className="relative w-[130px] h-[40px]">
+                <Image
+                  src="/logo.png"
+                  alt="shop logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </Link>
           </div>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline">
-                <SearchIcon />
+              <Button variant="outline" size="icon">
+                <SearchIcon className="h-5 w-5" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

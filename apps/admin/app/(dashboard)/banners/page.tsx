@@ -12,20 +12,23 @@ import {
 import { ImageIcon, ImagePlus, Layout, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 
-type IBanners = {
+export type IBanner = {
   _id: string;
   bannerType: string;
   category?: {
     name: string;
+    _id: string;
   };
-  image: string;
+  desktopImage?: string;
+  mobileImage?: string;
+  image?: string; // For backward compatibility
   order: number;
   isActive: boolean;
 };
 
 const BannerPage = () => {
   const { data, isLoading } = useGetBannersQuery({});
-  const banners = (data?.data as IBanners[]) || [];
+  const banners = (data?.data as IBanner[]) || [];
 
   const mainBanners = banners.filter(
     (banner) => banner.bannerType === "mainBanner"

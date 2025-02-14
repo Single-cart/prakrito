@@ -24,10 +24,19 @@ const BannerTableRow = ({
       <TableCell>
         <div className="relative w-40 h-20 rounded-md overflow-hidden">
           <Image
-            src={getImgUrl(banner.image)}
+            src={getImgUrl(banner.desktopImage || banner.image)}
             alt={`${banner.category?.name || ""} banner`}
             fill
             className="object-cover"
+          />
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="relative w-24 h-20 rounded-md overflow-hidden">
+          <Image
+            src={getImgUrl(banner.mobileImage || banner.image)}
+            alt={`${banner.category?.name || ""} banner`}
+            fill
           />
         </div>
       </TableCell>

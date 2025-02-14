@@ -1,18 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import useEmblaCarousel from "embla-carousel-react";
+import useEmblaCarousel, {
+  type UseEmblaCarouselType,
+} from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@workspace/ui/components/button";
-import { cn } from "../lib/utils.js";
+import { cn } from "@workspace/ui/lib/utils";
+
+type CarouselApi = UseEmblaCarouselType[1];
+type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
+type CarouselOptions = UseCarouselParameters[0];
+type CarouselPlugin = UseCarouselParameters[1];
 
 type CarouselProps = {
-  opts?: any;
-  plugins?: any;
+  opts?: CarouselOptions;
+  plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
-  setApi?: (api: any) => void;
+  setApi?: (api: CarouselApi) => void;
 };
 
 type CarouselContextProps = {
@@ -62,7 +68,7 @@ const Carousel = React.forwardRef<
     const [canScrollPrev, setCanScrollPrev] = React.useState(false);
     const [canScrollNext, setCanScrollNext] = React.useState(false);
 
-    const onSelect = React.useCallback((api: any) => {
+    const onSelect = React.useCallback((api: CarouselApi) => {
       if (!api) {
         return;
       }
@@ -252,4 +258,5 @@ export {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 };

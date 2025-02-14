@@ -40,13 +40,22 @@ interface UpdateBannerProps {
     category?: string;
     order: string;
     isActive: boolean;
-    image: string;
+    mobileImage: string;
+    desktopImage: string;
   };
 }
 
 const UpdateBanner = ({ banner }: UpdateBannerProps) => {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedMobileImage, setSelectedMobileImage] = useState<File | null>(
+    null
+  );
+  const [selectedDesktopImage, setSelectedDesktopImage] = useState<File | null>(
+    null
+  );
+  const [mobilePreviewUrl, setMobilePreviewUrl] = useState<string | null>(null);
+  const [desktopPreviewUrl, setDesktopPreviewUrl] = useState<string | null>(
+    null
+  );
   const [, setSubcategory] = useState<categoryType.ISubCategory[] | null>([]);
 
   const router = useRouter();
@@ -56,25 +65,57 @@ const UpdateBanner = ({ banner }: UpdateBannerProps) => {
   const { data } = useGetAllCategoryQuery({});
   const categoryData = data?.data as categoryType.ICategorySubcategory[];
 
-  const { getRootProps, getInputProps, isDragAccept, isDragReject, isFocused } =
-    useDropzone({
-      accept: {
-        "image/png": [".png"],
-        "image/jpg": [".jpg"],
-        "image/jpeg": [".jpeg"],
-        "image/webp": [".webp"],
-      },
-      maxFiles: 1,
-      maxSize: 5000000,
-      onDrop: (acceptedFiles) => {
-        const file = acceptedFiles[0];
-        if (file) {
-          setSelectedImage(file);
-          const objectUrl = URL.createObjectURL(file);
-          setPreviewUrl(objectUrl);
-        }
-      },
-    });
+  // Mobile image dropzone
+  const {
+    getRootProps: getMobileRootProps,
+    getInputProps: getMobileInputProps,
+    isDragAccept: isMobileDragAccept,
+    isDragReject: isMobileDragReject,
+    isFocused: isMobileFocused,
+  } = useDropzone({
+    accept: {
+      "image/png": [".png"],
+      "image/jpg": [".jpg"],
+      "image/jpeg": [".jpeg"],
+      "image/webp": [".webp"],
+    },
+    maxFiles: 1,
+    maxSize: 5000000,
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        setSelectedMobileImage(file);
+        const objectUrl = URL.createObjectURL(file);
+        setMobilePreviewUrl(objectUrl);
+      }
+    },
+  });
+
+  // Desktop image dropzone
+  const {
+    getRootProps: getDesktopRootProps,
+    getInputProps: getDesktopInputProps,
+    isDragAccept: isDesktopDragAccept,
+    isDragReject: isDesktopDragReject,
+    isFocused: isDesktopFocused,
+  } = useDropzone({
+    accept: {
+      "image/png": [".png"],
+      "image/jpg": [".jpg"],
+      "image/jpeg": [".jpeg"],
+      "image/webp": [".webp"],
+    },
+    maxFiles: 1,
+    maxSize: 5000000,
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        setSelectedDesktopImage(file);
+        const objectUrl = URL.createObjectURL(file);
+        setDesktopPreviewUrl(objectUrl);
+      }
+    },
+  });
 
   const form = useForm<z.infer<typeof bannerZodSchema.bannerSchema>>({
     resolver: zodResolver(bannerZodSchema.bannerSchema),
@@ -92,14 +133,16 @@ const UpdateBanner = ({ banner }: UpdateBannerProps) => {
     try {
       const formData = new FormData();
 
-      if (selectedImage) {
-        formData.append("image", selectedImage);
+      if (selectedMobileImage) {
+        formData.append("mobileImage", selectedMobileImage);
+      }
+
+      if (selectedDesktopImage) {
+        formData.append("desktopImage", selectedDesktopImage);
       }
 
       formData.append("bannerType", value.bannerType);
-
       formData.append("order", value.order?.toString() || "0");
-
       formData.append("isActive", value.isActive ? "true" : "false");
 
       if (value.bannerType === "categoryBanner" && value.category) {
@@ -119,29 +162,37 @@ const UpdateBanner = ({ banner }: UpdateBannerProps) => {
   // Cleanup function for object URLs
   useEffect(() => {
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
+      if (mobilePreviewUrl) {
+        URL.revokeObjectURL(mobilePreviewUrl);
+      }
+      if (desktopPreviewUrl) {
+        URL.revokeObjectURL(desktopPreviewUrl);
       }
     };
-  }, [previewUrl]);
+  }, [mobilePreviewUrl, desktopPreviewUrl]);
 
   useEffect(() => {
     if (isSuccess) {
       toast.success("Banner updated successfully");
       router.push("/banners");
     } else if (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errorData = error as any;
       toast.error(errorData?.data?.message || "Failed to update banner");
     }
   }, [error, isSuccess, router]);
 
-  const getCurrentImageUrl = () => {
-    if (previewUrl) {
-      return previewUrl;
+  const getMobileImageUrl = () => {
+    if (mobilePreviewUrl) {
+      return mobilePreviewUrl;
     }
+    return `${env.NEXT_PUBLIC_SERVER_URL}/${banner.mobileImage}`;
+  };
 
-    return `${env.NEXT_PUBLIC_SERVER_URL}/${banner.image}`;
+  const getDesktopImageUrl = () => {
+    if (desktopPreviewUrl) {
+      return desktopPreviewUrl;
+    }
+    return `${env.NEXT_PUBLIC_SERVER_URL}/${banner.desktopImage}`;
   };
 
   return (
@@ -254,15 +305,15 @@ const UpdateBanner = ({ banner }: UpdateBannerProps) => {
             />
           </div>
 
-          {/* Current Image Preview */}
+          {/* Desktop Image Section */}
           <div className="space-y-4">
-            <FormLabel>Current Banner Image</FormLabel>
+            <FormLabel>Desktop Banner Image</FormLabel>
             <div className="relative h-48 w-full rounded-lg overflow-hidden bg-gray-100">
-              {banner.image && (
+              {banner.desktopImage && (
                 <div className="relative w-full h-full">
                   <Image
-                    src={getCurrentImageUrl()}
-                    alt="Current banner"
+                    src={getDesktopImageUrl()}
+                    alt="Desktop banner"
                     className="object-cover w-full h-full"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -274,29 +325,66 @@ const UpdateBanner = ({ banner }: UpdateBannerProps) => {
                 </div>
               )}
             </div>
+            <div
+              className={cn(
+                "border-2 border-dashed rounded-lg p-4",
+                isDesktopDragAccept || (isDesktopFocused && "border-blue-500"),
+                isDesktopDragReject && "border-red-500",
+                "text-center flex flex-col items-center justify-center h-44 transition-all"
+              )}
+              {...getDesktopRootProps()}
+            >
+              <input {...getDesktopInputProps()} />
+              <p className="text-sm text-gray-600">
+                Drop new desktop banner image here or click to select
+              </p>
+              {selectedDesktopImage && (
+                <p className="text-sm text-green-600 mt-2">
+                  Selected: {selectedDesktopImage.name}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Image dropzone */}
-          <div
-            className={cn(
-              "border-2 border-dashed rounded-lg p-4",
-              isDragAccept || (isFocused && "border-blue-500"),
-              isDragReject && "border-red-500",
-              "text-center flex flex-col items-center justify-center h-44 transition-all"
-            )}
-            {...getRootProps()}
-          >
-            <input {...getInputProps()} />
-            <p className="text-sm text-gray-600">
-              {isLoading
-                ? "Updating image..."
-                : "Drop new banner image here or click to select"}
-            </p>
-            {selectedImage && (
-              <p className="text-sm text-green-600 mt-2">
-                Selected: {selectedImage.name}
+          {/* Mobile Image Section */}
+          <div className="space-y-4">
+            <FormLabel>Mobile Banner Image</FormLabel>
+            <div className="relative h-48 w-full rounded-lg overflow-hidden bg-gray-100">
+              {banner.mobileImage && (
+                <div className="relative w-full h-full">
+                  <Image
+                    src={getMobileImageUrl()}
+                    alt="Mobile banner"
+                    className="object-cover w-full h-full"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                    }}
+                    width={500}
+                    height={200}
+                  />
+                </div>
+              )}
+            </div>
+            <div
+              className={cn(
+                "border-2 border-dashed rounded-lg p-4",
+                isMobileDragAccept || (isMobileFocused && "border-blue-500"),
+                isMobileDragReject && "border-red-500",
+                "text-center flex flex-col items-center justify-center h-44 transition-all"
+              )}
+              {...getMobileRootProps()}
+            >
+              <input {...getMobileInputProps()} />
+              <p className="text-sm text-gray-600">
+                Drop new mobile banner image here or click to select
               </p>
-            )}
+              {selectedMobileImage && (
+                <p className="text-sm text-green-600 mt-2">
+                  Selected: {selectedMobileImage.name}
+                </p>
+              )}
+            </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>

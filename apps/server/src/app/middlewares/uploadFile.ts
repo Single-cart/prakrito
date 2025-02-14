@@ -1,14 +1,17 @@
 import { Request } from "express";
 import multer, { FileFilterCallback } from "multer";
 
-export const fileUploder = (
-  destinations: string,
-  singleUpload: boolean,
-  fieldName: string
+type UploadType = "single" | "array" | "fields";
+
+export const fileUploader = (
+  destination: string,
+  uploadType: UploadType = "single",
+  fieldConfig: string | { name: string; maxCount: number }[] = "file",
+  maxCount: number = 5
 ) => {
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, destinations);
+      cb(null, destination);
     },
 
     filename: (req, file, cb) => {
@@ -18,7 +21,7 @@ export const fileUploder = (
     },
   });
 
-  const fileFilters = async (
+  const fileFilter = (
     req: Request,
     file: Express.Multer.File,
     cb: FileFilterCallback
@@ -31,21 +34,28 @@ export const fileUploder = (
     ) {
       cb(null, true);
     } else {
-      cb(new Error("Only .jpg, .png or .jpeg format allowed!"));
+      cb(new Error("Only .jpg, .png, .webp or .jpeg format allowed!"));
     }
   };
 
-  const upload = singleUpload
-    ? multer({
-        fileFilter: fileFilters,
-        storage: storage,
-        limits: { fileSize: 1024 * 1024 * 5 },
-      }).single(fieldName)
-    : multer({
-        fileFilter: fileFilters,
-        storage: storage,
-        limits: { fileSize: 1024 * 1024 * 40 },
-      }).array(fieldName, 5);
+  const multerInstance = multer({
+    fileFilter: fileFilter,
+    storage: storage,
+    limits: {
+      fileSize: uploadType === "single" ? 1024 * 1024 * 5 : 1024 * 1024 * 40,
+    },
+  });
 
-  return upload;
+  switch (uploadType) {
+    case "single":
+      return multerInstance.single(fieldConfig as string);
+    case "array":
+      return multerInstance.array(fieldConfig as string, maxCount);
+    case "fields":
+      return multerInstance.fields(
+        fieldConfig as { name: string; maxCount: number }[]
+      );
+    default:
+      return multerInstance.single("file");
+  }
 };

@@ -6,16 +6,23 @@ import * as bannerService from "./banner.service";
 
 export const createBanner = catchAsync(async (req: Request, res: Response) => {
   const { bannerType, category, isActive, order } = req.body;
-  const image = req.file?.path;
+
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+  const desktopImagePath = files?.desktopImage?.[0]?.path;
+  const mobileImagePath = files?.mobileImage?.[0]?.path;
 
   const result = await bannerService.createBannerService(
     bannerType,
     category,
-    image,
+    {
+      desktopImage: desktopImagePath,
+      mobileImage: mobileImagePath,
+    },
     isActive,
     Number(order)
   );
-  console.log(result);
+
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     message: "Banner created successfully",
@@ -72,15 +79,22 @@ export const getSingleBanner = catchAsync(
 export const updateBanner = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { bannerType, category, isActive, order } = req.body;
-  const image = req.file?.path;
+
+  const files = req.files as
+    | { [fieldname: string]: Express.Multer.File[] }
+    | undefined;
+
+  const desktopImagePath = files?.desktopImage?.[0]?.path;
+  const mobileImagePath = files?.mobileImage?.[0]?.path;
 
   const result = await bannerService.updateBannerService({
     id,
     bannerType,
     category,
-    image,
+    desktopImage: desktopImagePath,
+    mobileImage: mobileImagePath,
     isActive,
-    order,
+    order: order ? Number(order) : undefined,
   });
 
   sendResponse(res, {
@@ -89,7 +103,6 @@ export const updateBanner = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
 export const deleteBanner = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
