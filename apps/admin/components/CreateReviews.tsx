@@ -1,5 +1,6 @@
 "use client";
 
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import { useCreateReviewMutation } from "@/redux/features/customerReview/customerReviewApi";
 import { Card } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
