@@ -31,10 +31,12 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
-        <ReduxProvider>
-          <Providers>{children}</Providers>
-          <Toaster position="top-center" reverseOrder={false} />
-        </ReduxProvider>
+        <Providers>
+          <ReduxProvider>
+            {children}
+            <Toaster position="top-center" reverseOrder={false} />
+          </ReduxProvider>
+        </Providers>
       </body>
     </html>
   );

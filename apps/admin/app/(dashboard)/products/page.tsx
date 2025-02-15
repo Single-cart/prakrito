@@ -20,7 +20,6 @@ import {
   Filter,
   Loader2,
   Plus,
-  RefreshCcw,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -292,7 +291,7 @@ const ProductTable = () => {
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
-              <Button
+              {/* <Button
                 variant="outline"
                 size="sm"
                 onClick={async () => await refetch()}
@@ -304,7 +303,7 @@ const ProductTable = () => {
                   <RefreshCcw className="mr-2 h-4 w-4" />
                 )}
                 Refresh
-              </Button>
+              </Button> */}
               <Link href="/products/create">
                 <Button size="sm">
                   <Plus className="mr-2 h-4 w-4" />

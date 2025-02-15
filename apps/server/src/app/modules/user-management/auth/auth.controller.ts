@@ -17,6 +17,7 @@ const authOriginService = new authService.AuthOriginService();
 export const googleAuth = catchAsync(async (req: Request, res: Response) => {
   // Validate origin
   let origin = req.headers.origin;
+
   if (!origin) {
     try {
       origin = new URL(req.headers.referer || "").origin;
@@ -32,15 +33,18 @@ export const googleAuth = catchAsync(async (req: Request, res: Response) => {
   // Get OAuth data
   const { authUrl, codeVerifier, state } = authService.getGoogleOAuthData();
 
+  // Extract domain from origin for cookie settings
+  const hostname = new URL(origin).hostname;
+  const rootDomain = authOriginService.extractRootDomain(hostname);
+
   // Set cookies
   const cookieOptions: CookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 10 * 60 * 1000,
     sameSite: "lax" as const,
-    ...(process.env.NODE_ENV === "production" && {
-      domain: origin,
-    }),
+    domain:
+      process.env.NODE_ENV === "production" ? `.${rootDomain}` : undefined,
   };
 
   res.cookie("google_oauth_state", state, cookieOptions);

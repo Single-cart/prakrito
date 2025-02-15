@@ -98,6 +98,16 @@ export class AuthOriginService {
   validateOrigin(origin: string): boolean {
     return this.allowedOrigins.includes(origin);
   }
+
+  extractRootDomain = (hostname: string): string => {
+    const parts = hostname.split(".");
+
+    if (parts.length > 2) {
+      return parts.slice(-2).join(".");
+    }
+
+    return hostname;
+  };
 }
 
 // Register user
