@@ -77,16 +77,16 @@ const MobileMenu = () => {
         </SheetHeader>
 
         <Tabs defaultValue="category" className="h-full">
-          <TabsList className="w-full rounded-none border-b grid grid-cols-2">
+          <TabsList className="w-full rounded-sm border-b grid grid-cols-2">
             <TabsTrigger
               value="category"
-              className="rounded-none data-[state=active]:border-b-2"
+              className="rounded-sm data-[state=active]:border-b-2"
             >
               Categories
             </TabsTrigger>
             <TabsTrigger
               value="menu"
-              className="rounded-none data-[state=active]:border-b-2"
+              className="rounded-sm data-[state=active]:border-b-2"
             >
               Menu
             </TabsTrigger>
@@ -137,7 +137,7 @@ const MobileMenu = () => {
                             (sub: categoryType.ISubCategory) => (
                               <Link
                                 key={sub._id}
-                                href={`/products?subcategory=${sub._id}`}
+                                href={`/category/${sub._id}`}
                                 className="block p-2 rounded-md hover:bg-primary/5 transition-colors"
                               >
                                 {sub.name}

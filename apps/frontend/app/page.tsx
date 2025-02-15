@@ -15,7 +15,7 @@ export default async function Home() {
 
   return (
     <main className={cn("")}>
-      <div className="fixed top-[90%] z-40 right-5 lg:hidden">
+      <div className="fixed top-[90%] z-40 right-5 hidden lg:block">
         <Cart />
       </div>
       <div

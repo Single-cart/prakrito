@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import NavHeader from "@/components/nav-header";
 import OrderAction from "@/components/OrderAction";
 import { useGetAllOrdersQuery } from "@/redux/features/orders/orderApi";
 import { Button } from "@workspace/ui/components/button";
@@ -223,178 +224,198 @@ const OrdersTable = () => {
     setPagination({ page });
   };
 
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>All Orders</CardTitle>
-            <CardDescription>
-              Manage and track all customer orders
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isLoading || isFetching}
-            >
-              {isLoading || isFetching ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCcw className="mr-2 h-4 w-4" />
-              )}
-              Refresh
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <div className="relative w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search order ID..."
-                value={filters.search}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-8"
-              />
-            </div>
-            <Select
-              value={filters.orderStatus || "All"}
-              onValueChange={handleStatusChange}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Processing">Processing</SelectItem>
-                <SelectItem value="Shipped">Shipped</SelectItem>
-                <SelectItem value="Delivered">Delivered</SelectItem>
-                <SelectItem value="Cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                Columns
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+  const bread = [
+    {
+      href: "/",
+      text: "Dashboard",
+      last: false,
+    },
+    {
+      href: "/order",
+      text: "Orders",
+      last: true,
+    },
+  ];
 
-        {isLoading ? (
-          <div className="h-[400px] flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin" />
+  return (
+    <div className="">
+      <NavHeader bread={bread} />
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>All Orders</CardTitle>
+              <CardDescription>
+                Manage and track all customer orders
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isLoading || isFetching}
+              >
+                {isLoading || isFetching ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCcw className="mr-2 h-4 w-4" />
+                )}
+                Refresh
+              </Button>
+            </div>
           </div>
-        ) : (
-          <>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        className="hover:bg-gray-50 transition-all duration-300"
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-2">
+              <div className="relative w-64">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search order ID..."
+                  value={filters.search}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+              <Select
+                value={filters.orderStatus || "All"}
+                onValueChange={handleStatusChange}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Processing">Processing</SelectItem>
+                  <SelectItem value="Shipped">Shipped</SelectItem>
+                  <SelectItem value="Delivered">Delivered</SelectItem>
+                  <SelectItem value="Cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Columns
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
                       >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {isLoading ? (
+            <div className="h-[400px] flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <TableRow key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                          <TableHead key={header.id}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
                         ))}
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
-                      >
-                        No orders found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                    ))}
+                  </TableHeader>
+                  <TableBody>
+                    {table.getRowModel().rows?.length ? (
+                      table.getRowModel().rows.map((row) => (
+                        <TableRow
+                          key={row.id}
+                          className="hover:bg-gray-50 transition-all duration-300"
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={columns.length}
+                          className="h-24 text-center"
+                        >
+                          No orders found.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
 
-            <div className="flex items-center justify-between space-x-2 py-4">
-              <div className="flex-1 text-sm text-muted-foreground">
-                Showing {data?.orders?.length || 0} of{" "}
-                {data?.pagination?.numOfOrders || 0} orders
+              <div className="flex items-center justify-between space-x-2 py-4">
+                <div className="flex-1 text-sm text-muted-foreground">
+                  Showing {data?.orders?.length || 0} of{" "}
+                  {data?.pagination?.numOfOrders || 0} orders
+                </div>
+                <div className="space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handlePageChange(
+                        (parseInt(pagination.page) - 1).toString()
+                      )
+                    }
+                    disabled={pagination.page === "1" || isLoading}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handlePageChange(
+                        (parseInt(pagination.page) + 1).toString()
+                      )
+                    }
+                    disabled={!data?.pagination?.nextPage || isLoading}
+                  >
+                    Next
+                  </Button>
+                </div>
               </div>
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    handlePageChange((parseInt(pagination.page) - 1).toString())
-                  }
-                  disabled={pagination.page === "1" || isLoading}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    handlePageChange((parseInt(pagination.page) + 1).toString())
-                  }
-                  disabled={!data?.pagination?.nextPage || isLoading}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

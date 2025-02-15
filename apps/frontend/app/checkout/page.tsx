@@ -20,6 +20,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 
+import { customEvent } from "@/components/gtm/customEvent";
 import ShippingPriceSelection from "@/components/ShippingPrice";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -127,6 +128,20 @@ const Checkout = () => {
     };
 
     await createOrder(data);
+
+    customEvent({
+      event: "purchase",
+      ecommerce: {
+        currencyCode: "BDT",
+        value: calculatedAmount,
+        items: orderItems.map((item: any) => ({
+          item_name: item.productName,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+      },
+    });
+
     await orderStatusRefetch();
     await refetch();
   };

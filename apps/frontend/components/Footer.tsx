@@ -123,7 +123,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="font-semibold text-sm flex items-center justify-between bg-[#275b5f] px-10 py-3 text-white">
+      <div className="font-semibold text-sm flex items-center justify-between bg-[#275b5f] px-10 py-3 text-white mb-16 lg:mb-0">
         <span>&copy; 2024 fablurabd</span>
         <span>
           develop by{" "}

@@ -1,8 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
+import BottomNavbar from "@/components/BottomNavbar";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Providers } from "@/components/providers";
+import { allkeywords, descriptionShop } from "@/lib/contstens";
 import ReduxProvider from "@/providers/ReduxProvider";
 import "@workspace/ui/globals.css";
 import { Metadata } from "next";
@@ -20,7 +22,8 @@ const fontMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Fablura",
-  description: "Fablura is a platform for buying and selling products",
+  description: descriptionShop,
+  keywords: allkeywords,
 };
 
 export default function RootLayout({
@@ -37,6 +40,7 @@ export default function RootLayout({
           <Providers>
             <Navbar />
             {children}
+            <BottomNavbar />
             <div className={"pt-20"}>
               <Footer />
             </div>

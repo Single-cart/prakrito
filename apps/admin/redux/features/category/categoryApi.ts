@@ -9,7 +9,7 @@ export const categoryApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
-
+      providesTags: ["Category"],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         const result = await queryFulfilled;
         dispatch(allCategory(result.data?.data));
@@ -23,6 +23,7 @@ export const categoryApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Category"],
     }),
 
     createSubcategory: build.mutation({
@@ -32,6 +33,7 @@ export const categoryApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Category"],
     }),
 
     deleteCategory: build.mutation({
@@ -40,6 +42,7 @@ export const categoryApi = apiSlice.injectEndpoints({
         method: "DELETE",
         credentials: "include",
       }),
+      invalidatesTags: ["Category"],
     }),
 
     deleteSubcategory: build.mutation({
@@ -48,6 +51,7 @@ export const categoryApi = apiSlice.injectEndpoints({
         method: "DELETE",
         credentials: "include",
       }),
+      invalidatesTags: ["Category"],
     }),
   }),
 });
