@@ -14,6 +14,7 @@ interface QueryProps {
 export const mixProduct = async () => {
   const res = await fetch(`${env.NEXT_PUBLIC_API_URL}/product/all-products`, {
     next: { tags: ["getAllProducts"] },
+    cache: "force-cache",
   });
   const data = await res.json();
 
@@ -23,6 +24,7 @@ export const mixProduct = async () => {
 export const resentSold = async () => {
   const res = await fetch(`${env.NEXT_PUBLIC_API_URL}/product/sold-product`, {
     next: { tags: ["getAllProducts"] },
+    cache: "force-cache",
   });
   const data = await res.json();
 

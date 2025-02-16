@@ -4,11 +4,11 @@ import { FC, useEffect } from "react";
 import toast from "react-hot-toast";
 
 import { AlertPopup } from "@/components/AlertPopup";
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import { useDeleteProductMutation } from "@/redux/features/product/productApi";
 import type { product } from "@workspace/shared/index";
 import { Button } from "@workspace/ui/components/button";
 import { FilePenLine, Trash } from "lucide-react";
-import { revalidateTag } from "next/cache";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -27,7 +27,7 @@ const ProductAction: FC<Props> = ({ product }) => {
 
     try {
       await deleteProduct({ productId });
-      revalidateTag("getAllProducts");
+      await customRevalidate("getAllProducts");
       router.refresh();
     } catch (err) {
       console.error("Failed to delete product:", err);

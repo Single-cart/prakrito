@@ -147,7 +147,6 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
 
       await Promise.all([
         await customRevalidate("getAllProducts"),
-        await customRevalidate("singleProduct"),
         await refetch(),
         await totalPriceRefetch(),
       ]);
