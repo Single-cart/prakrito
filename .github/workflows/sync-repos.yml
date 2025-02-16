@@ -1,0 +1,75 @@
+name: Sync Multiple Repositories
+on:
+  push:
+    branches:
+      - sync # Triggers when changes are pushed to sync branch
+
+jobs:
+  sync-repositories:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'Md Taifur'
+          git config --global user.email 'taifurislamashraf@gmail.com'
+
+      - name: Sync to target repositories
+        env:
+          SOURCE_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # List of target repositories to sync with
+          TARGET_REPOS=(
+            "Single-cart/inbej"
+          )
+
+          # Initialize counters for summary
+          SUCCESS_COUNT=0
+          FAILED_COUNT=0
+
+          for REPO in "${TARGET_REPOS[@]}"; do
+            echo "📦 Starting sync to $REPO"
+            
+            # Clone target repository
+            if git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git" "target_repo_${REPO//\//_}" 2>/dev/null; then
+              cd "target_repo_${REPO//\//_}"
+              
+              # Create or switch to sync branch
+              if git checkout sync 2>/dev/null || git checkout -b sync; then
+                # Pull changes from source repository's sync branch
+                git remote add source "https://github.com/${SOURCE_REPO}.git"
+                
+                if git fetch source sync && git merge source/sync -m "Sync: Merging updates from source repository" && git push origin sync; then
+                  echo "✅ Successfully synced with $REPO"
+                  ((SUCCESS_COUNT++))
+                else
+                  echo "❌ Failed to sync changes with $REPO"
+                  ((FAILED_COUNT++))
+                fi
+              else
+                echo "❌ Failed to create/switch to sync branch in $REPO"
+                ((FAILED_COUNT++))
+              fi
+              
+              cd ..
+              rm -rf "target_repo_${REPO//\//_}"
+            else
+              echo "❌ Failed to clone $REPO"
+              ((FAILED_COUNT++))
+            fi
+          done
+
+          # Print summary
+          echo "📊 Sync Summary:"
+          echo "✅ Successful syncs: $SUCCESS_COUNT"
+          echo "❌ Failed syncs: $FAILED_COUNT"
+
+          # Exit with error if any sync failed
+          if [ $FAILED_COUNT -gt 0 ]; then
+            exit 1
+          fi
