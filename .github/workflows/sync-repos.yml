@@ -1,4 +1,5 @@
 name: Sync Multiple Repositories
+
 on:
   push:
     branches:
@@ -13,6 +14,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT_TOKEN }}
+          persist-credentials: true
 
       - name: Configure Git
         run: |
@@ -21,7 +23,7 @@ jobs:
 
       - name: Sync to target repositories
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           # List of target repositories to sync with
           TARGET_REPOS=(
@@ -32,7 +34,7 @@ jobs:
             echo "📦 Starting sync to $REPO"
             
             # Use the PAT token in the clone URL
-            CLONE_URL="https://$GITHUB_TOKEN@github.com/Single-cart/${REPO}.git"
+            CLONE_URL="https://$GH_TOKEN@github.com/Single-cart/${REPO}.git"
             
             if git clone "$CLONE_URL" "target_repo_${REPO}" 2>/dev/null; then
               cd "target_repo_${REPO}"
@@ -40,7 +42,7 @@ jobs:
               # Create or switch to sync branch
               if git checkout sync 2>/dev/null || git checkout -b sync; then
                 # Add source remote using PAT
-                SOURCE_URL="https://$GITHUB_TOKEN@github.com/Single-cart/${GITHUB_REPOSITORY#*/}.git"
+                SOURCE_URL="https://$GH_TOKEN@github.com/Single-cart/${GITHUB_REPOSITORY#*/}.git"
                 git remote add source "$SOURCE_URL"
                 
                 if git fetch source sync && git merge source/sync -m "Sync: Merging updates from source repository" && git push origin sync; then
