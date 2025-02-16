@@ -1,9 +1,9 @@
 "use client";
 
+import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import { useDeleteReviewMutation } from "@/redux/features/customerReview/customerReviewApi";
 import { Button } from "@workspace/ui/components/button";
 import { Trash2 } from "lucide-react";
-import { revalidateTag } from "next/cache";
 import { FC, useEffect } from "react";
 import toast from "react-hot-toast";
 import { AlertPopup } from "./AlertPopup";
@@ -17,7 +17,7 @@ const ReviewDeleteBtn: FC<Props> = ({ id }) => {
 
   const handleCustomerReviewDelete = async (reviewId: string) => {
     await deleteReview(reviewId);
-    revalidateTag("customerReview");
+    await customRevalidate("customerReview");
   };
 
   useEffect(() => {
