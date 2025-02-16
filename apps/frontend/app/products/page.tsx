@@ -58,7 +58,7 @@ const Products = async (props: Props) => {
 
             {/* mobile filters */}
             <div className="lg:hidden block">
-              <MobileFilter subcategory={data?.allSubcategory} />
+              <MobileFilter subcategory={data?.data?.allSubcategory} />
             </div>
           </div>
           {data?.data ? (
@@ -76,7 +76,7 @@ const Products = async (props: Props) => {
       </div>
 
       {/* paginations  */}
-      {data?.pagination?.numberOfProducts > 10 && (
+      {data?.data?.pagination?.numberOfProducts > 10 && (
         <Paginations
           type="user"
           pagination={data?.data?.pagination}
