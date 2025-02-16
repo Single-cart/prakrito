@@ -22,7 +22,7 @@ const MixProdcts = async () => {
         ))}
       </div>
 
-      {data?.pagination?.numberOfProducts > 10 && (
+      {data?.data?.pagination?.numberOfProducts > 10 && (
         <div className="flex justify-center mt-10">
           {" "}
           {/* Center the button */}
