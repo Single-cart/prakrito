@@ -30,14 +30,14 @@ productRoute.post(
   // validator(ProductSchema),
   isAuthenticated,
   authorizeUser("admin"),
-  fileUploader("public/uploads/products", "single", "images"),
+  fileUploader("public/uploads/products", "array", "images"),
   createProduct
 );
 productRoute.put(
   "/update-product",
   isAuthenticated,
   authorizeUser("admin"),
-  fileUploader("public/uploads/products", "single", "images"),
+  fileUploader("public/uploads/products", "array", "images"),
   updateProduct
 );
 

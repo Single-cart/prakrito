@@ -37,6 +37,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { LoadingButton } from "./LoaderButton";
+import { customEvent } from "./gtm/customEvent";
 
 export function CartDialog({
   product,
@@ -68,6 +69,16 @@ export function CartDialog({
         size: value?.size,
         colors: value?.colors,
       });
+
+      customEvent({
+        event: "add_to_cart",
+        ecommerce: {
+          currencyCode: "BDT",
+          value: product?.discountPrice,
+          product: product,
+        },
+      });
+
       await refetch();
       await totalPriceRefetch();
     } else {

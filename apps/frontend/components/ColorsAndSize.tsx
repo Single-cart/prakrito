@@ -50,7 +50,7 @@ const ColorsAndSize = ({ product }: { product: product.IProductRes }) => {
           <h1 className="pb-2 text-sm font-semibold font-sans">
             Select Size :{" "}
           </h1>
-          <div className="flex items-center gap-2 md:gap-3 mb-5">
+          <div className="flex items-center flex-wrap gap-2 md:gap-3 mb-5">
             {availableSize &&
               availableSize?.map((size, index: number) => (
                 <Button

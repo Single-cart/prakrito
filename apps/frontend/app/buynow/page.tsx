@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +22,7 @@ import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { customEvent } from "@/components/gtm/customEvent";
+import PageViewTracker from "@/components/gtm/PageViewTracker";
 import ShippingPriceSelection from "@/components/ShippingPrice";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -60,7 +62,6 @@ const ByNowCheckout = () => {
   const { user } = useAuth();
   const { buyNowItem } = useSelector((state: RootState) => state.cart);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cartBuyNowItem = buyNowItem as any;
   console.log(cartBuyNowItem);
   // const totalAmount =
@@ -162,136 +163,146 @@ const ByNowCheckout = () => {
 
   // lg:mt-[140px] mt-[80px]
   return (
-    <div
-      className={cn(
-        styles.paddingX,
-        styles.paddingY,
-        " max-w-[1200px] w-full mx-auto"
-      )}
-    >
-      <div className="">
-        <h1 className={cn("text-3xl font-semibold")}>Checkout</h1>
-        <Separator />
-      </div>
+    <Suspense fallback={<ComponentLoader />}>
+      <PageViewTracker
+        event="initiate_checkout"
+        pageData={{
+          title: "Buy Now Checkout",
+          type: "checkout",
+        }}
+        productData={orderItems}
+      />
+      <div
+        className={cn(
+          styles.paddingX,
+          styles.paddingY,
+          " max-w-[1200px] w-full mx-auto"
+        )}
+      >
+        <div className="">
+          <h1 className={cn("text-3xl font-semibold")}>Checkout</h1>
+          <Separator />
+        </div>
 
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="flex flex-col lg:flex-row gap-10 mt-10"
-        >
-          <div className="flex-1 bg-primary-foreground p-4">
-            <h2 className="mb-6 text-lg font-[500] text-secondary-foreground flex items-center gap-2">
-              <Receipt size={20} /> Billing Details{" "}
-            </h2>
-            <div className="space-y-4">
-              <FormField
-                name="fullName"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Label className="text-primary">Full Name</Label>
-                    <FormControl>
-                      <Input
-                        // disabled={isLoading}
-                        placeholder="Enter Your Name"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Label className="text-primary">Email (Optional)</Label>
-                    <FormControl>
-                      <Input
-                        // disabled={isLoading}
-                        placeholder="Enter Your Email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="phone"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Label className="text-primary">Phone Number</Label>
-                    <FormControl>
-                      <Input
-                        // disabled={isLoading}
-                        placeholder="Enter Your Phone Number"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="address"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Label className="text-primary">Address</Label>
-                    <FormControl>
-                      <Input
-                        // disabled={isLoading}
-                        placeholder="Enter Your Full Address"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="orderNots"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Label>Order Nots (Optional)</Label>
-                    <Input placeholder="Enter Your Order Nots" {...field} />
-                  </FormItem>
-                )}
-              />
-
-              <div className="">
-                <ShippingPriceSelection
-                  form={form}
-                  insideDhaka={cartBuyNowItem?.insideDhaka}
-                  outsideDhaka={cartBuyNowItem?.outsideDhaka}
-                  onShippingChange={handleShippingChange}
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="flex flex-col lg:flex-row gap-10 mt-10"
+          >
+            <div className="flex-1 bg-primary-foreground p-4">
+              <h2 className="mb-6 text-lg font-[500] text-secondary-foreground flex items-center gap-2">
+                <Receipt size={20} /> Billing Details{" "}
+              </h2>
+              <div className="space-y-4">
+                <FormField
+                  name="fullName"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label className="text-primary">Full Name</Label>
+                      <FormControl>
+                        <Input
+                          // disabled={isLoading}
+                          placeholder="Enter Your Name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
+                <FormField
+                  name="email"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label className="text-primary">Email (Optional)</Label>
+                      <FormControl>
+                        <Input
+                          // disabled={isLoading}
+                          placeholder="Enter Your Email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="phone"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label className="text-primary">Phone Number</Label>
+                      <FormControl>
+                        <Input
+                          // disabled={isLoading}
+                          placeholder="Enter Your Phone Number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="address"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label className="text-primary">Address</Label>
+                      <FormControl>
+                        <Input
+                          // disabled={isLoading}
+                          placeholder="Enter Your Full Address"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="orderNots"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label>Order Nots (Optional)</Label>
+                      <Input placeholder="Enter Your Order Nots" {...field} />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="">
+                  <ShippingPriceSelection
+                    form={form}
+                    insideDhaka={cartBuyNowItem?.insideDhaka}
+                    outsideDhaka={cartBuyNowItem?.outsideDhaka}
+                    onShippingChange={handleShippingChange}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex-1 bg-primary-foreground p-4">
-            <h2 className="mb-6 text-lg font-[500] text-secondary-foreground flex items-center gap-2">
-              <ListOrdered size={20} /> Your Order{" "}
-            </h2>
-            <Suspense fallback={<ComponentLoader />}>
-              <BuyNowOrder
-                minShippingPrice={selectedShippingPrice}
-                selectItem={orderItems}
-                totalPrice={cartBuyNowItem?.price}
-                totalAmount={calculatedAmount}
-                isLoading={isLoading}
-              />
-            </Suspense>
-          </div>
-        </form>
-      </Form>
-    </div>
+            <div className="flex-1 bg-primary-foreground p-4">
+              <h2 className="mb-6 text-lg font-[500] text-secondary-foreground flex items-center gap-2">
+                <ListOrdered size={20} /> Your Order{" "}
+              </h2>
+              <Suspense fallback={<ComponentLoader />}>
+                <BuyNowOrder
+                  minShippingPrice={selectedShippingPrice}
+                  selectItem={orderItems}
+                  totalPrice={cartBuyNowItem?.price}
+                  totalAmount={calculatedAmount}
+                  isLoading={isLoading}
+                />
+              </Suspense>
+            </div>
+          </form>
+        </Form>
+      </div>
+    </Suspense>
   );
 };
 

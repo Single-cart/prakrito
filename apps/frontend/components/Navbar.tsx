@@ -81,7 +81,7 @@ const Navbar = async () => {
         >
           <div className="flex-shrink-0">
             <Link href="/">
-              <div className="relative w-[200px] h-[60px]">
+              <div className="relative w-[150px] h-[40px]">
                 <Image
                   src="/logo.png"
                   alt="shop logo"

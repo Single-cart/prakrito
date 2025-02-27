@@ -2,7 +2,6 @@ import { styles } from "@/app/styles";
 import Cart from "@/components/Cart";
 import ColorsAndSize from "@/components/ColorsAndSize";
 import ProductDesc from "@/components/ProductDesc";
-
 import ProductCarousel from "@/components/ProductSlider";
 import Ratings from "@/components/Ratings";
 import RelatedProduct from "@/components/RelatedProduct";
@@ -20,14 +19,28 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-const page: FC<Props> = async ({ params }) => {
+const Page: FC<Props> = async ({ params }) => {
   const { slug } = await params;
   const product = await singleProduct(slug);
   const productInfo = product?.data?.product;
 
-  // lg:mt-[140px] mt-[70px]
   return (
     <div className={cn(styles.paddingX, "")}>
+      {/* <ClientAnalytics
+        event="product_view"
+        pageData={{
+          title: productInfo?.name,
+          type: "product",
+        }}
+        productData={{
+          name: productInfo?.name,
+          id: productInfo?._id,
+          price: productInfo?.discountPrice,
+          brand: productInfo?.description?.brand,
+          category: productInfo?.subcategory?.name,
+          variant: productInfo?.description?.colors,
+        }}
+      /> */}
       <div className="fixed top-[90%] z-40 right-5 lg:hidden">
         <Cart />
       </div>
@@ -41,12 +54,13 @@ const page: FC<Props> = async ({ params }) => {
               {productInfo?.name}
             </h1>
             <div className="">
+              {/* Use a key to ensure consistent rendering */}
               <Ratings
-                numOfRating={Math.ceil(productInfo?.ratings)}
+                numOfRating={Math.ceil(productInfo?.ratings) || 0}
                 size="20px"
                 space="2px"
               />
-              <span> | {productInfo?.numOfReviews} Reviews</span>
+              <span> | {productInfo?.numOfReviews || 0} Reviews</span>
             </div>
             <h1 className="text-xl font-semibold space-x-2">
               <span className="line-through">TK. {productInfo?.price}</span>
@@ -124,4 +138,4 @@ const page: FC<Props> = async ({ params }) => {
   );
 };
 
-export default page;
+export default Page;

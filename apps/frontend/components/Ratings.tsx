@@ -28,6 +28,7 @@ const Ratings = ({
       starSpacing={space}
       numberOfStars={5}
       name={`rating-${stableId}`}
+      gradientPathName="star-rating"
     />
   );
 };
