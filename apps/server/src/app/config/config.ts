@@ -10,7 +10,7 @@ const config = {
     env: env.NODE_ENV || "development",
   },
   database: {
-    mongoUri: env.MONGODB_URI || "mongodb://localhost:27017/your_database",
+    mongoUri: env.DB_URL || "mongodb://localhost:27017/your_database",
   },
   domains: {
     origin: env.ALLOWED_ORIGINS?.split(",") || [

@@ -54,11 +54,9 @@ export function LoginForm({ className }: { className?: string }) {
   };
 
   useEffect(() => {
-    if (isSuccess && data?.user?.role === "admin") {
+    if (isSuccess) {
       toast.success("Login successful");
       router.replace("/");
-    } else if (data?.user?.role === "user") {
-      toast.error("Unauthorized Access");
     } else if (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errorData = error as any;
@@ -133,6 +131,14 @@ export function LoginForm({ className }: { className?: string }) {
               <SubmitButton isLoading={isLoading} />
             </form>
           </Form>
+
+          <div className="text-center text-sm text-muted-foreground mt-4">
+            Don&apos;t have an account?{" "}
+            <a href="/register" className="underline">
+              Sign up
+            </a>{" "}
+            now
+          </div>
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
