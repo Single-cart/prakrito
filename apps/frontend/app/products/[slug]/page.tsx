@@ -1,14 +1,14 @@
 import { styles } from "@/app/styles";
 import Cart from "@/components/Cart";
 import ColorsAndSize from "@/components/ColorsAndSize";
+import PageViewTracker from "@/components/gtm/PageViewTracker";
 import ProductDesc from "@/components/ProductDesc";
 import ProductCarousel from "@/components/ProductSlider";
 import Ratings from "@/components/Ratings";
 import RelatedProduct from "@/components/RelatedProduct";
 import Reviews from "@/components/Reviews";
-import { Separator } from "@workspace/ui/components/separator";
-
 import { singleProduct } from "@/lib/fetch/getProduct";
+import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 import { RefreshCcw, X } from "lucide-react";
 import Image from "next/image";
@@ -26,7 +26,7 @@ const Page: FC<Props> = async ({ params }) => {
 
   return (
     <div className={cn(styles.paddingX, "")}>
-      {/* <ClientAnalytics
+      <PageViewTracker
         event="product_view"
         pageData={{
           title: productInfo?.name,
@@ -40,7 +40,7 @@ const Page: FC<Props> = async ({ params }) => {
           category: productInfo?.subcategory?.name,
           variant: productInfo?.description?.colors,
         }}
-      /> */}
+      />
       <div className="fixed top-[90%] z-40 right-5 lg:hidden">
         <Cart />
       </div>

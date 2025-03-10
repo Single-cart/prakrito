@@ -2,9 +2,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import BottomNavbar from "@/components/BottomNavbar";
 import Footer from "@/components/Footer";
+import GoogleTagManager from "@/components/gtm/GoogleTagManager";
+import GoogleTagManagerNoScript from "@/components/gtm/GoogleTagManagerNoScript";
 import Navbar from "@/components/Navbar";
 import { Providers } from "@/components/providers";
 import { allkeywords, descriptionShop } from "@/lib/contstens";
+import { initDataLayer } from "@/lib/gtm";
 import ReduxProvider from "@/providers/ReduxProvider";
 import "@workspace/ui/globals.css";
 import { Metadata } from "next";
@@ -31,11 +34,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Initialize dataLayer as early as possible
+  if (typeof window !== "undefined") {
+    initDataLayer();
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <GoogleTagManager />
+      </head>
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
+        <GoogleTagManagerNoScript />
         <ReduxProvider>
           <Providers>
             <Navbar />

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { pushToDataLayer } from "@/lib/gtm";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
@@ -45,7 +46,7 @@ const PageViewTracker: React.FC<PageViewTrackerProps> = ({
       };
     }
 
-    window.dataLayer.push(trackingData);
+    pushToDataLayer(trackingData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
