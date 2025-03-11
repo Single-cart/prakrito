@@ -1,5 +1,6 @@
 export * as banner from "../src/types/banner";
 export * as categoryType from "../src/types/category";
+export * as landing from "../src/types/landing";
 export * as order from "../src/types/order";
 export * as product from "../src/types/product";
 export * as reviews from "../src/types/reviews";
