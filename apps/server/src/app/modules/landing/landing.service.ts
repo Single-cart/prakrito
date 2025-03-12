@@ -40,6 +40,7 @@ export const getSingleLandingService = async (
   id: string
 ): Promise<landing.ILanding | null> => {
   const result = await LandingModel.findById(id).populate("product");
+
   return result;
 };
 

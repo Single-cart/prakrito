@@ -192,7 +192,7 @@ const Landing = () => {
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
-              <Link href="/landings/create">
+              <Link href="/landing/create">
                 <Button size="sm">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Landing Page

@@ -42,8 +42,6 @@ const CartPage = () => {
     (state: RootState) => state.cart
   );
 
-  console.log(allCartProducts);
-
   const totalPriceData = totalPrice as any;
 
   const router = useRouter();

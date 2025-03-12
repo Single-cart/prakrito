@@ -1,5 +1,6 @@
 "use client";
 
+import { env } from "@/lib/env";
 import {
   Edit,
   ExternalLink,
@@ -87,13 +88,18 @@ const LandingAction = ({ landing }: { landing: any }) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() => window.open(`/landing/${landing._id}`, "_blank")}
+            onClick={() =>
+              window.open(
+                `${env.NEXT_PUBLIC_CLIENT_URL}/landing/${landing._id}`,
+                "_blank"
+              )
+            }
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             View Landing Page
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => router.push(`/landings/edit/${landing._id}`)}
+            onClick={() => router.push(`/landing/edit/${landing._id}`)}
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit

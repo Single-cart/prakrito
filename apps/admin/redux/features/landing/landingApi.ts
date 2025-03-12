@@ -4,7 +4,7 @@ export const landingApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     getLandings: build.query({
       query: () => ({
-        url: `/landings`,
+        url: `/landing`,
         method: "GET",
         credentials: "include",
       }),
@@ -13,7 +13,7 @@ export const landingApi = apiSlice.injectEndpoints({
 
     getLandingById: build.query({
       query: (id) => ({
-        url: `/landings/${id}`,
+        url: `/landing/${id}`,
         method: "GET",
         credentials: "include",
       }),
@@ -22,7 +22,7 @@ export const landingApi = apiSlice.injectEndpoints({
 
     createLanding: build.mutation({
       query: (data) => ({
-        url: "/landings",
+        url: "/landing",
         method: "POST",
         body: data,
         credentials: "include",
@@ -32,7 +32,7 @@ export const landingApi = apiSlice.injectEndpoints({
 
     updateLanding: build.mutation({
       query: ({ id, body }) => ({
-        url: `/landings/${id}`,
+        url: `/landing/${id}`,
         method: "PATCH",
         body,
         credentials: "include",
@@ -45,7 +45,7 @@ export const landingApi = apiSlice.injectEndpoints({
 
     deleteLanding: build.mutation({
       query: (id) => ({
-        url: `/landings/${id}`,
+        url: `/landing/${id}`,
         method: "DELETE",
         credentials: "include",
       }),

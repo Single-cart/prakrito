@@ -14,6 +14,7 @@ const config = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         mono: ["var(--font-mono)", ...fontFamily.mono],
+        bengali: ["Hind Siliguri", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
