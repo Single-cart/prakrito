@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   FormControl,
@@ -12,6 +13,9 @@ import {
 } from "@workspace/ui/components/radio-group";
 import { useEffect } from "react";
 
+// Define a type for the location values
+type LocationType = "inside" | "outside";
+
 const ShippingPriceSelection = ({
   form,
   onShippingChange,
@@ -23,13 +27,26 @@ const ShippingPriceSelection = ({
   insideDhaka: number;
   outsideDhaka: number;
 }) => {
-  // Initialize shipping price on component mount
+  // Explicitly type the defaultLocation
+  const defaultLocation = "outside" as LocationType;
+
+  // Initialize shipping price and form value on component mount
   useEffect(() => {
-    // Set initial shipping price to outside Dhaka
-    handleShippingChange("outside");
+    // Set initial value in the form
+    form.setValue("shippingLocation", defaultLocation, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+
+    // Set initial shipping price based on default location
+    onShippingChange(outsideDhaka);
   }, []);
 
   const handleShippingChange = (value: string) => {
+    // Type guard to ensure value is treated as LocationType
+    if (value !== "inside" && value !== "outside") return;
+
     const shippingPrice = value === "inside" ? insideDhaka : outsideDhaka;
     onShippingChange(shippingPrice);
   };
@@ -38,6 +55,7 @@ const ShippingPriceSelection = ({
     <FormField
       control={form.control}
       name="shippingLocation"
+      defaultValue={defaultLocation}
       render={({ field }) => (
         <FormItem className="space-y-3">
           <Label>Delivery Location</Label>
@@ -47,7 +65,8 @@ const ShippingPriceSelection = ({
                 field.onChange(value);
                 handleShippingChange(value);
               }}
-              defaultValue={field.value || "outside"}
+              value={field.value}
+              defaultValue={defaultLocation}
               className="flex flex-col space-y-1"
             >
               <div className="flex items-center space-x-3">
