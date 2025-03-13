@@ -46,10 +46,36 @@ jobs:
                 SOURCE_URL="https://$GH_TOKEN@github.com/Single-cart/${GITHUB_REPOSITORY#*/}.git"
                 git remote add source "$SOURCE_URL"
                 
-                if git fetch source sync && git merge source/sync -m "Sync: Merging updates from source repository" && git push origin sync; then
-                  echo "✅ Successfully synced with $REPO"
+                # Try to merge, but if there's a conflict, handle it with strategy
+                if git fetch source sync; then
+                  # Option 1: Try merge with ours strategy (prefer target repo's changes)
+                  if git merge -X ours source/sync -m "Sync: Merging updates from source repository (keeping our changes for conflicts)"; then
+                    echo "✅ Successfully merged with strategy 'ours' for $REPO"
+                  # Option 2: If that fails, try getting list of conflicted files and resolving manually
+                  else
+                    echo "⚠️ Merge conflicts detected, attempting to resolve..."
+                    
+                    # Abort the failed merge
+                    git merge --abort
+                    
+                    # Try theirs strategy instead (prefer source repo's changes)
+                    if git merge -X theirs source/sync -m "Sync: Merging updates from source repository (using source changes for conflicts)"; then
+                      echo "✅ Successfully merged with strategy 'theirs' for $REPO"
+                    else
+                      echo "❌ Unable to automatically resolve conflicts in $REPO"
+                      exit 1
+                    fi
+                  fi
+                  
+                  # Push the changes
+                  if git push origin sync; then
+                    echo "✅ Successfully pushed changes to $REPO"
+                  else
+                    echo "❌ Failed to push changes to $REPO"
+                    exit 1
+                  fi
                 else
-                  echo "❌ Failed to sync changes with $REPO"
+                  echo "❌ Failed to fetch from source for $REPO"
                   exit 1
                 fi
               else
