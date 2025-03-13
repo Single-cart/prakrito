@@ -27,7 +27,8 @@ jobs:
         run: |
           # List of target repositories to sync with
           TARGET_REPOS=(
-            "inbej"  # Since we're in the Single-cart org, we just need the repo name
+            "inbej"
+            "fablura"
           )
 
           for REPO in "${TARGET_REPOS[@]}"; do
