@@ -19,7 +19,7 @@ pnpm dlx shadcn@latest add button -c apps/web
 ok
 This will place the ui components in the `packages/ui/src/components` directory.
 
-## Tailwind
+## Tailwind v4
 
 Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
 
