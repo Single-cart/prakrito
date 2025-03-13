@@ -131,15 +131,17 @@ export const orderService = {
         })
       );
 
-      // Update user review counter
-      await Promise.all(
-        order.orderItems.map(async (value) => {
-          await updateReviewInfo(
-            value?.product.toString(),
-            order?.user?.toString()!
-          );
-        })
-      );
+      // Update user review counter only if user exists
+      if (order?.user) {
+        await Promise.all(
+          order.orderItems.map(async (value) => {
+            await updateReviewInfo(
+              value?.product.toString(),
+              order?.user?.toString()!
+            );
+          })
+        );
+      }
 
       // Update deliveredAt
       order.deliveredAt = new Date();
@@ -209,6 +211,11 @@ export const updateProductStockSold = async (
 };
 
 export const updateReviewInfo = async (productId: string, userId: string) => {
+  // Skip if userId is empty or undefined
+  if (!userId) {
+    return;
+  }
+
   const user = await UserModel.findById(userId);
   if (!user) {
     return;
