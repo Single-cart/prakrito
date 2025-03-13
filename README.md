@@ -16,7 +16,8 @@ To add components to your app, run the following command at the root of your `we
 pnpm dlx shadcn@latest add button -c apps/web
 ```
 
-This will place the ui components in the `packages/ui/src/components` directorys.
+ok
+This will place the ui components in the `packages/ui/src/components` directory.
 
 ## Tailwind
 
