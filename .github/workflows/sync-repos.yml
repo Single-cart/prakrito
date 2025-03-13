@@ -1,4 +1,4 @@
-name: Sync Multiple Repositories
+name: Repository Sync
 
 on:
   push:
@@ -7,6 +7,8 @@ on:
 
 jobs:
   sync-repositories:
+    # Only run on the singlecart-core repository
+    if: ${{ github.repository == 'Single-cart/singlecart-core' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source repository
@@ -31,10 +33,6 @@ jobs:
             "fablura"
           )
 
-          # Get the current repository name
-          CURRENT_REPO=${GITHUB_REPOSITORY#*/}
-          echo "Current repository: $CURRENT_REPO"
-
           for REPO in "${TARGET_REPOS[@]}"; do
             echo "📦 Starting sync to $REPO"
             
@@ -47,62 +45,69 @@ jobs:
               # Create or switch to sync branch
               if git checkout sync 2>/dev/null || git checkout -b sync; then
                 # Add source remote using PAT
-                SOURCE_URL="https://$GH_TOKEN@github.com/Single-cart/${CURRENT_REPO}.git"
-                git remote add source "$SOURCE_URL"
+                SOURCE_URL="https://$GH_TOKEN@github.com/Single-cart/singlecart-core.git"
+                git remote add source "$SOURCE_URL" || git remote set-url source "$SOURCE_URL"
                 
                 # Fetch from source
                 if git fetch source sync; then
-                  echo "Attempting merge with --allow-unrelated-histories..."
+                  # Find the common ancestor (if any)
+                  COMMON_ANCESTOR=$(git merge-base HEAD source/sync 2>/dev/null || echo "")
                   
-                  # Try merge with allow-unrelated-histories
-                  if git merge --allow-unrelated-histories source/sync -m "Sync: Merging updates from source repository"; then
-                    echo "✅ Successfully merged from source for $REPO"
-                  else
-                    echo "⚠️ Merge conflicts detected, attempting to resolve with -X theirs strategy..."
-                    # Clean up failed merge
-                    git merge --abort || true
+                  if [ -n "$COMMON_ANCESTOR" ]; then
+                    echo "Common ancestor found. Getting changed files only..."
                     
-                    # Try again with theirs strategy and allow-unrelated-histories
-                    if git merge --allow-unrelated-histories -X theirs source/sync -m "Sync: Merging updates from source (using source changes for conflicts)"; then
-                      echo "✅ Successfully merged using 'theirs' strategy for $REPO"
+                    # Get list of files changed in source since common ancestor
+                    CHANGED_FILES=$(git diff --name-only $COMMON_ANCESTOR source/sync)
+                    
+                    # If there are changed files, checkout only those files
+                    if [ -n "$CHANGED_FILES" ]; then
+                      echo "Changes detected. Checking out modified files..."
+                      echo "$CHANGED_FILES" | while read FILE; do
+                        if [ -n "$FILE" ]; then
+                          echo "Updating: $FILE"
+                          git checkout source/sync -- "$FILE" || echo "Failed to checkout $FILE"
+                        fi
+                      done
+                      
+                      # Commit and push changes
+                      if [ -n "$(git status --porcelain)" ]; then
+                        git add .
+                        git commit -m "Sync: Updated changed files from singlecart-core"
+                        git push origin sync
+                        echo "✅ Successfully pushed changes to $REPO"
+                      else
+                        echo "No changes to commit for $REPO"
+                      fi
                     else
-                      echo "❌ Failed to automatically resolve conflicts in $REPO"
-                      git merge --abort || true
-                      cd ..
-                      rm -rf "target_repo_${REPO}"
-                      # Continue to next repo instead of exiting
-                      continue
+                      echo "No changes detected since last sync"
                     fi
-                  fi
-                  
-                  # Push the changes
-                  if git push origin sync; then
-                    echo "✅ Successfully pushed changes to $REPO"
                   else
-                    echo "❌ Failed to push changes to $REPO"
-                    # Continue to next repo instead of exiting
-                    cd ..
-                    rm -rf "target_repo_${REPO}"
-                    continue
+                    echo "No common history found. Performing initial full sync..."
+                    
+                    # For initial sync, checkout all files from source
+                    git checkout source/sync -- .
+                    
+                    # Commit and push changes
+                    if [ -n "$(git status --porcelain)" ]; then
+                      git add .
+                      git commit -m "Sync: Initial full sync from singlecart-core"
+                      git push origin sync
+                      echo "✅ Successfully pushed initial sync to $REPO"
+                    else
+                      echo "No changes to commit for $REPO"
+                    fi
                   fi
                 else
                   echo "❌ Failed to fetch from source for $REPO"
-                  cd ..
-                  rm -rf "target_repo_${REPO}"
-                  continue
                 fi
               else
                 echo "❌ Failed to create/switch to sync branch in $REPO"
-                cd ..
-                rm -rf "target_repo_${REPO}"
-                continue
               fi
               
               cd ..
               rm -rf "target_repo_${REPO}"
             else
               echo "❌ Failed to clone $REPO"
-              continue
             fi
           done
 
