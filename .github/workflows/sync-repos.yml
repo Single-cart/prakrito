@@ -31,6 +31,10 @@ jobs:
             "fablura"
           )
 
+          # Get the current repository name
+          CURRENT_REPO=${GITHUB_REPOSITORY#*/}
+          echo "Current repository: $CURRENT_REPO"
+
           for REPO in "${TARGET_REPOS[@]}"; do
             echo "📦 Starting sync to $REPO"
             
@@ -43,27 +47,31 @@ jobs:
               # Create or switch to sync branch
               if git checkout sync 2>/dev/null || git checkout -b sync; then
                 # Add source remote using PAT
-                SOURCE_URL="https://$GH_TOKEN@github.com/Single-cart/${GITHUB_REPOSITORY#*/}.git"
+                SOURCE_URL="https://$GH_TOKEN@github.com/Single-cart/${CURRENT_REPO}.git"
                 git remote add source "$SOURCE_URL"
                 
-                # Try to merge, but if there's a conflict, handle it with strategy
+                # Fetch from source
                 if git fetch source sync; then
-                  # Option 1: Try merge with ours strategy (prefer target repo's changes)
-                  if git merge -X ours source/sync -m "Sync: Merging updates from source repository (keeping our changes for conflicts)"; then
-                    echo "✅ Successfully merged with strategy 'ours' for $REPO"
-                  # Option 2: If that fails, try getting list of conflicted files and resolving manually
+                  echo "Attempting merge with --allow-unrelated-histories..."
+                  
+                  # Try merge with allow-unrelated-histories
+                  if git merge --allow-unrelated-histories source/sync -m "Sync: Merging updates from source repository"; then
+                    echo "✅ Successfully merged from source for $REPO"
                   else
-                    echo "⚠️ Merge conflicts detected, attempting to resolve..."
+                    echo "⚠️ Merge conflicts detected, attempting to resolve with -X theirs strategy..."
+                    # Clean up failed merge
+                    git merge --abort || true
                     
-                    # Abort the failed merge
-                    git merge --abort
-                    
-                    # Try theirs strategy instead (prefer source repo's changes)
-                    if git merge -X theirs source/sync -m "Sync: Merging updates from source repository (using source changes for conflicts)"; then
-                      echo "✅ Successfully merged with strategy 'theirs' for $REPO"
+                    # Try again with theirs strategy and allow-unrelated-histories
+                    if git merge --allow-unrelated-histories -X theirs source/sync -m "Sync: Merging updates from source (using source changes for conflicts)"; then
+                      echo "✅ Successfully merged using 'theirs' strategy for $REPO"
                     else
-                      echo "❌ Unable to automatically resolve conflicts in $REPO"
-                      exit 1
+                      echo "❌ Failed to automatically resolve conflicts in $REPO"
+                      git merge --abort || true
+                      cd ..
+                      rm -rf "target_repo_${REPO}"
+                      # Continue to next repo instead of exiting
+                      continue
                     fi
                   fi
                   
@@ -72,21 +80,30 @@ jobs:
                     echo "✅ Successfully pushed changes to $REPO"
                   else
                     echo "❌ Failed to push changes to $REPO"
-                    exit 1
+                    # Continue to next repo instead of exiting
+                    cd ..
+                    rm -rf "target_repo_${REPO}"
+                    continue
                   fi
                 else
                   echo "❌ Failed to fetch from source for $REPO"
-                  exit 1
+                  cd ..
+                  rm -rf "target_repo_${REPO}"
+                  continue
                 fi
               else
                 echo "❌ Failed to create/switch to sync branch in $REPO"
-                exit 1
+                cd ..
+                rm -rf "target_repo_${REPO}"
+                continue
               fi
               
               cd ..
               rm -rf "target_repo_${REPO}"
             else
               echo "❌ Failed to clone $REPO"
-              exit 1
+              continue
             fi
           done
+
+          echo "💯 Sync process completed!"
