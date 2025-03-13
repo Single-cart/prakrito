@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   PackageSearch,
+  PanelsTopLeft,
   ShoppingCart,
   Users,
 } from "lucide-react";
@@ -74,6 +75,11 @@ const data = {
       title: "Category",
       url: "/category",
       icon: FolderTree,
+    },
+    {
+      title: "Landing Page",
+      url: "/landing",
+      icon: PanelsTopLeft,
     },
     {
       title: "Users",
