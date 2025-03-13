@@ -221,7 +221,12 @@ const OrdersTable = () => {
   };
 
   const handlePageChange = (page: string) => {
-    setPagination({ page });
+    const pageNum = parseInt(page);
+    if (isNaN(pageNum) || pageNum < 1) {
+      setPagination({ page: "1" });
+    } else {
+      setPagination({ page: pageNum.toString() });
+    }
   };
 
   const bread = [
@@ -388,24 +393,32 @@ const OrdersTable = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      handlePageChange(
-                        (parseInt(pagination.page) - 1).toString()
-                      )
+                    onClick={() => {
+                      const prevPage = Math.max(
+                        parseInt(pagination.page) - 1,
+                        1
+                      );
+                      handlePageChange(prevPage.toString());
+                    }}
+                    disabled={
+                      pagination.page === "1" || isLoading || isFetching
                     }
-                    disabled={pagination.page === "1" || isLoading}
                   >
                     Previous
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      handlePageChange(
-                        (parseInt(pagination.page) + 1).toString()
-                      )
+                    onClick={() => {
+                      if (data?.pagination?.nextPage) {
+                        handlePageChange(
+                          (parseInt(pagination.page) + 1).toString()
+                        );
+                      }
+                    }}
+                    disabled={
+                      !data?.pagination?.hasNextPage || isLoading || isFetching
                     }
-                    disabled={!data?.pagination?.nextPage || isLoading}
                   >
                     Next
                   </Button>
