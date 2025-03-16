@@ -53,6 +53,7 @@ const formSchema = z.object({
   phone: z.string().min(10, {
     message: "Phone number must be at least 10 characters.",
   }),
+  youtubeLink: z.string().optional(),
   order: z.coerce.number().int().nonnegative(),
   isActive: z.boolean().default(true),
 });
@@ -82,6 +83,7 @@ export default function CreateLanding() {
       product: undefined,
       name: "",
       phone: "",
+      youtubeLink: "",
       order: 0,
       isActive: true,
     },
@@ -132,6 +134,25 @@ export default function CreateLanding() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Name */}
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter landing page name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Name for landing page</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {/* Heading */}
                 <FormField
                   control={form.control}
@@ -147,24 +168,6 @@ export default function CreateLanding() {
                       </FormControl>
                       <FormDescription>
                         The main heading for your landing page
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Order */}
-                <FormField
-                  control={form.control}
-                  name="order"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Display Order</FormLabel>
-                      <FormControl>
-                        <Input type="number" min="0" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Order in which this landing page appears (0 = first)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -300,18 +303,18 @@ export default function CreateLanding() {
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Name */}
+                {/* Order */}
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="order"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact Name</FormLabel>
+                      <FormLabel>Display Order</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter contact name" {...field} />
+                        <Input type="number" min="0" {...field} />
                       </FormControl>
                       <FormDescription>
-                        Name for contact information
+                        Order in which this landing page appears (0 = first)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -336,6 +339,28 @@ export default function CreateLanding() {
                   )}
                 />
               </div>
+
+              {/* YouTube Link */}
+              <FormField
+                control={form.control}
+                name="youtubeLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>YouTube Link (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        placeholder="Enter YouTube video URL"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Add a YouTube video to your landing page
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Active Status */}
               <FormField

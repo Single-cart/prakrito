@@ -7,4 +7,5 @@ export interface ILanding extends Document {
   product: mongoose.Schema.Types.ObjectId;
   order: number;
   isActive: boolean;
+  youtubeLink: string;
 }

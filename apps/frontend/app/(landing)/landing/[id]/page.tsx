@@ -15,6 +15,39 @@ type Props = {
 
 const Page: FC<Props> = async ({ params }) => {
   const { id } = await params;
+
+  // Helper function to extract YouTube video ID from various URL formats
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (!url) return "";
+
+    // Remove any @ symbol that might be at the beginning
+    const cleanUrl = url.startsWith("@") ? url.substring(1) : url;
+
+    // Extract video ID
+    let videoId = "";
+
+    // Handle youtu.be format
+    if (cleanUrl.includes("youtu.be/")) {
+      videoId = cleanUrl.split("youtu.be/")[1] ?? "";
+    }
+    // Handle youtube.com/watch format
+    else if (cleanUrl.includes("youtube.com/watch")) {
+      const urlParams = new URLSearchParams(cleanUrl.split("?")[1] ?? "");
+      videoId = urlParams.get("v") || "";
+    }
+    // Handle youtube.com/embed format
+    else if (cleanUrl.includes("youtube.com/embed/")) {
+      videoId = cleanUrl.split("youtube.com/embed/")[1] ?? "";
+    }
+
+    // Remove any additional parameters
+    if (videoId && videoId.includes("?")) {
+      videoId = videoId.split("?")[0] ?? "";
+    }
+
+    return `https://www.youtube.com/embed/${videoId}`;
+  };
+
   const landing = await getSingleLanding(id);
   const landingData = landing?.data;
   const productData = landingData?.product;
@@ -53,8 +86,8 @@ const Page: FC<Props> = async ({ params }) => {
           >
             <Button
               size="lg"
-              variant="secondary"
-              className="text-base sm:text-lg py-5 font-bengali"
+              variant="default"
+              className="text-base sm:text-lg py-5 font-bengali bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary shadow-lg hover:shadow-xl transition-all"
             >
               <ShoppingBag className="mr-2 h-4 w-4 sm:h-5 sm:w-5" /> অর্ডার করতে
               চাই
@@ -153,19 +186,20 @@ const Page: FC<Props> = async ({ params }) => {
                 href={`https://wa.me/${landingData.phone?.replace(/\D/g, "")}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="flex-1"
               >
                 <Button
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-white flex-1 text-base sm:text-lg py-5 font-bengali"
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-500 text-white text-base sm:text-lg py-5 font-bengali shadow-lg hover:shadow-xl transition-all"
                 >
                   হোয়াটসঅ্যাপ
                 </Button>
               </Link>
-              <Link href={"#order"}>
+              <Link href={"#order"} className="flex-1">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="flex-1 text-base sm:text-lg border-primary text-primary hover:bg-primary/10 py-5 font-bengali"
+                  className="w-full text-base sm:text-lg border-primary text-primary hover:bg-primary/10 py-5 font-bengali border-2 hover:border-blue-600 hover:text-blue-600 shadow-lg hover:shadow-xl transition-all"
                 >
                   অর্ডার করুন
                 </Button>
@@ -174,6 +208,29 @@ const Page: FC<Props> = async ({ params }) => {
           </div>
         </div>
       </div>
+
+      {/* YouTube Video Section */}
+      {landingData?.youtubeLink && (
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
+            <div className="p-4 sm:p-6">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center font-bengali bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
+                ভিডিও দেখুন
+              </h2>
+              <div className="aspect-video w-full relative rounded-lg overflow-hidden border-4 border-primary/20">
+                <iframe
+                  src={getYouTubeEmbedUrl(landingData.youtubeLink)}
+                  title="Product Video"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute top-0 left-0 w-full h-full"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Product Description Section */}
       {productData?.description && (
@@ -215,7 +272,7 @@ const Page: FC<Props> = async ({ params }) => {
       )}
 
       {/* Call to Action Section */}
-      <div className="bg-primary text-white py-10 sm:py-16">
+      <div className="bg-gradient-to-r from-primary to-blue-600 text-white py-10 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 font-bengali">
             এখনই অর্ডার করুন!
@@ -228,10 +285,7 @@ const Page: FC<Props> = async ({ params }) => {
             <Button
               size="lg"
               variant="secondary"
-              className="text-base sm:text-lg py-5"
-              // onClick={() =>
-              //   (window.location.href = `tel:${landingData.phone}`)
-              // }
+              className="text-base sm:text-lg py-5 bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all"
             >
               <Phone className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />{" "}
               {landingData.phone}
@@ -240,10 +294,7 @@ const Page: FC<Props> = async ({ params }) => {
               <Button
                 size="lg"
                 variant="secondary"
-                className="text-base sm:text-lg py-5 font-bengali"
-                // onClick={() =>
-                //   (window.location.href = `tel:${landingData.phone}`)
-                // }
+                className="text-base sm:text-lg py-5 font-bengali bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all"
               >
                 <ShoppingBag className="mr-2 h-4 w-4 sm:h-5 sm:w-5" /> অর্ডার
                 করতে চাই
@@ -253,7 +304,7 @@ const Page: FC<Props> = async ({ params }) => {
         </div>
       </div>
 
-      <div className="" id="#order">
+      <div className="" id="order">
         <LandingCheckout product={productData} />
       </div>
 

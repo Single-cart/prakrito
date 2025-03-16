@@ -7,16 +7,24 @@ import * as landingService from "./landing.service";
 
 // Create landing page
 export const createLanding = catchAsync(async (req: Request, res: Response) => {
-  const { heading, product, name, phone, order, isActive } = req.body;
+  const { heading, product, name, phone, order, isActive, youtubeLink } =
+    req.body;
 
   const landingData: Pick<
     landing.ILanding,
-    "heading" | "product" | "name" | "phone" | "order" | "isActive"
+    | "heading"
+    | "product"
+    | "name"
+    | "phone"
+    | "order"
+    | "isActive"
+    | "youtubeLink"
   > = {
     heading,
     product,
     name,
     phone,
+    youtubeLink,
     order: order ? Number(order) : 0,
     isActive: isActive !== undefined ? Boolean(isActive) : true,
   };

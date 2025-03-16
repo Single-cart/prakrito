@@ -43,6 +43,7 @@ const formSchema = z.object({
   phone: z.string().min(10, {
     message: "Phone number must be at least 10 characters.",
   }),
+  youtubeLink: z.string().optional(),
   order: z.coerce.number().int().nonnegative(),
   isActive: z.boolean().default(true),
 });
@@ -50,14 +51,14 @@ const formSchema = z.object({
 export default function EditLanding() {
   const router = useRouter();
   const params = useParams();
-  // Convert params.id to string if it's not already
+
   const landingId =
     typeof params.id === "string"
       ? params.id
       : Array.isArray(params.id)
         ? params.id[0]
         : "";
-  const [formKey, setFormKey] = useState(0); // Add a key to force re-render when needed
+  const [formKey, setFormKey] = useState(0);
 
   const {
     data: landingData,
@@ -75,25 +76,26 @@ export default function EditLanding() {
       heading: "",
       name: "",
       phone: "",
+      youtubeLink: "",
       order: 0,
       isActive: true,
     },
   });
 
-  // Update form when data is fetched
   useEffect(() => {
     if (landingData?.data) {
       form.reset({
         heading: landingData.data.heading || "",
         name: landingData.data.name || "",
         phone: landingData.data.phone || "",
+        youtubeLink: landingData.data.youtubeLink || "",
         order: landingData.data.order || 0,
         isActive:
           landingData.data.isActive !== undefined
             ? landingData.data.isActive
             : true,
       });
-      // Force re-render after form reset
+
       setFormKey((prev) => prev + 1);
     }
   }, [landingData, form]);
@@ -228,6 +230,28 @@ export default function EditLanding() {
                   )}
                 />
               </div>
+
+              {/* YouTube Link */}
+              <FormField
+                control={form.control}
+                name="youtubeLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>YouTube Link (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        placeholder="Enter YouTube video URL"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Add a YouTube video to your landing page
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Active Status */}
               <FormField

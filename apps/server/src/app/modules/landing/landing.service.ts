@@ -7,7 +7,13 @@ import LandingModel from "./landing.model";
 export const createLandingService = async (
   landingData: Pick<
     landing.ILanding,
-    "heading" | "product" | "name" | "phone" | "order" | "isActive"
+    | "heading"
+    | "product"
+    | "name"
+    | "phone"
+    | "order"
+    | "isActive"
+    | "youtubeLink"
   >
 ): Promise<landing.ILanding> => {
   const nameExists = await LandingModel.findOne({ name: landingData.name });

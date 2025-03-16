@@ -22,6 +22,10 @@ const landingSchema = new mongoose.Schema<landing.ILanding>({
     type: Number,
     default: 0,
   },
+  youtubeLink: {
+    type: String,
+    default: "",
+  },
   isActive: {
     type: Boolean,
     default: true,
