@@ -61,16 +61,20 @@ const formSchema = z.object({
 export default function CreateLanding() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Get products for the dropdown
-  const { data: productsData, isLoading: productsLoading } =
-    useGetAllProductsQuery(
-      {},
-      {
-        refetchOnFocus: false,
-        refetchOnReconnect: false,
-      }
-    );
+  const {
+    data: productsData,
+    isLoading: productsLoading,
+    refetch,
+  } = useGetAllProductsQuery(
+    { search: searchTerm },
+    {
+      refetchOnFocus: false,
+      refetchOnReconnect: false,
+    }
+  );
   console.log("productsData", productsData);
   // Create landing mutation
   const [createLanding, { isLoading }] = useCreateLandingMutation();
@@ -237,9 +241,16 @@ export default function CreateLanding() {
                             <Input
                               placeholder="Search products..."
                               className="mb-2"
-                              //   onChange={(e) => {
-                              //     // You can implement search functionality here if needed
-                              //   }}
+                              value={searchTerm}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setSearchTerm(value);
+                                // Only trigger search when at least 2 characters are entered
+                                // or when the search field is cleared
+                                if (value.length >= 2 || value.length === 0) {
+                                  refetch();
+                                }
+                              }}
                             />
                           </div>
 

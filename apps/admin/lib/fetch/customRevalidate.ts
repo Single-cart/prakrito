@@ -5,7 +5,7 @@ import { env } from "../env";
 
 export const customRevalidate = async (tag: string) => {
   try {
-    revalidateTag(tag);
+    await revalidateTag(tag);
     await fetch(`${env.NEXT_PUBLIC_CLIENT_URL}/api/revalidate`, {
       method: "POST",
       body: JSON.stringify({ tag }),
