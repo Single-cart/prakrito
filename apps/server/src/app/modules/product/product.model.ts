@@ -48,33 +48,26 @@ const productSchema: Schema<product.IProduct> = new Schema(
       trim: true,
     },
 
-    price: {
-      type: Number,
-    },
-    discountPrice: {
-      type: String,
-      default: 0,
-      required: [true, "Product descountPrice price is required"],
-    },
-
     description: {
       type: String,
       required: [true, "Product description is required"],
     },
 
-    colors: {
+    priceVariation: {
       type: [
         {
-          name: { type: String },
-          stock: { type: Boolean },
-        },
-      ],
-    },
-    size: {
-      type: [
-        {
-          name: { type: String },
-          available: { type: Boolean },
+          price: {
+            type: String,
+            required: [true, "Product price is required"],
+          },
+          quantity: {
+            type: String,
+            required: [true, "Product quantity is required"],
+          },
+          available: {
+            type: Boolean,
+            required: [true, "Product available is required"],
+          },
         },
       ],
     },

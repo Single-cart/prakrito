@@ -2,28 +2,18 @@ import { z } from "zod";
 
 export const ProductSchema = z.object({
   name: z.string({ required_error: "Product name is required" }),
-  price: z.string({ required_error: "Product price is required" }),
-  discountPrice: z.string().optional(),
-  colors: z
+  priceVariation: z
     .array(
-      z
-        .object({
-          name: z.string().optional(),
-          stock: z.boolean().optional(),
-        })
-        .optional()
+      z.object({
+        price: z.string({ required_error: "Price is required" }),
+        quantity: z.string({ required_error: "Quantity is required" }),
+        available: z.boolean({
+          required_error: "Availability status is required",
+        }),
+      })
     )
-    .optional(),
-  size: z
-    .array(
-      z
-        .object({
-          name: z.string(),
-          available: z.boolean().optional(),
-        })
-        .optional()
-    )
-    .optional(),
+    .min(1, { message: "At least one price variation is required" }),
+
   stock: z.string({ required_error: "Product stock is required" }),
   sold: z.string().optional(),
   soldAt: z.date().optional(),

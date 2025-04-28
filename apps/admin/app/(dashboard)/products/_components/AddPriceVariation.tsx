@@ -14,6 +14,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import {
@@ -23,43 +24,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { useFieldArray } from "react-hook-form";
 
-interface AddColorsSizeProps {
+interface AddPriceVariationProps {
   // form: UseFormReturn<z.infer<typeof productZodSchema.ProductSchema>>;
   form: any;
 }
 
-const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
+const AddPriceVariation: FC<AddPriceVariationProps> = ({ form }) => {
   const {
-    fields: colorFields,
-    append: appendColor,
-    remove: removeColor,
+    fields: priceVariationFields,
+    append: appendPriceVariation,
+    remove: removePriceVariation,
   } = useFieldArray({
     control: form.control,
-    name: "colors",
+    name: "priceVariation",
   });
 
-  const {
-    fields: sizeFields,
-    append: appendSize,
-    remove: removeSize,
-  } = useFieldArray({
-    control: form.control,
-    name: "size",
-  });
+  // Add at least one price variation by default if none exists
+  useEffect(() => {
+    if (priceVariationFields.length === 0) {
+      appendPriceVariation({
+        price: 0,
+        quantity: "",
+        available: true,
+      });
+    }
+  }, [appendPriceVariation, priceVariationFields.length]);
 
-  const addNewColor = () => {
-    appendColor({
-      name: "",
-      stock: true,
-    });
-  };
-
-  const addNewSize = () => {
-    appendSize({
-      name: "",
+  const addNewPriceVariation = () => {
+    appendPriceVariation({
+      price: 0,
+      quantity: "",
       available: true,
     });
   };
@@ -72,86 +69,42 @@ const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
         </DialogTrigger>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add Sizes and Colors</DialogTitle>
+            <DialogTitle>Add Price Variation</DialogTitle>
           </DialogHeader>
 
-          {/* Colors */}
+          {/* Price Variations */}
           <div>
-            <FormLabel>Colors</FormLabel>
-            {colorFields.map((field, index) => (
+            <FormLabel>Price Variation</FormLabel>
+            {priceVariationFields.map((field, index) => (
               <div key={field.id} className="flex items-center space-x-2 mt-2">
                 <FormField
-                  name={`colors.${index}.name`}
+                  name={`priceVariation.${index}.price`}
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Color name" {...field} />
+                        <Input placeholder="Price" {...field} type="number" />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
-                  name={`colors.${index}.stock`}
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Select
-                          onValueChange={(value: string) =>
-                            field.onChange(value === "true")
-                          }
-                          value={field.value ? "true" : "false"}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Stock" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="true">In Stock</SelectItem>
-                            <SelectItem value="false">Out of Stock</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  size="sm"
-                  type="button"
-                  onClick={() => removeColor(index)}
-                >
-                  Remove
-                </Button>
-              </div>
-            ))}
-            <Button
-              variant="outline"
-              className="w-full mt-4"
-              type="button"
-              onClick={addNewColor}
-            >
-              Add Color
-            </Button>
-          </div>
 
-          {/* Sizes */}
-          <div>
-            <FormLabel>Sizes</FormLabel>
-            {sizeFields.map((field, index) => (
-              <div key={field.id} className="flex items-center space-x-2 mt-2">
                 <FormField
-                  name={`size.${index}.name`}
+                  name={`priceVariation.${index}.quantity`}
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Size name" {...field} />
+                        <Input placeholder="Quantity" {...field} />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
-                  name={`size.${index}.available`}
+                  name={`priceVariation.${index}.available`}
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
@@ -171,25 +124,27 @@ const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
                           </SelectContent>
                         </Select>
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
                 <Button
                   size="sm"
                   type="button"
-                  onClick={() => removeSize(index)}
+                  className="bg-red-500 text-white"
+                  onClick={() => removePriceVariation(index)}
+                  disabled={priceVariationFields.length === 1}
                 >
                   Remove
                 </Button>
               </div>
             ))}
             <Button
-              variant="outline"
               className="w-full mt-4"
               type="button"
-              onClick={addNewSize}
+              onClick={addNewPriceVariation}
             >
-              Add Size
+              Add Price Variation
             </Button>
           </div>
         </DialogContent>
@@ -198,4 +153,4 @@ const AddColorsSize: FC<AddColorsSizeProps> = ({ form }) => {
   );
 };
 
-export default AddColorsSize;
+export default AddPriceVariation;

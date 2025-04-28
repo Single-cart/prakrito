@@ -26,7 +26,7 @@ import { useDispatch } from "react-redux";
 import { z } from "zod";
 
 import { creactProductData } from "@/redux/features/product/productSlice";
-import AddColorsSize from "../_components/AddColorsSize";
+import AddPriceVariation from "./AddPriceVariation";
 
 interface Props {
   formStep: number;
@@ -58,32 +58,64 @@ const ProductInfoForm: FC<Props> = ({
         name: "",
         category: "",
         subcategory: "",
-        price: "",
-        discountPrice: "",
+
         stock: "",
         insideDhaka: "",
         outsideDhaka: "",
-        colors: [],
-        size: [],
+        priceVariation: [],
         order: "0",
       },
     });
 
+  console.log(form.watch());
+
   const handleSubmit = async (
     value: z.infer<typeof productZodSchema.ProductSchema>
   ) => {
-    const formData = new FormData();
-    if (images && images.length > 0) {
-      const imageArray = Array.from(images);
+    try {
+      // Make sure at least one price variation exists
+      if (!value.priceVariation || value.priceVariation.length === 0) {
+        form.setError("priceVariation", {
+          type: "manual",
+          message: "At least one price variation is required",
+        });
+        return;
+      }
 
-      imageArray.forEach((file) => {
-        formData.append("images", file);
-      });
+      // Check if each price variation has the required fields
+      const isValid = value.priceVariation.every(
+        (variation) =>
+          variation.price &&
+          variation.quantity &&
+          variation.available !== undefined
+      );
 
-      dispatch(creactProductData(value));
-      setLocalImages(imageArray);
-      setFormStep(formStep + 1);
-      form.reset();
+      if (!isValid) {
+        form.setError("priceVariation", {
+          type: "manual",
+          message: "All price variation fields must be filled",
+        });
+        return;
+      }
+
+      const formData = new FormData();
+      if (images && images.length > 0) {
+        const imageArray = Array.from(images);
+
+        imageArray.forEach((file) => {
+          formData.append("images", file);
+        });
+
+        dispatch(creactProductData(value));
+        setLocalImages(imageArray);
+        setFormStep(formStep + 1);
+        form.reset();
+      } else {
+        // If no images, show an error
+        alert("Please select at least one image");
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
     }
   };
 
@@ -114,44 +146,6 @@ const ProductInfoForm: FC<Props> = ({
               </FormItem>
             )}
           />
-
-          <div className="grid grid-cols-2 gap-5">
-            <FormField
-              name="price"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Enter Product Price"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name="discountPrice"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Discount Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Enter Product Discount Price"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
           <div className="grid grid-cols-2 gap-5">
             <FormField
@@ -310,7 +304,7 @@ const ProductInfoForm: FC<Props> = ({
             />
           </div>
 
-          <AddColorsSize form={form} />
+          <AddPriceVariation form={form} />
           <div className="">
             <FormLabel>Product Image</FormLabel>
             <Input

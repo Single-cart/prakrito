@@ -51,7 +51,7 @@ import { InfoIcon, PackageIcon, TagIcon } from "lucide-react";
 const UpdateDescForm = dynamic(() => import("../_components/UpdateDescForm"), {
   ssr: false,
 });
-const AddColorsSize = dynamic(() => import("./AddColorsSize"), {
+const AddColorsSize = dynamic(() => import("./AddPriceVariation"), {
   ssr: false,
 });
 

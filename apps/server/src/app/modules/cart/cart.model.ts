@@ -12,22 +12,7 @@ const cartItemSchema = new mongoose.Schema({
     default: 1,
     min: 1,
   },
-  colors: {
-    type: String,
-    required: [true, "Product colors are required"],
-  },
-  size: {
-    type: String,
-    required: [true, "Product size are required"],
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  discountPrice: {
-    type: Number,
-    required: true,
-  },
+
   selected: {
     type: Boolean,
     default: true,
@@ -41,15 +26,10 @@ const cartSchema = new mongoose.Schema(
       required: true,
     },
     cartItem: [cartItemSchema],
-    totalMainPrice: {
+    totalPrice: {
       type: Number,
       default: 0,
     },
-    totalDiscountPrice: {
-      type: Number,
-      default: 0,
-    },
-
     selectAll: {
       type: Boolean,
       default: true,

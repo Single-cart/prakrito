@@ -2,7 +2,6 @@ import { product } from "@workspace/shared/index";
 import ApiError from "../../errorHandlers/ApiError";
 import { deleteMultipleImages } from "../../helpers/deleteFile";
 import { slugify } from "../../helpers/slugify";
-import CartModel from "../cart/cart.model";
 import { SubCategoryModel } from "../category/category.model";
 import { FilterQuery } from "./product.interface";
 import ProductModel from "./product.model";
@@ -40,13 +39,10 @@ export const updateProductService = async (
 
   const sanitizedUpdateData = {
     ...updateData,
-    colors: updateData.colors?.map((color) => ({
-      name: color.name,
-      stock: Boolean(color.stock),
-    })),
-    size: updateData.size?.map((size) => ({
-      name: size.name,
-      available: Boolean(size.available),
+    priceVariation: updateData.priceVariation?.map((priceVariation: any) => ({
+      price: priceVariation.price,
+      quantity: priceVariation.quantity,
+      available: Boolean(priceVariation.available),
     })),
   };
 
@@ -64,25 +60,6 @@ export const updateProductService = async (
     updatedProductData,
     { new: true }
   );
-
-  // Sync price and discountPrice with cart items
-  if (updateData.price || updateData.discountPrice) {
-    const cartToUpdate = await CartModel.find({
-      "cartItem.productId": updateData.id,
-    });
-
-    await Promise.all(
-      cartToUpdate.map(async (cart) => {
-        cart.cartItem.forEach((item) => {
-          if (item.productId.toString() === updateData.id) {
-            item.price = updateData.price!;
-            item.discountPrice = parseInt(updateData.discountPrice!);
-          }
-        });
-        await cart.save();
-      })
-    );
-  }
 
   return updatedProduct;
 };
@@ -120,8 +97,7 @@ export const getSingleProductService = async (slug: string) => {
       name: 1,
       ratings: 1,
       numOfReviews: 1,
-      price: 1,
-      discountPrice: 1,
+      priceVariation: 1,
       images: 1,
       slug: 1,
     }
@@ -170,7 +146,7 @@ export const getAllProductsService = async (
         $gte: [
           {
             $convert: {
-              input: "$discountPrice",
+              input: "$priceVariation.price",
               to: "double",
               onError: 0,
               onNull: 0,
@@ -186,7 +162,7 @@ export const getAllProductsService = async (
         $lte: [
           {
             $convert: {
-              input: "$discountPrice",
+              input: "$priceVariation.price",
               to: "double",
               onError: 0,
               onNull: 0,

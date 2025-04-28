@@ -93,11 +93,8 @@ export interface IPorductReviews {
 export interface IProduct extends Document {
   name: string;
   slug: string;
-  price: number;
-  discountPrice?: string;
   description: string;
-  colors?: { name: string; stock: boolean }[];
-  size?: { name: string; available: boolean }[];
+  priceVariation?: { price: string; quantity: string; available: boolean }[];
   stock: number;
   sold: number;
   soldAt: Date;

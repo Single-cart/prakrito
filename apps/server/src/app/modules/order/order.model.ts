@@ -19,29 +19,9 @@ export const orderSchema = new Schema(
 
     orderItems: [
       {
-        productName: {
-          type: String,
-          required: [true, "Product name is required"],
-        },
-        colors: {
-          type: String,
-          required: [true, "Product colors are required"],
-        },
-        size: {
-          type: String,
-          required: [true, "Product size are required"],
-        },
-        price: {
-          type: Number,
-          required: [true, "Product price is required"],
-        },
         quantity: {
           type: Number,
           required: [true, "Product quentity is required"],
-        },
-        image: {
-          type: String,
-          required: [true, "Product image is required"],
         },
         product: {
           type: mongoose.Schema.Types.ObjectId,

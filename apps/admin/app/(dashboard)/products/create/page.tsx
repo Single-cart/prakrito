@@ -45,15 +45,15 @@ const CreateProduct = () => {
       formData.append("name", productCreateData.name);
       formData.append("category", productCreateData.category);
       formData.append("subcategory", productCreateData.subcategory);
-      formData.append("price", productCreateData.price);
       formData.append("order", productCreateData.order);
-      formData.append("discountPrice", productCreateData.discountPrice);
       formData.append("stock", productCreateData.stock);
       formData.append("insideDhaka", productCreateData.insideDhaka);
       formData.append("outsideDhaka", productCreateData.outsideDhaka);
       formData.append("description", productCreateData.description);
-      formData.append("colors", JSON.stringify(productCreateData.colors));
-      formData.append("size", JSON.stringify(productCreateData.size));
+      formData.append(
+        "priceVariation",
+        JSON.stringify(productCreateData.priceVariation)
+      );
 
       // Append images
       localImages.forEach((image) => {

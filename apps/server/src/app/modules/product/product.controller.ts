@@ -19,8 +19,7 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     category,
     subcategory,
     description,
-    colors,
-    size,
+    priceVariation,
     order,
   } = req.body;
 
@@ -34,8 +33,7 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     price: parseInt(price),
     discountPrice,
     stock: parseInt(stock),
-    colors: JSON.parse(colors),
-    size: JSON.parse(size),
+    priceVariation: JSON.parse(priceVariation),
     insideDhaka: parseInt(insideDhaka),
     outsideDhaka: parseInt(outsideDhaka),
     category,
@@ -70,12 +68,7 @@ export const updateProduct = catchAsync(async (req: Request, res: Response) => {
     : {
         ...req.body,
         // If no files, the data should already be parsed
-        colors: Array.isArray(req.body.colors)
-          ? req.body.colors
-          : JSON.parse(req.body.colors || "[]"),
-        size: Array.isArray(req.body.size)
-          ? req.body.size
-          : JSON.parse(req.body.size || "[]"),
+        priceVariation: JSON.parse(req.body.priceVariation || "[]"),
       };
 
   const result = await productService.updateProductService(data);
@@ -305,10 +298,9 @@ export const getCartProducts = catchAsync(
     const formattedProducts = products.map((product) => ({
       _id: product._id,
       name: product.name,
-      price: product.price,
+      priceVariation: product.priceVariation,
       images:
         product.images && product.images.length > 0 ? product.images[0] : null,
-      discountPrice: product.discountPrice,
       slug: product.slug,
     }));
 

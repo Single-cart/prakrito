@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { Badge } from "@workspace/ui/components/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@workspace/ui/components/table";
 import Image from "next/image";
 import { FC } from "react";
 import { useSelector } from "react-redux";
@@ -12,7 +21,7 @@ type Props = {
 
 const ProductFormPreview: FC<Props> = ({ localImages }) => {
   const { productCreateData } = useSelector((state: any) => state.product);
-
+  console.log(productCreateData);
   return (
     <div className="p-6 bg-white shadow-md rounded-md space-y-4">
       {/* Product Name */}
@@ -21,15 +30,52 @@ const ProductFormPreview: FC<Props> = ({ localImages }) => {
       </h1>
 
       {/* Price and Discount */}
-      <div className="flex items-center space-x-4">
-        <span className="text-xl font-semibold text-gray-800">
-          ${productCreateData?.discountPrice}
-        </span>
-        {productCreateData?.price && (
-          <span className="text-xl font-semibold text-red-500 line-through">
-            ${productCreateData?.price}
-          </span>
-        )}
+      <div className="w-full mt-4">
+        <h3 className="text-lg font-semibold mb-2">Price Variations</h3>
+        <div className="border rounded-md">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Price</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {productCreateData?.priceVariation?.map(
+                (
+                  variation: {
+                    price: number;
+                    quantity: string;
+                    available: boolean;
+                  },
+                  index: number
+                ) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">
+                      ${variation.price}
+                    </TableCell>
+                    <TableCell>{variation.quantity}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          variation.available ? "default" : "destructive"
+                        }
+                        className={
+                          variation.available
+                            ? "bg-green-100 text-green-800"
+                            : ""
+                        }
+                      >
+                        {variation.available ? "In Stock" : "Out of Stock"}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Description */}
@@ -47,38 +93,6 @@ const ProductFormPreview: FC<Props> = ({ localImages }) => {
         <span className="text-gray-700">
           outside Dhaka: ${productCreateData?.outsideDhaka}
         </span>
-      </div>
-
-      {/* Colors */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-700">
-          Available Colors
-        </h3>
-        <div className="flex space-x-4 mt-2">
-          {productCreateData?.colors?.map((color: any, index: number) => (
-            <span
-              key={index}
-              className="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-700"
-            >
-              {color.name} - {color.stock ? "In Stock" : "Out of Stock"}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Sizes */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-700">Available Sizes</h3>
-        <div className="flex space-x-4 mt-2">
-          {productCreateData?.size?.map((size: any, index: number) => (
-            <span
-              key={index}
-              className="px-4 text-sm py-2 bg-gray-200 rounded-md text-gray-700"
-            >
-              {size.name} - {size.available ? "Available" : "Unavailable"}
-            </span>
-          ))}
-        </div>
       </div>
 
       {/* Local Images */}
