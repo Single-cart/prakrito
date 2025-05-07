@@ -76,7 +76,6 @@ const Reviews: FC<Props> = ({
   const [createReview, { isLoading, error, isSuccess }] =
     useCreateProductReviewMutation();
   const { refetch } = useGetReviewsQuery({ userId: user?._id, productId });
-  console.log(productReview);
   function countStarRatings(): StarCounts {
     let oneStar = 0;
     let twoStar = 0;

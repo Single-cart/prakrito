@@ -13,8 +13,7 @@ const config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
-        mono: ["var(--font-mono)", ...fontFamily.mono],
-        bengali: ["Hind Siliguri", "sans-serif"],
+        noto: ["Noto Sans Bengali", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

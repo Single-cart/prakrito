@@ -42,9 +42,15 @@ const CategoryProducts = async ({ params }: Props) => {
             "basis-[22%] md:px-4 px-0 shadow-lg bg-secondary hidden lg:block"
           )}
         >
-          <h1 className="font-semibold uppercase text-xl mb-4">Filters</h1>
-          <div className="space-y-5">
-            <Suspense fallback={<div>Loading filters...</div>}>
+          <h1 className="font-semibold uppercase text-xl mb-4 text-primary">
+            Filters
+          </h1>
+          <div className="space-y-4">
+            <Suspense
+              fallback={
+                <div className="p-4 bg-white rounded-lg animate-pulse h-40"></div>
+              }
+            >
               <SubCategoryFilters subcategory={data?.data?.allSubcategory} />
               <PriceFilters />
               <RatingsFilters key={`ratings-${id}`} />

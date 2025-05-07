@@ -51,7 +51,7 @@ import { InfoIcon, PackageIcon, TagIcon } from "lucide-react";
 const UpdateDescForm = dynamic(() => import("../_components/UpdateDescForm"), {
   ssr: false,
 });
-const AddColorsSize = dynamic(() => import("./AddPriceVariation"), {
+const AddPriceVariation = dynamic(() => import("./AddPriceVariation"), {
   ssr: false,
 });
 
@@ -75,8 +75,7 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
   const form = useForm({
     defaultValues: {
       name: product?.name || "",
-      price: product?.price?.toString() || "",
-      discountPrice: product?.discountPrice?.toString() || "",
+
       insideDhaka:
         product?.insideDhaka === 0 ? "0" : product?.insideDhaka?.toString(),
       outsideDhaka:
@@ -85,8 +84,7 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
       description: product?.description || "",
       category: product?.category?._id || "",
       subcategory: product?.subcategory?._id || "",
-      colors: product?.colors || [],
-      size: product?.size || [],
+      priceVariation: product?.priceVariation || [],
       order: product?.order.toString() || "0",
     },
   });
@@ -97,8 +95,6 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
       const requestData: product.IUpdateProductInput = {
         id: product?._id,
         name: value.name,
-        price: Number(value.price),
-        discountPrice: value.discountPrice.toString(),
         insideDhaka: Number(value.insideDhaka),
         outsideDhaka: Number(value.outsideDhaka),
         stock: Number(value.stock),
@@ -106,13 +102,11 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
         category: value.category,
         subcategory: value.subcategory,
         order: Number(value.order),
-        colors: value.colors.map((color: any) => ({
-          name: color.name,
-          stock: Boolean(color.stock),
-        })),
-        size: value.size.map((size: any) => ({
-          name: size.name,
-          available: Boolean(size.available),
+        priceVariation: value.priceVariation.map((price: any) => ({
+          price: price.price,
+          discountPrice: price.discountPrice,
+          quantity: price.quantity,
+          available: Boolean(price.available),
         })),
       };
 
@@ -313,35 +307,6 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
               <TabsContent value="pricing" className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    name="price"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Regular Price</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="0.00" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    name="discountPrice"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Discount Price</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="0.00" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
                     name="order"
                     control={form.control}
                     render={({ field }) => (
@@ -402,7 +367,7 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
               </TabsContent>
 
               <TabsContent value="attributes" className="space-y-4 mt-4">
-                <AddColorsSize form={form} />
+                <AddPriceVariation form={form} />
                 <div className="space-y-4">
                   <h2 className="text-lg font-semibold">Product Description</h2>
                   <UpdateDescForm form={form} />

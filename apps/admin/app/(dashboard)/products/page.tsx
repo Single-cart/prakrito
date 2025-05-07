@@ -85,13 +85,10 @@ const ProductTable = () => {
     );
   }, [queryParams]);
 
-  const { data, isLoading, isFetching, refetch } = useGetAllProductsQuery(
-    transformedQuery,
-    {
-      refetchOnFocus: false,
-      refetchOnReconnect: false,
-    }
-  );
+  const { data, isLoading } = useGetAllProductsQuery(transformedQuery, {
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
 
   const debouncedSearch = useMemo(
     () =>
@@ -196,11 +193,32 @@ const ProductTable = () => {
         );
       },
       cell: ({ row }) => {
-        const amount = parseFloat(row.original.discountPrice);
+        const amount = parseFloat(
+          row.original.priceVariation[0]?.discountPrice || 0
+        );
         const formatted = new Intl.NumberFormat("en-US", {
           style: "currency",
-          currency: "USD",
+          currency: "BDT",
         }).format(amount);
+
+        // Show first price variation if available
+        if (
+          row.original.priceVariation &&
+          row.original.priceVariation.length > 0
+        ) {
+          const firstQuantity =
+            row.original.priceVariation[0]?.quantity || "Standard";
+
+          return (
+            <div className="flex flex-col">
+              <span>{formatted}</span>
+              <div className="flex flex-col mt-1">
+                <span className="text-xs text-gray-500">{firstQuantity}</span>
+              </div>
+            </div>
+          );
+        }
+
         return formatted;
       },
     },

@@ -26,14 +26,19 @@ const Search: FC<Props> = ({ searchRoute, className }) => {
   return (
     <div className={cn(className, "flex items-center justify-center w-full")}>
       <Input
-        className="max-w-[500px]"
+        className="max-w-[500px] bg-secondary"
         name="search"
         placeholder="Search for products"
         onChange={(e) => setName(e.target.value)}
         value={name}
         required
       />
-      <Button size={"icon"} onClick={handleSearch} variant={"outline"}>
+      <Button
+        size={"icon"}
+        onClick={handleSearch}
+        variant={"outline"}
+        className="bg-secondary"
+      >
         <SearchIcon />
       </Button>
     </div>

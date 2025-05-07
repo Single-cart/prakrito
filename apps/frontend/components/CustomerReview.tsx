@@ -17,7 +17,7 @@ const CustomerReview = async () => {
 
   return (
     <div className="">
-      {data?.data?.customerReview && (
+      {data?.data?.customerReview && data?.data?.customerReview?.length > 0 && (
         <div className="">
           <h1 className={cn(styles.headingText, "text-center")}>
             Customer Review

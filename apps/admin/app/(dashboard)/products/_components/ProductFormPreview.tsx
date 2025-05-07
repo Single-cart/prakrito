@@ -37,6 +37,7 @@ const ProductFormPreview: FC<Props> = ({ localImages }) => {
             <TableHeader>
               <TableRow>
                 <TableHead>Price</TableHead>
+                <TableHead>Discount Price</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
@@ -46,6 +47,7 @@ const ProductFormPreview: FC<Props> = ({ localImages }) => {
                 (
                   variation: {
                     price: number;
+                    discountPrice: number;
                     quantity: string;
                     available: boolean;
                   },
@@ -54,6 +56,9 @@ const ProductFormPreview: FC<Props> = ({ localImages }) => {
                   <TableRow key={index}>
                     <TableCell className="font-medium">
                       ${variation.price}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      ${variation.discountPrice}
                     </TableCell>
                     <TableCell>{variation.quantity}</TableCell>
                     <TableCell>

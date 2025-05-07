@@ -8,23 +8,25 @@ interface Props {
 
 const SubCategoryFilters = ({ subcategory }: Props) => {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="rounded-lg bg-white p-4 shadow-sm">
       {subcategory && (
         <>
-          <h1 className="font-[400] text-lg">Categories</h1>
-          <Separator />
+          <h1 className="font-medium text-lg mb-2 text-primary">Categories</h1>
+          <Separator className="mb-3 bg-gray-200" />
         </>
       )}
 
-      {subcategory?.map((item) => (
-        <Link
-          className="font-[500] hover:underline hover:text-[#000000b2]"
-          href={`/category/${item._id}`}
-          key={item._id}
-        >
-          {item.name}
-        </Link>
-      ))}
+      <div className="flex flex-col gap-2">
+        {subcategory?.map((item) => (
+          <Link
+            className="py-1.5 px-2 rounded-md font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            href={`/category/${item._id}`}
+            key={item._id}
+          >
+            {item.name}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };

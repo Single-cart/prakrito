@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { product } from "@workspace/shared/index";
 
 export interface CartType {
   allCartProducts: {
@@ -9,7 +10,10 @@ export interface CartType {
     selectAll: boolean;
   };
   totalPrice: object;
-  buyNowItem: object;
+  buyNowItem: {
+    product: product.IProductRes;
+    priceVariationIndex: number;
+  } | null;
 }
 
 const initialState: CartType = {
@@ -20,7 +24,7 @@ const initialState: CartType = {
     selectAll: true,
   },
   totalPrice: {},
-  buyNowItem: {},
+  buyNowItem: null,
 };
 
 const cartSlice = createSlice({
@@ -52,7 +56,7 @@ const cartSlice = createSlice({
       state.buyNowItem = action.payload;
     },
     clearBuyNow: (state) => {
-      state.buyNowItem = {};
+      state.buyNowItem = null;
     },
   },
 });

@@ -2,6 +2,7 @@
 "use client";
 
 import NavHeader from "@/components/nav-header";
+import { getImgUrl } from "@/lib/getImgPath";
 import {
   useGetOrderStatusQuery,
   useGetSingleOrdersQuery,
@@ -32,6 +33,7 @@ import {
 } from "@workspace/ui/components/table";
 import { Clock, CreditCard, FileText, Package } from "lucide-react";
 import { revalidateTag } from "next/cache";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
@@ -211,6 +213,15 @@ const SingleOrder = () => {
                   </div>
                 </div>
 
+                {data?.order?.orderNots && (
+                  <div className="space-y-1.5">
+                    <p className="text-sm text-gray-500">Order Notes</p>
+                    <p className="text-sm bg-gray-50 p-3 rounded-lg">
+                      {data?.order?.orderNots}
+                    </p>
+                  </div>
+                )}
+
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg flex items-start gap-2">
                   <Package className="h-5 w-5 text-blue-500 mt-0.5" />
                   <div>
@@ -238,28 +249,64 @@ const SingleOrder = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Product Info</TableHead>
-                  <TableHead>Size</TableHead>
-                  <TableHead>Color</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Variation</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data?.order?.orderItems?.map((item: any) => (
-                  <TableRow key={item?.product}>
-                    <TableCell className="font-medium">
-                      {item?.productName}{" "}
-                      <span className="text-sm">x {item?.quantity}</span>
-                    </TableCell>
-                    <TableCell>{item?.size}</TableCell>
-                    <TableCell>{item?.colors}</TableCell>
-                    <TableCell className="text-right">
-                      ${(parseInt(item?.price) * item?.quantity).toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {data?.order?.orderItems?.map((item: any) => {
+                  // Get the product information
+                  const product = item?.product;
+                  // Get the selected price variation
+                  const priceVariation =
+                    product?.priceVariation?.[item.priceVariationIndex - 1];
+
+                  return (
+                    <TableRow key={item?._id}>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          {product?.images?.[0] && (
+                            <div className="relative h-12 w-12 overflow-hidden rounded border bg-gray-50">
+                              <Image
+                                src={getImgUrl(product.images[0])}
+                                alt={product?.name || "Product"}
+                                width={48}
+                                height={48}
+                                style={{ objectFit: "cover" }}
+                                className="rounded"
+                              />
+                            </div>
+                          )}
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {product?.name || "Unnamed Product"}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              Qty: {item?.quantity}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {priceVariation?.quantity ? (
+                          <Badge className="bg-blue-100 text-blue-800">
+                            {priceVariation.quantity}
+                          </Badge>
+                        ) : (
+                          <span className="text-sm text-gray-500">
+                            Standard
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        ${(item?.price * item?.quantity).toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
                 <TableRow>
-                  <TableCell colSpan={3} className="font-semibold">
+                  <TableCell colSpan={2} className="font-semibold">
                     Subtotal
                   </TableCell>
                   <TableCell className="text-right font-semibold">
@@ -267,7 +314,7 @@ const SingleOrder = () => {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell colSpan={3} className="font-semibold">
+                  <TableCell colSpan={2} className="font-semibold">
                     Shipping
                   </TableCell>
                   <TableCell className="text-right font-semibold">
@@ -277,7 +324,7 @@ const SingleOrder = () => {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell colSpan={3} className="font-semibold">
+                  <TableCell colSpan={2} className="font-semibold">
                     Total
                   </TableCell>
                   <TableCell className="text-right font-semibold">

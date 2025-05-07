@@ -15,9 +15,10 @@ export const createOrderSchema = z.object({
     shippingPrice: z.number({ required_error: "shipping price is required" }),
     orderItems: z.array(
       z.object({
-        productName: z.string({ required_error: "product name  is required" }),
-        colors: z.string({ required_error: "Product Color is required" }),
-        size: z.string({ required_error: "Product Size is required" }),
+        productName: z.string({ required_error: "product name is required" }),
+        priceVariationIndex: z.number({
+          required_error: "Price variation index is required",
+        }),
         price: z.number({ required_error: "price is required" }),
         quantity: z.number({ required_error: "quantity is required" }),
         image: z.string({ required_error: "image is required" }),

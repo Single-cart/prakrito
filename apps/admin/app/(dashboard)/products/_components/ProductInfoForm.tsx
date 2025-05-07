@@ -85,7 +85,7 @@ const ProductInfoForm: FC<Props> = ({
       // Check if each price variation has the required fields
       const isValid = value.priceVariation.every(
         (variation) =>
-          variation.price &&
+          variation.discountPrice &&
           variation.quantity &&
           variation.available !== undefined
       );

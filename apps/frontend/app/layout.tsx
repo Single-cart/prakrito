@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Noto_Sans_Bengali, Poppins } from "next/font/google";
 
 import BottomNavbar from "@/components/BottomNavbar";
 import Footer from "@/components/Footer";
@@ -18,13 +18,20 @@ const fontSans = Geist({
   variable: "--font-sans",
 });
 
-const fontMono = Geist_Mono({
+const fontPoppin = Poppins({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-poppins",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const fontNoto = Noto_Sans_Bengali({
+  subsets: ["latin"],
+  variable: "--font-noto",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Fablura",
+  title: "Prakrito",
   description: descriptionShop,
   keywords: allkeywords,
 };
@@ -45,7 +52,7 @@ export default function RootLayout({
         <GoogleTagManager />
       </head>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
+        className={`${fontSans.variable} ${fontPoppin.className} ${fontNoto.variable} antialiased `}
       >
         <GoogleTagManagerNoScript />
         <ReduxProvider>

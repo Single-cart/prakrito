@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookOpen,
   FolderTree,
   ImagePlus,
   LayoutDashboard,
@@ -80,6 +81,11 @@ const data = {
       title: "Landing Page",
       url: "/landing",
       icon: PanelsTopLeft,
+    },
+    {
+      title: "Blogs",
+      url: "/blogs",
+      icon: BookOpen,
     },
     {
       title: "Users",

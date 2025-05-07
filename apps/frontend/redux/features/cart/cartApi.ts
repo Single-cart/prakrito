@@ -10,8 +10,7 @@ const cartApi = apiSlice.injectEndpoints({
         isSelectAll,
         cartQuantity,
         deleteCartItem,
-        colors,
-        size,
+        priceVariationIndex,
       }) => ({
         url: `/cart/cart-sync`,
         method: "POST",
@@ -21,18 +20,17 @@ const cartApi = apiSlice.injectEndpoints({
           isSelectAll,
           cartQuantity,
           deleteCartItem,
-          colors,
-          size,
+          priceVariationIndex,
         },
         credentials: "include",
       }),
     }),
 
     addToCart: build.mutation({
-      query: ({ productId, colors, size }) => ({
+      query: ({ productId, priceVariationIndex }) => ({
         url: "/cart/add-to-cart",
         method: "POST",
-        body: { productId, colors, size },
+        body: { productId, priceVariationIndex },
         credentials: "include",
       }),
       invalidatesTags: ["Cart"],

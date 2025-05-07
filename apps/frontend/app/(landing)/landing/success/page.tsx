@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import { Button } from "@workspace/ui/components/button";
+import { CheckCircle2, Home } from "lucide-react";
 
 const Success = () => {
   const handleGoBack = () => {
@@ -8,28 +9,32 @@ const Success = () => {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center gap-3">
-      <Image
-        src={"/order-success.png"}
-        width={100}
-        height={100}
-        alt="Order Success"
-      />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100 p-4">
+      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center space-y-6">
+        <div className="flex justify-center">
+          <div className="rounded-full bg-green-100 p-3">
+            <CheckCircle2 className="h-16 w-16 text-green-600" />
+          </div>
+        </div>
 
-      <h1 className="text-lg md:text-2xl font-semibold">
-        আপনার অর্ডার সফলভাবে গৃহীত হয়েছে।
-      </h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 font-bengali">
+          অর্ডার সফলভাবে গৃহীত হয়েছে
+        </h1>
 
-      <h1>বিঃদ্রঃ আমরা খুব শীঘ্রই যোগাযোগ করব। অর্ডার করার জন্য ধন্যবাদ</h1>
-      <div className="flex items-center justify-center gap-2 font-semibold">
-        <h3>
-          <button
+        <p className="text-gray-600 font-bengali">
+          আমরা খুব শীঘ্রই আপনার সাথে যোগাযোগ করব। অর্ডার করার জন্য ধন্যবাদ।
+        </p>
+
+        <div className="flex gap-4 justify-center pt-4">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
             onClick={handleGoBack}
-            className="text-blue-500 font-semibold cursor-pointer"
           >
-            হোম পেজে ফিরে যান
-          </button>
-        </h3>
+            <Home className="h-4 w-4" />
+            <span className="font-bengali">হোম পেজে ফিরুন</span>
+          </Button>
+        </div>
       </div>
     </div>
   );

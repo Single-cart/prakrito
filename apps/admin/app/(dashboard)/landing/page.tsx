@@ -20,6 +20,8 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 
+import { getImgUrl } from "@/lib/getImgPath";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -42,6 +44,7 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
+import Image from "next/image";
 
 import LandingAction from "@/components/LandingAction";
 import NavHeader from "@/components/nav-header";
@@ -95,14 +98,68 @@ const Landing = () => {
     {
       accessorKey: "product",
       header: "Product",
-      cell: ({ row }) => (
-        <Link
-          href={`/products/${row.original.product?._id}`}
-          className="hover:underline text-blue-600"
-        >
-          {row.original.product?.name || "No Product"}
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const product = row.original.product;
+
+        if (!product) return <div className="text-gray-500">No Product</div>;
+
+        return (
+          <div className="flex items-center space-x-3">
+            {product.images?.[0] && (
+              <div className="relative h-10 w-10 overflow-hidden rounded border bg-gray-50">
+                <Image
+                  src={getImgUrl(product.images[0])}
+                  alt={product.name}
+                  width={40}
+                  height={40}
+                  style={{ objectFit: "cover" }}
+                  className="rounded"
+                />
+              </div>
+            )}
+            <Link
+              href={`/products/${product._id}`}
+              className="hover:underline text-blue-600"
+            >
+              {product.name}
+            </Link>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "price",
+      header: "Price Variation",
+      cell: ({ row }) => {
+        const product = row.original.product;
+
+        if (
+          !product ||
+          !product.priceVariation ||
+          product.priceVariation.length === 0
+        ) {
+          return <div className="text-gray-500">No pricing</div>;
+        }
+
+        // Get first price variation
+        const firstVariation = product.priceVariation[0];
+        const amount = parseFloat(firstVariation?.discountPrice || 0);
+        const formatted = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "BDT",
+        }).format(amount);
+
+        return (
+          <div className="flex flex-col">
+            <span className="font-medium">{formatted}</span>
+            {firstVariation.quantity && (
+              <Badge className="mt-1 bg-blue-100 text-blue-800 self-start">
+                {firstVariation.quantity}
+              </Badge>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "name",

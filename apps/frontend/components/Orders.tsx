@@ -2,23 +2,45 @@
 import { Button } from "@workspace/ui/components/button";
 import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
+import { useEffect, useState } from "react";
 import { LoadingButton } from "./LoaderButton";
 
 type Props = {
   selectItem: any;
-  totalPrice: any;
   minShippingPrice: number;
-  totalAmount: number;
   isLoading: boolean;
 };
 
-const Orders = ({
-  selectItem,
-  totalPrice,
-  minShippingPrice,
-  totalAmount,
-  isLoading,
-}: Props) => {
+const Orders = ({ selectItem, minShippingPrice, isLoading }: Props) => {
+  const [subtotal, setSubtotal] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [currentShippingPrice, setCurrentShippingPrice] =
+    useState(minShippingPrice);
+
+  // Calculate subtotal whenever items change
+  useEffect(() => {
+    const calculatedSubtotal =
+      selectItem?.reduce((acc: number, item: any) => {
+        const selectedVariation =
+          item?.product?.priceVariation?.[item?.priceVariationIndex - 1];
+        const itemPrice = selectedVariation?.discountPrice || 0;
+        return acc + itemPrice * (item?.quantity || 1);
+      }, 0) || 0;
+
+    setSubtotal(calculatedSubtotal);
+  }, [selectItem]);
+
+  // Update shipping price when it changes
+  useEffect(() => {
+    setCurrentShippingPrice(minShippingPrice);
+  }, [minShippingPrice]);
+
+  // Update total whenever subtotal or shipping price changes
+  useEffect(() => {
+    const newTotal = subtotal + currentShippingPrice;
+    setTotal(newTotal);
+  }, [subtotal, currentShippingPrice]);
+
   return (
     <div>
       <table className="w-full table-auto border-collapse border border-gray-400">
@@ -31,45 +53,50 @@ const Orders = ({
           </tr>
         </thead>
         <tbody className="text-sm">
-          {selectItem?.map((item: any, index: number) => (
-            <tr key={item.productId + index}>
-              <td className="border border-gray-400 p-2 flex items-center justify-between">
-                <span>
-                  {" "}
-                  {item?.product?.name}{" "}
-                  <span className="font-bold text-sm font-sans">
-                    x {item?.quantity}
+          {selectItem?.map((item: any, index: number) => {
+            const selectedVariation =
+              item?.product?.priceVariation?.[item?.priceVariationIndex - 1];
+            const itemPrice = selectedVariation?.discountPrice || 0;
+            const quantity = item?.quantity || 1;
+
+            return (
+              <tr key={item.productId + index}>
+                <td className="border border-gray-400 p-2 flex items-center justify-between">
+                  <span>
+                    {item?.product?.name}{" "}
+                    <span className="font-bold text-sm font-sans">
+                      x {quantity}
+                    </span>
+                    {selectedVariation && (
+                      <span className="text-sm text-gray-600 ml-2">
+                        ({selectedVariation.quantity})
+                      </span>
+                    )}
                   </span>
-                </span>{" "}
-                <div className="flex flex-col border-l pl-2">
-                  <span className="font-bold text-sm font-sans">
-                    size: {item?.size}
-                  </span>
-                  <span className="font-bold text-sm font-sans">
-                    color: {item?.colors}
-                  </span>
-                </div>
-              </td>
-              <td className="border border-gray-400 p-2">
-                {parseInt(item?.discountPrice) * item?.quantity}
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td className="border border-gray-400 p-2">
+                  ৳{(itemPrice * quantity).toFixed(2)}
+                </td>
+              </tr>
+            );
+          })}
           <tr className="font-semibold">
-            <td className="border border-gray-400 p-2">subTotal</td>
+            <td className="border border-gray-400 p-2">Subtotal</td>
             <td className="border border-gray-400 p-2">
-              {totalPrice.totalDiscountPrice}
+              ৳{subtotal.toFixed(2)}
             </td>
           </tr>
           <tr className="font-semibold">
             <td className="border border-gray-400 p-2">Shipping Charge</td>
             <td className="border border-gray-400 p-2">
-              {minShippingPrice === 0 ? "Free" : minShippingPrice}
+              {currentShippingPrice === 0
+                ? "Free"
+                : `৳${currentShippingPrice.toFixed(2)}`}
             </td>
           </tr>
           <tr className="font-semibold">
             <td className="border border-gray-400 p-2">Total</td>
-            <td className="border border-gray-400 p-2">{totalAmount}</td>
+            <td className="border border-gray-400 p-2">৳{total.toFixed(2)}</td>
           </tr>
         </tbody>
       </table>
@@ -83,7 +110,7 @@ const Orders = ({
 
         <div className="mt-4">
           <p className="text-sm">
-            Your parsonal data will be used to process your order, support, your
+            Your personal data will be used to process your order, support your
             experience throughout this website
           </p>
         </div>

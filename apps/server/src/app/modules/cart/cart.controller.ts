@@ -11,14 +11,18 @@ import {
 } from "./cart.service";
 
 export const addCartItem = catchAsync(async (req: Request, res: Response) => {
-  const { productId, colors, size } = req.body;
+  const { productId, priceVariationIndex } = req.body;
   const cartSession = req.cookies.cart_session;
 
-  if (!productId || !colors || !size) {
+  if (!productId || !priceVariationIndex) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Missing required fields");
   }
 
-  const result = await addCartItemService(productId, colors, size, cartSession);
+  const result = await addCartItemService(
+    productId,
+    priceVariationIndex,
+    cartSession
+  );
 
   if (result?.sessionId) {
     const expirationDate = new Date();
@@ -89,8 +93,7 @@ export const syncCart = catchAsync(async (req, res) => {
     isSelectAll,
     cartQuantity,
     deleteCartItem,
-    colors,
-    size,
+    priceVariationIndex,
   } = req.query;
   const sessionId = req.cookies.cart_session;
 
@@ -164,35 +167,7 @@ export const syncCart = catchAsync(async (req, res) => {
     );
   }
 
-  // if (colors && cartItemId) {
-  //   // Update product selected colors
-  //   await CartModel.findOneAndUpdate(
-  //     {
-  //       sessionId,
-  //       "cartItem._id": cartItemId,
-  //     },
-  //     {
-  //       $set: { "cartItem.$.colors": colors },
-  //     },
-  //     { new: true }
-  //   );
-  // }
-
-  // if (size && cartItemId) {
-  //   // Update product selected colors
-  //   await CartModel.findOneAndUpdate(
-  //     {
-  //       sessionId,
-  //       "cartItem._id": cartItemId,
-  //     },
-  //     {
-  //       $set: { "cartItem.$.size": size },
-  //     },
-  //     { new: true }
-  //   );
-  // }
-
-  if ((colors || size) && cartItemId) {
+  if (priceVariationIndex && cartItemId) {
     const cart = await CartModel.findOne({ sessionId });
     if (!cart) {
       throw new ApiError(404, "Cart not found");
@@ -203,30 +178,25 @@ export const syncCart = catchAsync(async (req, res) => {
       throw new ApiError(404, "Cart item not found");
     }
 
-    const newColors = colors || updatingItem.colors;
-    const newSize = size || updatingItem.size;
+    const newPriceVariationIndex = parseInt(priceVariationIndex as string);
+    if (isNaN(newPriceVariationIndex) || newPriceVariationIndex < 1) {
+      throw new ApiError(400, "Invalid price variation index");
+    }
 
-    // Check if a product with the same ID, color, and size already exists
+    // Check if a product with the same ID and priceVariationIndex already exists
     const existingItem = cart.cartItem.find(
       (item: any) =>
         item?._id?.toString() !== cartItemId &&
         item.productId.toString() === updatingItem.productId.toString() &&
-        item.colors === newColors &&
-        item.size === newSize
+        item.priceVariationIndex === newPriceVariationIndex
     );
 
     if (existingItem) {
-      throw new ApiError(400, "Product already exists in the cart");
+      throw new ApiError(400, "Product variation already exists in the cart");
     }
 
-    // If no duplicate found, update the item
-    if (colors) {
-      updatingItem.colors = colors;
-    }
-    if (size) {
-      updatingItem.size = size;
-    }
-
+    // Update the priceVariationIndex
+    updatingItem.priceVariationIndex = newPriceVariationIndex;
     await cart.save();
   }
 

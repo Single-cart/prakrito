@@ -17,10 +17,9 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fablura",
-  description: "Fablura is a platform for buying and selling products",
+  title: "Prakrito",
+  description: "Prakrito is a platform for buying and selling products",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{

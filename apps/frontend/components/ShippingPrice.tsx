@@ -30,6 +30,11 @@ const ShippingPriceSelection = ({
   // Explicitly type the defaultLocation
   const defaultLocation = "outside" as LocationType;
 
+  const handleShippingChange = (value: LocationType) => {
+    const shippingPrice = value === "inside" ? insideDhaka : outsideDhaka;
+    onShippingChange(shippingPrice);
+  };
+
   // Initialize shipping price and form value on component mount
   useEffect(() => {
     // Set initial value in the form
@@ -40,16 +45,14 @@ const ShippingPriceSelection = ({
     });
 
     // Set initial shipping price based on default location
-    onShippingChange(outsideDhaka);
+    handleShippingChange(defaultLocation);
   }, []);
 
-  const handleShippingChange = (value: string) => {
-    // Type guard to ensure value is treated as LocationType
-    if (value !== "inside" && value !== "outside") return;
-
-    const shippingPrice = value === "inside" ? insideDhaka : outsideDhaka;
-    onShippingChange(shippingPrice);
-  };
+  // Update shipping price when inside/outside prices change
+  useEffect(() => {
+    const currentLocation = form.getValues("shippingLocation") as LocationType;
+    handleShippingChange(currentLocation);
+  }, [insideDhaka, outsideDhaka]);
 
   return (
     <FormField
@@ -61,7 +64,7 @@ const ShippingPriceSelection = ({
           <Label>Delivery Location</Label>
           <FormControl>
             <RadioGroup
-              onValueChange={(value) => {
+              onValueChange={(value: LocationType) => {
                 field.onChange(value);
                 handleShippingChange(value);
               }}

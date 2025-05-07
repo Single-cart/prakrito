@@ -21,7 +21,15 @@ export const orderSchema = new Schema(
       {
         quantity: {
           type: Number,
-          required: [true, "Product quentity is required"],
+          required: [true, "Product quantity is required"],
+        },
+        price: {
+          type: Number,
+          required: [true, "Product price is required"],
+        },
+        priceVariationIndex: {
+          type: Number,
+          required: [true, "Price variation index is required"],
         },
         product: {
           type: mongoose.Schema.Types.ObjectId,

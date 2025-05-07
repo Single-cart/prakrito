@@ -10,8 +10,12 @@ type Props = {
     {
       _id: string;
       name: string;
-      price: number;
-      discountPrice: string;
+      priceVariation: {
+        price: number;
+        discountPrice: number;
+        quantity: string;
+        available: boolean;
+      }[];
       ratings: number;
       numOfReviews: number;
       images: [string];
@@ -21,7 +25,6 @@ type Props = {
 };
 
 const RelatedProduct: FC<Props> = ({ product }) => {
-  console.log(product);
   return (
     <div>
       <h1 className="text-xl font-semibold">Related Product</h1>
@@ -58,8 +61,15 @@ const RelatedProduct: FC<Props> = ({ product }) => {
                   ({item?.numOfReviews})
                 </div>
                 <h2 className="space-x-2">
-                  <span className="line-through">TK.{item?.price}</span>
-                  <span>TK.{item?.discountPrice}</span>
+                  <span className="line-through">
+                    TK.
+                    {item?.priceVariation && item?.priceVariation[0]?.price}
+                  </span>
+                  <span>
+                    TK.
+                    {item?.priceVariation &&
+                      item?.priceVariation[0]?.discountPrice}
+                  </span>
                 </h2>
               </div>
             </Link>

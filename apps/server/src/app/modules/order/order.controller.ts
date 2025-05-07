@@ -1,11 +1,33 @@
 import { Request, Response } from "express";
 import catchAsync from "../../middlewares/catchAsync";
+import { orderRiskService } from "../order-risk/order-risk.service";
 import { orderAnalyticsService, orderService } from "./order.service";
 
 export const createOrder = catchAsync(async (req: Request, res: Response) => {
+  // First assess the risk
+  const riskAssessment = await orderRiskService.assessOrderRisk({
+    phone: req.body.phone,
+    address: req.body.address,
+    ip: req.ip || "Unknown",
+    email: req.body.email,
+  });
+
+  // Add risk assessment to response
   const order = await orderService.createOrder(
     req.body,
     req.cookies.cart_session
+  );
+
+  // Update risk history with new order
+  await orderRiskService.updateOrderStatus(
+    order.orderId,
+    {
+      phone: req.body.phone,
+      address: req.body.address,
+      ip: req.ip || "Unknown",
+      email: req.body.email,
+    },
+    "Pending"
   );
 
   if (!req.body.user) {
@@ -21,6 +43,7 @@ export const createOrder = catchAsync(async (req: Request, res: Response) => {
     success: true,
     message: "Order placed successfully",
     order,
+    riskAssessment,
   });
 });
 
@@ -53,6 +76,17 @@ export const updateOrderStatus = catchAsync(
   async (req: Request, res: Response) => {
     const order = await orderService.updateOrderStatus(
       req.params.id,
+      req.body.orderStatus
+    );
+
+    // Update risk history when order status changes
+    await orderRiskService.updateOrderStatus(
+      order.orderId,
+      {
+        phone: order?.shippingInfo?.phone,
+        address: order?.shippingInfo?.address,
+        ip: req.ip || "Unknown",
+      },
       req.body.orderStatus
     );
 

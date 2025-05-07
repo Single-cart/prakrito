@@ -61,10 +61,10 @@ const Checkout = () => {
   const { refetch } = useGetCartItemQuery({});
   const { refetch: orderStatusRefetch } = useGetOrderStatusQuery({});
   const [selectedShippingPrice, setSelectedShippingPrice] = useState(0);
-  const [calculatedAmount, setCalculatedAmount] = useState(0);
+  const [, setCalculatedAmount] = useState(0);
 
   useTotalPriceQuery({});
-  const [createOrder, { isLoading, error, isError, isSuccess }] =
+  const [createOrder, { isLoading, error, isError, isSuccess, data }] =
     useCreateOrderMutation();
   const { user } = useAuth();
   const { allCartProducts, totalPrice } = useSelector(
@@ -106,26 +106,41 @@ const Checkout = () => {
     },
   });
 
-  const orderItems = selectItem?.map((item: any) => ({
-    productName: item?.product?.name,
-    price: item?.discountPrice,
-    quantity: item?.quantity,
-    image: item?.product?.image,
-    product: item?.productId,
-    colors: item?.colors,
-    size: item?.size,
-    _id: item?._id,
-  }));
+  const orderItems = selectItem?.map((item: any) => {
+    const selectedVariation =
+      item?.product?.priceVariation?.[item?.priceVariationIndex - 1];
+    return {
+      productName: item?.product?.name,
+      price: selectedVariation?.discountPrice || 0,
+      quantity: item?.quantity,
+      image: item?.product?.images?.[0],
+      product: item?.productId,
+      priceVariationIndex: item?.priceVariationIndex,
+      _id: item?._id,
+    };
+  });
 
   const handleSubmit = async (value: z.infer<typeof orderSchema>) => {
+    // Calculate item prices properly
+    const subtotal =
+      selectItem?.reduce((acc: number, item: any) => {
+        const selectedVariation =
+          item?.product?.priceVariation?.[item?.priceVariationIndex - 1];
+        const discountPrice = selectedVariation?.discountPrice || 0;
+        return acc + discountPrice * item.quantity;
+      }, 0) || 0;
+
+    const shippingCost = selectedShippingPrice;
+    const finalTotal = subtotal + shippingCost;
+
     const data = {
       ...value,
       user: user?._id ? user?._id : "",
       paymentType: "Cash on delivery",
       orderItems,
-      itemsPrice: totalPriceData?.totalDiscountPrice,
-      shippingPrice: selectedShippingPrice,
-      totalAmount: calculatedAmount,
+      itemsPrice: subtotal,
+      shippingPrice: shippingCost,
+      totalAmount: finalTotal,
     };
 
     await createOrder(data);
@@ -134,7 +149,7 @@ const Checkout = () => {
       event: "purchase",
       ecommerce: {
         currencyCode: "BDT",
-        value: calculatedAmount,
+        value: finalTotal,
         items: orderItems.map((item: any) => ({
           item_name: item.productName,
           price: item.price,
@@ -153,31 +168,32 @@ const Checkout = () => {
     setSelectedShippingPrice(initialShippingPrice);
 
     // Calculate initial total amount
-    if (totalPriceData?.totalDiscountPrice) {
-      const initialTotal =
-        totalPriceData.totalDiscountPrice + initialShippingPrice;
-      setCalculatedAmount(initialTotal);
-    }
-  }, [finalOutsidePrice, totalPriceData?.totalDiscountPrice]);
+    const initialSubtotal =
+      selectItem?.reduce((acc: number, item: any) => {
+        const selectedVariation =
+          item?.product?.priceVariation?.[item?.priceVariationIndex - 1];
+        const discountPrice = selectedVariation?.discountPrice || 0;
+        return acc + discountPrice * item.quantity;
+      }, 0) || 0;
+
+    const initialTotal = initialSubtotal + initialShippingPrice;
+    setCalculatedAmount(initialTotal);
+  }, [finalOutsidePrice, selectItem]);
 
   const handleShippingChange = (shippingPrice: number) => {
-    if (totalPriceData?.totalDiscountPrice) {
-      const newTotal = totalPriceData.totalDiscountPrice + shippingPrice;
-      setCalculatedAmount(newTotal);
-      setSelectedShippingPrice(shippingPrice);
-    }
+    setSelectedShippingPrice(shippingPrice);
   };
 
   useEffect(() => {
-    if (isSuccess) {
-      toast.success("Order successfully plased");
-      router.replace("/orderSuccess");
+    if (isSuccess && data?.order) {
+      toast.success("Order successfully placed");
+      router.replace("/orderSuccess?orderId=" + data?.order?._id);
       dispatch(clearCart());
     } else if (isError) {
       const errroData = error as any;
       toast.error(errroData?.data?.message);
     }
-  }, [dispatch, error, isError, isSuccess, refetch, router]);
+  }, [dispatch, error, isError, isSuccess, refetch, router, data?.order]);
 
   useEffect(() => {
     form.setValue("fullName", user?.fullName || "");
@@ -300,7 +316,6 @@ const Checkout = () => {
                     insideDhaka={finalInsidePrice}
                     outsideDhaka={finalOutsidePrice}
                     onShippingChange={handleShippingChange}
-                    // initialPrice={selectedShippingPrice}
                   />
                 </div>
               </div>
@@ -314,8 +329,6 @@ const Checkout = () => {
                 <Orders
                   minShippingPrice={selectedShippingPrice}
                   selectItem={selectItem}
-                  totalPrice={totalPrice}
-                  totalAmount={calculatedAmount}
                   isLoading={isLoading}
                 />
               </Suspense>

@@ -12,7 +12,12 @@ const cartItemSchema = new mongoose.Schema({
     default: 1,
     min: 1,
   },
-
+  priceVariationIndex: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 1,
+  },
   selected: {
     type: Boolean,
     default: true,

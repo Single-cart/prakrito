@@ -38,11 +38,7 @@ const CartPage = () => {
   const { isLoading, isSuccess, refetch } = useGetCartItemQuery({});
   const { refetch: totalPriceRefetch } = useTotalPriceQuery({});
   const { user } = useAuth();
-  const { allCartProducts, totalPrice } = useSelector(
-    (state: RootState) => state.cart
-  );
-
-  const totalPriceData = totalPrice as any;
+  const { allCartProducts } = useSelector((state: RootState) => state.cart);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -51,6 +47,10 @@ const CartPage = () => {
   const [isMount, setIsMount] = useState(false);
   const [selectAll, setSelectAll] = useState<boolean>();
   const [toggleProduct, setToggleProduct] = useState<any[]>([]);
+  const [calculatedTotals, setCalculatedTotals] = useState<{
+    totalMainPrice: number;
+    totalDiscountPrice: number;
+  }>({ totalMainPrice: 0, totalDiscountPrice: 0 });
 
   //select all product
   const handleSelectAll = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -130,24 +130,40 @@ const CartPage = () => {
     }
   };
 
-  //size change
-  const handleSizeChange = async (cartId: string, value: string) => {
-    setIsLoadingFetch(true);
-    await syncCart({ cartItemId: cartId, size: value });
-    await refetch();
-    setIsLoadingFetch(false);
-  };
+  // Update price variation index
+  const handlePriceVariationChange = async (cartId: string, value: string) => {
+    try {
+      setIsLoadingFetch(true);
+      const priceVariationIndex = parseInt(value);
 
-  //colors change
-  const handleColorsChange = async (cartId: string, value: string) => {
-    setIsLoadingFetch(true);
-    await syncCart({ cartItemId: cartId, colors: value });
-    await refetch();
-    setIsLoadingFetch(false);
+      if (isNaN(priceVariationIndex) || priceVariationIndex < 1) {
+        toast.error("Invalid price variation selection");
+        return;
+      }
+
+      const result = await syncCart({
+        cartItemId: cartId,
+        priceVariationIndex: priceVariationIndex,
+      });
+
+      if (result.data?.success) {
+        toast.success("Product variation updated");
+        await refetch();
+        await totalPriceRefetch();
+      } else {
+        toast.error("Failed to update variation");
+      }
+    } catch (error: any) {
+      console.error("Error updating price variation:", error);
+      const errorMsg =
+        error?.data?.message || "Failed to update product variation";
+      toast.error(errorMsg);
+    } finally {
+      setIsLoadingFetch(false);
+    }
   };
 
   //side effects
-
   useEffect(() => {
     const initialToggleProduct =
       allCartProducts?.cartItem?.map((item: any) => ({
@@ -155,6 +171,39 @@ const CartPage = () => {
         cartItemId: item._id,
       })) || [];
     setToggleProduct(initialToggleProduct);
+
+    // Calculate the total price based on selected variations
+    const calculateTotalPrice = () => {
+      if (!allCartProducts?.cartItem?.length)
+        return { totalMainPrice: 0, totalDiscountPrice: 0 };
+
+      let totalMainPrice = 0;
+      let totalDiscountPrice = 0;
+
+      allCartProducts.cartItem.forEach((item) => {
+        if (item.selected) {
+          const priceVariation =
+            item.product?.priceVariation?.[item.priceVariationIndex - 1];
+
+          if (priceVariation) {
+            const price = parseFloat(priceVariation.price) || 0;
+            const discountPrice =
+              parseFloat(priceVariation.discountPrice) || price;
+
+            totalMainPrice += price * item.quantity;
+            totalDiscountPrice += discountPrice * item.quantity;
+          } else {
+            totalMainPrice += item.price * item.quantity;
+            totalDiscountPrice += item.discountPrice * item.quantity;
+          }
+        }
+      });
+
+      return { totalMainPrice, totalDiscountPrice };
+    };
+
+    // Set calculated totals to state
+    setCalculatedTotals(calculateTotalPrice());
   }, [allCartProducts]);
 
   useEffect(() => {
@@ -201,10 +250,10 @@ const CartPage = () => {
                     <h1>
                       {user?.fullName ? user.fullName : ""} - Your Total:{" "}
                       <span className="text-red-500 line-through">
-                        TK. {totalPriceData?.totalMainPrice}
+                        TK. {calculatedTotals.totalMainPrice.toFixed(2)}
                       </span>{" "}
                       <span className="text-green-500 font-[500]">
-                        TK. {totalPriceData?.totalDiscountPrice}
+                        TK. {calculatedTotals.totalDiscountPrice.toFixed(2)}
                       </span>
                     </h1>
                   </div>
@@ -238,10 +287,24 @@ const CartPage = () => {
                                   <div className="flex-shrink-0">
                                     <Image
                                       className="max-w-full max-h-full object-contain"
-                                      src={`${env.NEXT_PUBLIC_SERVER_URL}/${product?.product?.image}`}
-                                      alt={product?.product?.slug}
+                                      src={
+                                        product?.product?.images?.[0]
+                                          ? `${env.NEXT_PUBLIC_SERVER_URL}/${product.product.images[0]}`
+                                          : product?.product?.image?.[0]
+                                            ? `${env.NEXT_PUBLIC_SERVER_URL}/${product.product.image[0]}`
+                                            : "/natural.png"
+                                      }
+                                      alt={
+                                        product?.product?.slug ||
+                                        "Product image"
+                                      }
                                       width={120}
                                       height={120}
+                                      onError={(e) => {
+                                        const target =
+                                          e.target as HTMLImageElement;
+                                        target.src = "/natural.png";
+                                      }}
                                     />
                                   </div>
                                   <div className="space-y-4">
@@ -270,78 +333,72 @@ const CartPage = () => {
                                 <div className="flex flex-col gap-3">
                                   <Select
                                     onValueChange={(value) =>
-                                      handleSizeChange(product?._id, value)
+                                      handlePriceVariationChange(
+                                        product?._id,
+                                        value
+                                      )
                                     }
-                                    defaultValue={product?.size}
+                                    defaultValue={
+                                      product?.priceVariationIndex?.toString() ||
+                                      "1"
+                                    }
                                   >
                                     <SelectTrigger className="w-full md:min-w-[140px]">
-                                      <SelectValue placeholder="Select Size" />
+                                      <SelectValue placeholder="Select Variation" />
                                     </SelectTrigger>
                                     <SelectContent className="w-full md:min-w-[140px]">
-                                      {product?.product?.size
-                                        ?.filter(
-                                          (item: any) =>
-                                            item?.available === true
-                                        )
-                                        .map(
-                                          (filterItem: any, index: number) => (
-                                            <SelectItem
-                                              key={index}
-                                              value={filterItem?.name}
-                                            >
-                                              {filterItem?.name}
-                                            </SelectItem>
-                                          )
+                                      {/* Display available variations */}
+                                      {product?.product?.priceVariation &&
+                                        Array.isArray(
+                                          product?.product?.priceVariation
+                                        ) &&
+                                        product?.product?.priceVariation.map(
+                                          (variation: any, idx: number) => {
+                                            const indexToUse = idx + 1; // 1-based index
+                                            const isSelected =
+                                              product?.priceVariationIndex ===
+                                              indexToUse;
+                                            const isAvailable =
+                                              variation?.available === true;
+
+                                            return (
+                                              <SelectItem
+                                                key={idx}
+                                                value={indexToUse.toString()}
+                                                disabled={!isAvailable}
+                                              >
+                                                {isSelected ? "✓ " : ""}
+                                                {isAvailable
+                                                  ? ""
+                                                  : "[Out of Stock] "}
+                                                Qty:{" "}
+                                                {variation?.quantity || "N/A"} -
+                                                ৳
+                                                {variation?.discountPrice ||
+                                                  variation?.price}
+                                              </SelectItem>
+                                            );
+                                          }
                                         )}
+
+                                      {/* Show message if no variations */}
+                                      {(!product?.product?.priceVariation ||
+                                        !Array.isArray(
+                                          product?.product?.priceVariation
+                                        ) ||
+                                        product?.product?.priceVariation
+                                          .length === 0) && (
+                                        <SelectItem
+                                          value={
+                                            product?.priceVariationIndex?.toString() ||
+                                            "1"
+                                          }
+                                        >
+                                          No variations available
+                                        </SelectItem>
+                                      )}
                                     </SelectContent>
                                   </Select>
-
-                                  <Select
-                                    onValueChange={(value) =>
-                                      handleColorsChange(product?._id, value)
-                                    }
-                                    defaultValue={product?.colors}
-                                  >
-                                    <SelectTrigger className="w-full md:min-w-[140px]">
-                                      <SelectValue placeholder="Select Color" />
-                                    </SelectTrigger>
-                                    <SelectContent className="w-full md:min-w-[140px]">
-                                      {product?.product?.colors
-                                        ?.filter(
-                                          (item: any) => item?.stock === true
-                                        )
-                                        .map(
-                                          (filterItem: any, index: number) => (
-                                            <SelectItem
-                                              key={index}
-                                              value={filterItem?.name}
-                                            >
-                                              {filterItem?.name}
-                                            </SelectItem>
-                                          )
-                                        )}
-                                    </SelectContent>
-                                  </Select>
-
-                                  {/* <select onChange={(e) => handleSizeChange(product?._id, e)} name="size" id="size" aria-placeholder="select size" className="">
-                                    <option defaultValue={product?.size} value="">Size: <span className="font-bold text-green-300">{product?.size}</span></option>
-                                    {product?.product?.size
-                                      ?.filter((item: any) => item?.available === true).map((filterItem: any, index: number) => (
-                                        <option key={index} value={filterItem?.name}>
-                                          {filterItem?.name}
-                                        </option>
-                                      ))}
-                                  </select>
-
-                                  <select onChange={(e) => handleColorsChange(product?._id, e)} name="colors" id="colors" aria-placeholder="select colors" className="">
-                                    <option defaultValue={product?.colors} value="">Colors: <span className="font-bold text-green-300">{product?.colors}</span></option>
-                                    {product?.product?.colors
-                                      ?.filter((item: any) => item?.stock === true).map((filterItem: any, index: number) => (
-                                        <option key={index} value={filterItem?.name}>
-                                          {filterItem?.name}
-                                        </option>
-                                      ))}
-                                  </select> */}
                                 </div>
 
                                 <div className="flex items-center justify-between md:pt-0 pt-6 gap-10">
@@ -384,10 +441,28 @@ const CartPage = () => {
                                   </div>
                                   <div className="">
                                     <h1 className="font-semibold">
-                                      {product?.discountPrice} TK.
+                                      {product?.product?.priceVariation &&
+                                      product?.priceVariationIndex &&
+                                      (product?.product?.priceVariation[
+                                        product?.priceVariationIndex - 1
+                                      ]?.discountPrice ??
+                                        null)
+                                        ? `${product?.product?.priceVariation[product?.priceVariationIndex - 1]?.discountPrice} TK.`
+                                        : product?.discountPrice
+                                          ? `${product?.discountPrice} TK.`
+                                          : ""}
                                     </h1>
                                     <p className="line-through">
-                                      {product?.price} TK.
+                                      {product?.product?.priceVariation &&
+                                      product?.priceVariationIndex &&
+                                      (product?.product?.priceVariation[
+                                        product?.priceVariationIndex - 1
+                                      ]?.price ??
+                                        null)
+                                        ? `${product?.product?.priceVariation[product?.priceVariationIndex - 1]?.price} TK.`
+                                        : product?.price
+                                          ? `${product?.price} TK.`
+                                          : ""}
                                     </p>
                                   </div>
                                 </div>
@@ -415,9 +490,13 @@ const CartPage = () => {
                     <Image
                       className="mt-2"
                       src={"/cash-on-delivery.png"}
-                      alt="cash on deliviery"
+                      alt="cash on delivery"
                       height={25}
                       width={25}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/natural.png";
+                      }}
                     />
                     <h1>Cash on Delivery Available</h1>
                   </div>
@@ -425,9 +504,13 @@ const CartPage = () => {
                     <Image
                       className="mt-2"
                       src={"/replacement-policy.png"}
-                      alt="cash on deliviery"
+                      alt="replacement policy"
                       height={25}
                       width={25}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/natural.png";
+                      }}
                     />
                     <h1>7 Days Replacement Policy</h1>
                   </div>
@@ -435,9 +518,13 @@ const CartPage = () => {
                     <Image
                       className="mt-2"
                       src={"/authentic.png"}
-                      alt="cash on deliviery"
+                      alt="authentic"
                       height={25}
                       width={25}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/natural.png";
+                      }}
                     />
                     <h1>100% Authentice</h1>
                   </div>
@@ -445,9 +532,13 @@ const CartPage = () => {
                     <Image
                       className="mt-2"
                       src={"/image-processing.png"}
-                      alt="cash on deliviery"
+                      alt="image processing"
                       height={25}
                       width={25}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/natural.png";
+                      }}
                     />
                     <h1>As shown in picture</h1>
                   </div>
@@ -461,6 +552,10 @@ const CartPage = () => {
                 alt="empty cart"
                 width={200}
                 height={200}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/natural.png";
+                }}
               />
               <h1 className="mt-6 mb-6 font-semibold text-2xl">
                 Your Cart is Empty!

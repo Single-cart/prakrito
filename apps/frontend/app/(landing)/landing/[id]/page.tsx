@@ -130,14 +130,44 @@ const Page: FC<Props> = async ({ params }) => {
             {/* Price Section */}
             <div className="bg-white p-4 sm:p-6 rounded-lg sm:rounded-xl shadow-md">
               <div className="flex items-end gap-2 sm:gap-3">
-                {productData?.price && (
-                  <span className="text-gray-500 line-through text-base sm:text-xl">
-                    ৳{productData.price}
-                  </span>
-                )}
-                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary animate-bounce">
-                  ৳{productData?.discountPrice || "Call for price"}
-                </span>
+                {productData?.priceVariation &&
+                  productData.priceVariation.length > 0 && (
+                    <>
+                      {/* Find first available variation */}
+                      {(() => {
+                        const availableVariation =
+                          productData.priceVariation.find(
+                            (variation: any) => variation.available !== false
+                          );
+
+                        if (!availableVariation) {
+                          return (
+                            <span className="text-xl font-medium text-primary">
+                              Call for price: {landingData.phone}
+                            </span>
+                          );
+                        }
+
+                        return (
+                          <>
+                            {availableVariation.price && (
+                              <span className="text-gray-500 line-through text-base sm:text-xl">
+                                ৳{availableVariation.price}
+                              </span>
+                            )}
+                            <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary animate-bounce">
+                              ৳{availableVariation.discountPrice}
+                            </span>
+                            {availableVariation.quantity && (
+                              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full ml-2">
+                                {availableVariation.quantity}
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </>
+                  )}
               </div>
               <p className="text-xs sm:text-sm text-gray-500 mt-2 font-bengali">
                 *শুধুমাত্র সীমিত সময়ের জন্য অফার মূল্য

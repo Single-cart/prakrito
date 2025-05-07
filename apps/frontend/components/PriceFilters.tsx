@@ -26,6 +26,7 @@ const PriceFilters = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchParams, minPrice]
   );
+
   const handleQuery = () => {
     if (minPrice) {
       router.push(`/products?${createQueryString("minPrice", minPrice)}`);
@@ -36,28 +37,40 @@ const PriceFilters = () => {
   };
 
   return (
-    <div className="space-y-1">
-      <h1 className="font-[400] text-lg">Price</h1>
-      <Separator />
-      <div className="flex items-center">
-        <Input
-          name="minPrice"
-          placeholder="Min"
-          type="number"
-          onChange={(e) => setMinPrice(e.target.value)}
-          value={minPrice?.toString()}
-          className="mr-2"
-        />
-        -
-        <Input
-          name="maxPrice"
-          placeholder="Max"
-          type="number"
-          onChange={(e) => setMaxPrice(e.target.value)}
-          value={maxPrice?.toString()}
-          className="ml-2"
-        />
-        <Button onClick={handleQuery} className="ml-3" size={"sm"}>
+    <div className="rounded-lg bg-white p-4 shadow-sm">
+      <h1 className="font-medium text-lg mb-2 text-primary">Price</h1>
+      <Separator className="mb-3 bg-gray-200" />
+
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Input
+            name="minPrice"
+            placeholder="Min"
+            type="number"
+            onChange={(e) => setMinPrice(e.target.value)}
+            value={minPrice?.toString()}
+            className="border-gray-300 focus-visible:ring-primary"
+          />
+        </div>
+
+        <span className="text-gray-500">to</span>
+
+        <div className="relative flex-1">
+          <Input
+            name="maxPrice"
+            placeholder="Max"
+            type="number"
+            onChange={(e) => setMaxPrice(e.target.value)}
+            value={maxPrice?.toString()}
+            className="border-gray-300 focus-visible:ring-primary"
+          />
+        </div>
+
+        <Button
+          onClick={handleQuery}
+          size="sm"
+          className="bg-primary hover:bg-primary/90 transition-colors"
+        >
           Apply
         </Button>
       </div>

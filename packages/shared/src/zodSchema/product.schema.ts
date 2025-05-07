@@ -5,7 +5,10 @@ export const ProductSchema = z.object({
   priceVariation: z
     .array(
       z.object({
-        price: z.string({ required_error: "Price is required" }),
+        price: z.string().optional(),
+        discountPrice: z.string({
+          required_error: "discount price is required",
+        }),
         quantity: z.string({ required_error: "Quantity is required" }),
         available: z.boolean({
           required_error: "Availability status is required",

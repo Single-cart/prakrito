@@ -3,55 +3,66 @@
 import { byNowItem } from "@/redux/features/cart/cartSlice";
 import { product } from "@workspace/shared/index";
 import { Button } from "@workspace/ui/components/button";
-import { useRouter } from "next/navigation";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@workspace/ui/components/sheet";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import BuyNowCheckout from "./BuyNowCheckout";
+
+interface BuyNowProps {
+  product: product.IProductRes;
+  priceVariationIndex: number;
+  className?: string;
+}
 
 const BuyNow = ({
   product,
-  colors,
-  size,
-}: {
-  product: product.IProductRes;
-  colors: string;
-  size: string;
-}) => {
+  priceVariationIndex,
+  className = "",
+}: BuyNowProps) => {
   const dispatch = useDispatch();
-  const router = useRouter();
+
+  const isAvailable =
+    priceVariationIndex === 0
+      ? (product.stock ?? 0) > 0
+      : (product.priceVariation?.[priceVariationIndex - 1]?.available ?? false);
 
   const handleClick = () => {
-    if (!colors || !size) {
-      toast.error("Please Select Size & Colors");
-    } else if (product?.stock > 0) {
-      dispatch(
-        byNowItem({
-          productName: product?.name,
-          price: product?.discountPrice,
-          quantity: 1,
-          image: product?.images[0],
-          product: product?._id,
-
-          insideDhaka: product?.insideDhaka,
-          outsideDhaka: product?.outsideDhaka,
-          colors,
-          size,
-        })
-      );
-
-      router.push("/buynow");
-    } else {
+    if (!isAvailable) {
       toast.error("Product Out of stock");
+      return;
     }
+
+    dispatch(
+      byNowItem({
+        product,
+        priceVariationIndex,
+      })
+    );
   };
 
   return (
-    <Button
-      variant={"outline"}
-      onClick={handleClick}
-      disabled={product?.stock <= 0}
-    >
-      Buy Now
-    </Button>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button
+          variant="outline"
+          onClick={handleClick}
+          disabled={!isAvailable}
+          className={className}
+        >
+          Buy Now
+        </Button>
+      </SheetTrigger>
+      <SheetContent
+        side="bottom"
+        className="h-[90vh] mx-auto max-w-[700px] w-full overflow-y-auto rounded-t-2xl"
+      >
+        <BuyNowCheckout />
+      </SheetContent>
+    </Sheet>
   );
 };
 

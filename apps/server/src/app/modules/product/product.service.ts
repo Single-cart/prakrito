@@ -41,6 +41,7 @@ export const updateProductService = async (
     ...updateData,
     priceVariation: updateData.priceVariation?.map((priceVariation: any) => ({
       price: priceVariation.price,
+      discountPrice: priceVariation.discountPrice,
       quantity: priceVariation.quantity,
       available: Boolean(priceVariation.available),
     })),
@@ -146,7 +147,7 @@ export const getAllProductsService = async (
         $gte: [
           {
             $convert: {
-              input: "$priceVariation.price",
+              input: "$priceVariation.discountPrice",
               to: "double",
               onError: 0,
               onNull: 0,
@@ -162,7 +163,7 @@ export const getAllProductsService = async (
         $lte: [
           {
             $convert: {
-              input: "$priceVariation.price",
+              input: "$priceVariation.discountPrice",
               to: "double",
               onError: 0,
               onNull: 0,

@@ -19,6 +19,7 @@ export interface OrderItem {
   product: string;
   quantity: number;
   price: number;
+  priceVariationIndex: number;
   _id: string;
 }
 
@@ -36,7 +37,7 @@ export interface OrderData {
   paymentType: string;
   itemsPrice: number;
   shippingPrice: number;
-  orderItems: any[];
+  orderItems: OrderItem[];
   totalAmount: number;
   user?: string;
 }

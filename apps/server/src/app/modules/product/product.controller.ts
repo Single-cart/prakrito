@@ -11,8 +11,7 @@ import * as productService from "./product.service";
 export const createProduct = catchAsync(async (req: Request, res: Response) => {
   const {
     name,
-    price,
-    discountPrice,
+
     stock,
     insideDhaka,
     outsideDhaka,
@@ -27,13 +26,19 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(httpStatus.BAD_REQUEST, "Products Images are required");
   }
 
+  const priceVariationArray = JSON.parse(priceVariation).map((item: any) => ({
+    price: Number(item.price),
+    discountPrice: Number(item.discountPrice),
+    quantity: item.quantity,
+    available: item.available,
+  }));
+
   const productData = {
     name,
     description,
-    price: parseInt(price),
-    discountPrice,
+
     stock: parseInt(stock),
-    priceVariation: JSON.parse(priceVariation),
+    priceVariation: priceVariationArray,
     insideDhaka: parseInt(insideDhaka),
     outsideDhaka: parseInt(outsideDhaka),
     category,
@@ -56,19 +61,38 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
 
 // Update product controller
 export const updateProduct = catchAsync(async (req: Request, res: Response) => {
+  // Check if priceVariation is a string that needs parsing or already an object
+  let parsedPriceVariation;
+  if (req.body.priceVariation) {
+    try {
+      // If it's a string (from FormData), parse it
+      parsedPriceVariation =
+        typeof req.body.priceVariation === "string"
+          ? JSON.parse(req.body.priceVariation)
+          : req.body.priceVariation;
+    } catch (error) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Invalid price variation format"
+      );
+    }
+  } else {
+    parsedPriceVariation = [];
+  }
+
   const data = req.files
     ? {
         ...req.body,
-        colors: JSON.parse(req.body.colors || "[]"),
-        size: JSON.parse(req.body.size || "[]"),
+        id: req.body.id,
+        priceVariation: parsedPriceVariation,
         images: (req.files as Express.Multer.File[]).map(
           (file: Express.Multer.File) => file.path
         ),
       }
     : {
         ...req.body,
-        // If no files, the data should already be parsed
-        priceVariation: JSON.parse(req.body.priceVariation || "[]"),
+        id: req.body.id,
+        priceVariation: parsedPriceVariation,
       };
 
   const result = await productService.updateProductService(data);

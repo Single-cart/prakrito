@@ -57,8 +57,11 @@ const productSchema: Schema<product.IProduct> = new Schema(
       type: [
         {
           price: {
-            type: String,
-            required: [true, "Product price is required"],
+            type: Number,
+          },
+          discountPrice: {
+            type: Number,
+            required: [true, "Product discount price is required"],
           },
           quantity: {
             type: String,

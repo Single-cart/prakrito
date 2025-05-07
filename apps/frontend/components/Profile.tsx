@@ -46,7 +46,7 @@ const Profile = () => {
         </Link>
       ) : (
         <Link href={"/login"}>
-          <CircleUserRound size={30} />
+          <CircleUserRound className="text-secondary" size={30} />
         </Link>
       )}
     </div>

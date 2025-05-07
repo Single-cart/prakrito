@@ -1,7 +1,7 @@
 import { styles } from "@/app/styles";
 import Cart from "@/components/Cart";
-import ColorsAndSize from "@/components/ColorsAndSize";
 import PageViewTracker from "@/components/gtm/PageViewTracker";
+import PriceVariations from "@/components/PriceVariations";
 import ProductDesc from "@/components/ProductDesc";
 import ProductCarousel from "@/components/ProductSlider";
 import Ratings from "@/components/Ratings";
@@ -24,8 +24,16 @@ const Page: FC<Props> = async ({ params }) => {
   const product = await singleProduct(slug);
   const productInfo = product?.data?.product;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const priceVariation = productInfo?.priceVariation?.map((item: any) => ({
+    price: item.price,
+    discountPrice: item.discountPrice,
+    quantity: item.quantity,
+    available: item.available,
+  }));
+
   return (
-    <div className={cn(styles.paddingX, "")}>
+    <div className={cn(styles.paddingX, "font-noto")}>
       <PageViewTracker
         event="product_view"
         pageData={{
@@ -35,7 +43,7 @@ const Page: FC<Props> = async ({ params }) => {
         productData={{
           name: productInfo?.name,
           id: productInfo?._id,
-          price: productInfo?.discountPrice,
+          price: priceVariation,
           brand: productInfo?.description?.brand,
           category: productInfo?.subcategory?.name,
           variant: productInfo?.description?.colors,
@@ -54,7 +62,6 @@ const Page: FC<Props> = async ({ params }) => {
               {productInfo?.name}
             </h1>
             <div className="">
-              {/* Use a key to ensure consistent rendering */}
               <Ratings
                 numOfRating={Math.ceil(productInfo?.ratings) || 0}
                 size="20px"
@@ -62,10 +69,9 @@ const Page: FC<Props> = async ({ params }) => {
               />
               <span> | {productInfo?.numOfReviews || 0} Reviews</span>
             </div>
-            <h1 className="text-xl font-semibold space-x-2">
-              <span className="line-through">TK. {productInfo?.price}</span>
-              <span>TK. {productInfo?.discountPrice}</span>
-            </h1>
+
+            <PriceVariations product={productInfo} />
+
             <h1>
               <span className="font-[500]">Category:</span>{" "}
               <Link
@@ -93,7 +99,6 @@ const Page: FC<Props> = async ({ params }) => {
                 </div>
               )}
             </div>
-            <ColorsAndSize product={productInfo} />
 
             <div className="text-xs space-y-2 pt-3">
               <h2 className="flex items-center gap-2">

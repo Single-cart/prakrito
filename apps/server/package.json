@@ -24,6 +24,7 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
+    "@faker-js/faker": "9.7.0",
     "@workspace/shared": "workspace:*",
     "arctic": "3.1.2",
     "bcrypt": "^5.1.1",

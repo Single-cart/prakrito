@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { styles } from "@/app/styles";
 import BuyNowOrder from "@/components/BuyNowOrder";
 import ComponentLoader from "@/components/ComponentLoader";
 import { clearBuyNow } from "@/redux/features/cart/cartSlice";
@@ -19,10 +17,8 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
-import { cn } from "@workspace/ui/lib/utils";
 
 import { customEvent } from "@/components/gtm/customEvent";
-import PageViewTracker from "@/components/gtm/PageViewTracker";
 import ShippingPriceSelection from "@/components/ShippingPrice";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -50,101 +46,39 @@ const orderSchema = z.object({
   }),
 });
 
-const ByNowCheckout = () => {
+const BuyNowCheckout = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [calculatedAmount, setCalculatedAmount] = useState(0);
   const [selectedShippingPrice, setSelectedShippingPrice] = useState(0);
-
-  const [createOrder, { isLoading, error, isError, isSuccess }] =
+  const [createOrder, { isLoading, error, isError, isSuccess, data }] =
     useCreateOrderMutation();
   const { refetch } = useGetOrderStatusQuery({});
   const { user } = useAuth();
-  const { buyNowItem } = useSelector((state: RootState) => state.cart);
-
-  const cartBuyNowItem = buyNowItem as any;
-  console.log(cartBuyNowItem);
-  // const totalAmount =
-  //   parseInt(buyNowItem?.price) + parseInt(buyNowItem?.shippingPrice);
-  const orderItems = [
-    {
-      productName: cartBuyNowItem?.productName,
-      price: parseInt(cartBuyNowItem?.price),
-      quantity: cartBuyNowItem?.quantity,
-      image: cartBuyNowItem?.image,
-      product: cartBuyNowItem?.product,
-      colors: cartBuyNowItem?.colors,
-      size: cartBuyNowItem?.size,
-    },
-  ];
+  const { buyNowItem } = useSelector((state: RootState) => state.cart as any);
 
   const form = useForm<z.infer<typeof orderSchema>>({
     resolver: zodResolver(orderSchema),
+    defaultValues: {
+      fullName: user?.fullName || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      address: user?.address || "",
+      orderNots: "",
+      shippingLocation: "outside",
+    },
   });
 
-  const handleSubmit = async (value: z.infer<typeof orderSchema>) => {
-    if (cartBuyNowItem?.price) {
-      const data = {
-        ...value,
-        user: user?._id ? user?._id : "",
-        paymentType: "Cash on delivery",
-        orderItems,
-        itemsPrice: parseInt(cartBuyNowItem?.price),
-        shippingPrice: selectedShippingPrice,
-        totalAmount: calculatedAmount,
-      };
-
-      await createOrder(data);
-
-      customEvent({
-        event: "purchase",
-        ecommerce: {
-          currencyCode: "BDT",
-          value: calculatedAmount,
-          items: orderItems.map((item: any) => ({
-            item_name: item.productName,
-            price: item.price,
-            quantity: item.quantity,
-          })),
-        },
-      });
-
-      await refetch();
-    } else {
-      toast.error("Product select again");
-    }
-  };
-
-  const handleShippingChange = (shippingPrice: number) => {
-    if (cartBuyNowItem?.price) {
-      const newTotal = parseInt(cartBuyNowItem.price) + shippingPrice;
-      setCalculatedAmount(newTotal);
-      setSelectedShippingPrice(shippingPrice);
-    }
-  };
-
-  // useEffect(() => {
-  //   if (cartBuyNowItem?.price && cartBuyNowItem?.shippingPrice) {
-  //     const amount =
-  //       parseInt(cartBuyNowItem.price) + parseInt(cartBuyNowItem.shippingPrice);
-  //     setCalculatedAmount(amount);
-  //   }
-  // }, [cartBuyNowItem]);
-
   useEffect(() => {
-    if (isSuccess) {
-      const amount = calculatedAmount;
+    if (isSuccess && data?.order) {
       toast.success("Order Placed successfully");
-      router.replace(`/orderSuccess?amount=${amount}`);
-
-      setTimeout(() => {
-        return dispatch(clearBuyNow());
-      }, 100);
+      router.replace("/orderSuccess?orderId=" + data?.order?._id);
+      setTimeout(() => dispatch(clearBuyNow()), 100);
     } else if (isError) {
       const errorData = error as { data: { message: string } };
       toast.error(errorData?.data?.message);
     }
-  }, [dispatch, error, isError, isSuccess, router, calculatedAmount]);
+  }, [data?.order, dispatch, error, isError, isSuccess, router]);
 
   useEffect(() => {
     form.setValue("fullName", user?.fullName || "");
@@ -152,46 +86,111 @@ const ByNowCheckout = () => {
     form.setValue("phone", user?.phone || "");
     form.setValue("address", user?.address || "");
     form.setValue("orderNots", "");
-  }, [
-    form,
-    user?.address,
-    user?.email,
-    user?.fullName,
-    cartBuyNowItem,
-    user?.phone,
-  ]);
+    form.setValue("shippingLocation", "outside", {
+      shouldValidate: true,
+    });
 
-  // lg:mt-[140px] mt-[80px]
+    if (buyNowItem?.product) {
+      const defaultShippingPrice = buyNowItem.product.outsideDhaka || 0;
+      setSelectedShippingPrice(defaultShippingPrice);
+
+      const selectedVariation =
+        buyNowItem.product.priceVariation?.[buyNowItem.priceVariationIndex - 1];
+
+      if (selectedVariation) {
+        setCalculatedAmount(
+          selectedVariation.discountPrice + defaultShippingPrice
+        );
+      }
+    }
+  }, [form, user, buyNowItem, router]);
+
+  const selectedVariation =
+    buyNowItem?.product?.priceVariation?.[buyNowItem?.priceVariationIndex - 1];
+
+  const orderItems = [
+    {
+      productName: buyNowItem?.product?.name,
+      price: selectedVariation?.discountPrice || 0,
+      quantity: 1,
+      image: buyNowItem?.product?.images?.[0],
+      product: buyNowItem?.product?._id,
+      priceVariationIndex: buyNowItem?.priceVariationIndex,
+    },
+  ];
+
+  const handleSubmit = async (value: z.infer<typeof orderSchema>) => {
+    if (!selectedVariation) {
+      toast.error("Invalid product variation");
+      return;
+    }
+
+    const productPrice =
+      Number(selectedVariation.discountPrice) ||
+      Number(selectedVariation.price) ||
+      0;
+    const totalPrice = productPrice;
+    const shipping = Number(selectedShippingPrice) || 0;
+    const totalAmount = productPrice + shipping;
+
+    const data = {
+      ...value,
+      user: user?._id || "",
+      paymentType: "Cash on delivery",
+      orderItems,
+      itemsPrice: totalPrice,
+      shippingPrice: shipping,
+      totalAmount: totalAmount,
+    };
+
+    try {
+      await createOrder(data).unwrap();
+
+      customEvent({
+        event: "purchase",
+        ecommerce: {
+          currencyCode: "BDT",
+          value: totalAmount,
+          items: [
+            {
+              item_name: buyNowItem?.product?.name || "",
+              price: productPrice,
+              quantity: 1,
+            },
+          ],
+        },
+      });
+
+      await refetch();
+    } catch (err) {
+      console.error("Order creation failed:", err);
+    }
+  };
+
+  const handleShippingChange = (shippingPrice: number) => {
+    if (selectedVariation) {
+      setSelectedShippingPrice(shippingPrice);
+      const newTotal = selectedVariation.discountPrice + shippingPrice;
+      setCalculatedAmount(newTotal);
+    }
+  };
+
   return (
     <Suspense fallback={<ComponentLoader />}>
-      <PageViewTracker
-        event="initiate_checkout"
-        pageData={{
-          title: "Buy Now Checkout",
-          type: "checkout",
-        }}
-        productData={orderItems}
-      />
-      <div
-        className={cn(
-          styles.paddingX,
-          styles.paddingY,
-          " max-w-[1200px] w-full mx-auto"
-        )}
-      >
-        <div className="">
-          <h1 className={cn("text-3xl font-semibold")}>Checkout</h1>
+      <div className="w-full mx-auto p-2">
+        <div>
+          <h1 className="text-2xl font-semibold">Checkout</h1>
           <Separator />
         </div>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="flex flex-col lg:flex-row gap-10 mt-10"
+            className="flex flex-col gap-6 mt-6"
           >
-            <div className="flex-1 bg-primary-foreground p-4">
-              <h2 className="mb-6 text-lg font-[500] text-secondary-foreground flex items-center gap-2">
-                <Receipt size={20} /> Billing Details{" "}
+            <div className="flex-1 bg-primary-foreground p-4 rounded-lg">
+              <h2 className="mb-4 text-lg font-[500] text-secondary-foreground flex items-center gap-2">
+                <Receipt size={18} /> Billing Details
               </h2>
               <div className="space-y-4">
                 <FormField
@@ -201,11 +200,7 @@ const ByNowCheckout = () => {
                     <FormItem>
                       <Label className="text-primary">Full Name</Label>
                       <FormControl>
-                        <Input
-                          // disabled={isLoading}
-                          placeholder="Enter Your Name"
-                          {...field}
-                        />
+                        <Input placeholder="Enter Your Name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -218,11 +213,7 @@ const ByNowCheckout = () => {
                     <FormItem>
                       <Label className="text-primary">Email (Optional)</Label>
                       <FormControl>
-                        <Input
-                          // disabled={isLoading}
-                          placeholder="Enter Your Email"
-                          {...field}
-                        />
+                        <Input placeholder="Enter Your Email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -236,7 +227,6 @@ const ByNowCheckout = () => {
                       <Label className="text-primary">Phone Number</Label>
                       <FormControl>
                         <Input
-                          // disabled={isLoading}
                           placeholder="Enter Your Phone Number"
                           {...field}
                         />
@@ -253,7 +243,6 @@ const ByNowCheckout = () => {
                       <Label className="text-primary">Address</Label>
                       <FormControl>
                         <Input
-                          // disabled={isLoading}
                           placeholder="Enter Your Full Address"
                           {...field}
                         />
@@ -262,38 +251,36 @@ const ByNowCheckout = () => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   name="orderNots"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label>Order Nots (Optional)</Label>
-                      <Input placeholder="Enter Your Order Nots" {...field} />
+                      <Label>Order Notes (Optional)</Label>
+                      <Input placeholder="Enter Your Order Notes" {...field} />
                     </FormItem>
                   )}
                 />
-
-                <div className="">
+                <div>
                   <ShippingPriceSelection
                     form={form}
-                    insideDhaka={cartBuyNowItem?.insideDhaka}
-                    outsideDhaka={cartBuyNowItem?.outsideDhaka}
+                    insideDhaka={buyNowItem?.product?.insideDhaka}
+                    outsideDhaka={buyNowItem?.product?.outsideDhaka}
                     onShippingChange={handleShippingChange}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 bg-primary-foreground p-4">
-              <h2 className="mb-6 text-lg font-[500] text-secondary-foreground flex items-center gap-2">
-                <ListOrdered size={20} /> Your Order{" "}
+            <div className="w-full bg-primary-foreground p-4 rounded-lg">
+              <h2 className="mb-4 text-lg font-[500] text-secondary-foreground flex items-center gap-2">
+                <ListOrdered size={18} /> Your Order
               </h2>
               <Suspense fallback={<ComponentLoader />}>
                 <BuyNowOrder
                   minShippingPrice={selectedShippingPrice}
                   selectItem={orderItems}
-                  totalPrice={cartBuyNowItem?.price}
+                  totalPrice={selectedVariation?.discountPrice || 0}
                   totalAmount={calculatedAmount}
                   isLoading={isLoading}
                 />
@@ -306,4 +293,4 @@ const ByNowCheckout = () => {
   );
 };
 
-export default ByNowCheckout;
+export default BuyNowCheckout;

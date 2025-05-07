@@ -20,6 +20,19 @@ import OrderModel from "./order.model";
 
 export const orderService = {
   async createOrder(orderData: OrderData, sessionId?: string) {
+    // Calculate item prices from order items if needed
+    const calculatedItemsPrice =
+      orderData.orderItems?.reduce((total, item: any) => {
+        return total + (Number(item.price) || 0) * (Number(item.quantity) || 1);
+      }, 0) || 0;
+
+    // Ensure we have valid numerical values for prices
+    const itemsPrice =
+      Number(orderData.itemsPrice) || calculatedItemsPrice || 0;
+    const shippingPrice = Number(orderData.shippingPrice) || 0;
+    const totalAmount =
+      Number(orderData.totalAmount) || itemsPrice + shippingPrice;
+
     const order = await OrderModel.create({
       shippingInfo: {
         phone: orderData.phone,
@@ -29,9 +42,9 @@ export const orderService = {
       orderItems: orderData.orderItems,
       orderNots: orderData.orderNots,
       paymentType: orderData.paymentType,
-      itemsPrice: orderData.itemsPrice,
-      shippingPrice: orderData.shippingPrice,
-      totalAmount: orderData.totalAmount,
+      itemsPrice: itemsPrice,
+      shippingPrice: shippingPrice,
+      totalAmount: totalAmount,
       user: orderData.user,
       orderId: generateOrderId(),
     });
@@ -66,7 +79,11 @@ export const orderService = {
       throw new ApiError(400, "Invalid order ID");
     }
 
-    const order = await OrderModel.findById(orderId);
+    const order = await OrderModel.findById(orderId).populate({
+      path: "orderItems.product",
+      select: "name images priceVariation category",
+    });
+
     if (!order) {
       throw new ApiError(404, "Order not found");
     }

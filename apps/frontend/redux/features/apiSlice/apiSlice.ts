@@ -69,6 +69,7 @@ export const apiSlice = createApi({
     "Products",
     "Reviews",
     "Cart",
+    "Blog",
     "Users",
     "Banner",
     "customerReview",

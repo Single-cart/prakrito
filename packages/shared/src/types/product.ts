@@ -35,8 +35,12 @@ export interface FilterQuery {
 // Product Input Interfaces
 export interface ICreateProductInput {
   name: string;
-  price: number;
-  discountPrice: string;
+  priceVariation: {
+    price: number;
+    discountPrice: number;
+    quantity: string;
+    available: boolean;
+  }[];
   stock: number;
   insideDhaka: number;
   outsideDhaka: number;
@@ -44,8 +48,7 @@ export interface ICreateProductInput {
   category: Types.ObjectId;
   subcategory: Types.ObjectId;
   description: any;
-  colors?: Array<{ name: string; stock: boolean }>;
-  size?: Array<{ name: string; available: boolean }>;
+
   images: string[];
 }
 
@@ -94,7 +97,12 @@ export interface IProduct extends Document {
   name: string;
   slug: string;
   description: string;
-  priceVariation?: { price: string; quantity: string; available: boolean }[];
+  priceVariation?: {
+    price: string;
+    discountPrice: string;
+    quantity: string;
+    available: boolean;
+  }[];
   stock: number;
   sold: number;
   soldAt: Date;
@@ -113,12 +121,14 @@ export interface IProductRes {
   _id: string;
   name: string;
   slug: string;
-  price: number;
   order: number;
-  discountPrice?: string;
   description: string;
-  colors?: { name: string; stock: boolean }[];
-  size?: { name: string; available: boolean }[];
+  priceVariation?: {
+    price: string;
+    discountPrice: string;
+    quantity: string;
+    available: boolean;
+  }[];
   stock: number;
   sold: number;
   soldAt: Date;

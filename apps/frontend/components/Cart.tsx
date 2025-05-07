@@ -26,7 +26,7 @@ const Cart = () => {
   if (!isMount) {
     return (
       <Link href={"/cart"} className="flex items-center">
-        <Button size={"icon"} variant={"outline"}>
+        <Button size={"icon"} variant={"outline"} className="bg-secondary">
           <ShoppingCart />
         </Button>
       </Link>
@@ -36,7 +36,7 @@ const Cart = () => {
   return (
     <div>
       <div className="cart">
-        <Button variant={"outline"}>
+        <Button variant={"outline"} className="bg-secondary">
           <Link href={"/cart"} className="flex items-center">
             <ShoppingCart />({cartLength})
           </Link>

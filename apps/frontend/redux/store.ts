@@ -7,13 +7,14 @@ import categorySlice from "./features/category/categorySlice";
 import orderSlice from "./features/orders/orderSlice";
 import porductSlice from "./features/product/productSlice";
 import reviewSlice from "./features/reviews/reviewSlice";
-
+import blogSlice from "./features/blog/blogSlice";
 export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authReducer,
     banner: bannerSlice,
     category: categorySlice,
+    blog: blogSlice,
     cart: cartSlice,
     porductReviews: reviewSlice,
     order: orderSlice,

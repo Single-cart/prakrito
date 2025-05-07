@@ -10,18 +10,11 @@ import {
   RadioGroup,
   RadioGroupItem,
 } from "@workspace/ui/components/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { MinusIcon, PlusIcon, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 const LandingCheckout = ({ product }: { product: any }) => {
@@ -29,25 +22,40 @@ const LandingCheckout = ({ product }: { product: any }) => {
     useCreateOrderMutation();
 
   const router = useRouter();
-  const [selectedSize, setSelectedSize] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedPriceVariationIndex, setSelectedPriceVariationIndex] =
+    useState(0);
   const [quantity, setQuantity] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     address: "",
   });
+  const [formErrors, setFormErrors] = useState({
+    name: false,
+    phone: false,
+    address: false,
+    variation: false,
+  });
   const [shippingLocation, setShippingLocation] = useState("outside");
   const [shippingPrice, setShippingPrice] = useState(
     product?.outsideDhaka || 120
   );
 
-  // Add validation state
-  const [showValidation, setShowValidation] = useState(false);
+  // Filter available price variations only using useMemo
+  const availablePriceVariations = useMemo(
+    () =>
+      product?.priceVariation?.filter(
+        (variation: any) => variation.available !== false
+      ) || [],
+    [product?.priceVariation]
+  );
 
-  // Compute these values
-  const hasSizes = product?.size && product.size.length > 0;
-  const hasColors = product?.colors && product.colors.length > 0;
+  // Set default selected variation to first available one
+  useEffect(() => {
+    if (availablePriceVariations.length > 0) {
+      setSelectedPriceVariationIndex(0);
+    }
+  }, [availablePriceVariations]);
 
   // Handle quantity changes
   const handleQuantityDecrement = () => {
@@ -81,22 +89,7 @@ const LandingCheckout = ({ product }: { product: any }) => {
 
   // Initialize shipping price on component mount
   useEffect(() => {
-    // Set initial shipping price to outside Dhaka
     handleShippingChange("outside");
-
-    // Set initial size and color if available
-    if (product?.size && product.size.length > 0) {
-      const firstSize = product.size[0];
-      setSelectedSize(
-        typeof firstSize === "object" ? firstSize.name : firstSize
-      );
-    }
-    if (product?.colors && product.colors.length > 0) {
-      const firstColor = product.colors[0];
-      setSelectedColor(
-        typeof firstColor === "object" ? firstColor.name : firstColor
-      );
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -111,26 +104,39 @@ const LandingCheckout = ({ product }: { product: any }) => {
     }
   }, [error, isError, isSuccess, router]);
 
+  // Validate form fields
+  const validateForm = () => {
+    const errors = {
+      name: !formData.name.trim(),
+      phone: !formData.phone.trim(),
+      address: !formData.address.trim(),
+      variation: availablePriceVariations.length === 0,
+    };
+
+    setFormErrors(errors);
+
+    // Check if any errors exist
+    return !Object.values(errors).some((error) => error);
+  };
+
   const handlePlaceOrder = async (e: any) => {
     e.preventDefault();
 
-    // Validate form
-    if (!formData.name || !formData.phone || !formData.address) {
+    // Validate form before submission
+    if (!validateForm()) {
       toast.error("সকল তথ্য পূরণ করুন", {
         id: "form-validation",
       });
       return;
     }
 
-    // Check if product has sizes and colors and validate selection
-    const hasSizes = product?.size && product.size.length > 0;
-    const hasColors = product?.colors && product.colors.length > 0;
-
-    if (hasSizes && !selectedSize) {
-      return;
-    }
-
-    if (hasColors && !selectedColor) {
+    // Get the selected price variation from available variations
+    const selectedVariation =
+      availablePriceVariations[selectedPriceVariationIndex];
+    if (!selectedVariation) {
+      toast.error("দয়া করে একটি বৈধ প্রোডাক্ট ভেরিয়েশন নির্বাচন করুন", {
+        id: "variation-error",
+      });
       return;
     }
 
@@ -138,18 +144,17 @@ const LandingCheckout = ({ product }: { product: any }) => {
     const orderItems = [
       {
         productName: product?.name,
-        price: Number(product?.discountPrice),
+        price: Number(selectedVariation.discountPrice || 0),
         quantity: quantity,
         image: product?.images?.[0],
         product: product?._id,
-        colors: selectedColor,
-        size: selectedSize,
+        priceVariationIndex: selectedPriceVariationIndex + 1,
       },
     ];
 
     // Calculate total amount
     const totalAmount =
-      (product?.discountPrice || 0) * quantity + shippingPrice;
+      (selectedVariation.discountPrice || 0) * quantity + shippingPrice;
 
     // Create order data
     const orderData = {
@@ -158,7 +163,7 @@ const LandingCheckout = ({ product }: { product: any }) => {
       address: formData.address,
       paymentType: "Cash on delivery",
       orderItems,
-      itemsPrice: Number(product?.discountPrice),
+      itemsPrice: Number(selectedVariation.discountPrice || 0) * quantity,
       shippingPrice: shippingPrice,
       totalAmount: totalAmount,
       shippingLocation: shippingLocation,
@@ -208,323 +213,216 @@ const LandingCheckout = ({ product }: { product: any }) => {
                 </div>
 
                 {/* Product Details */}
-                <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div>
-                    <span className="font-semibold font-bengali">
-                      {product?.name}
-                    </span>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-lg mb-2">
+                    {product?.name}
+                  </h4>
+
+                  {/* Price Variations */}
+                  <div className="space-y-2">
+                    {availablePriceVariations.length > 0 ? (
+                      availablePriceVariations.map(
+                        (variation: any, index: number) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="priceVariation"
+                              checked={selectedPriceVariationIndex === index}
+                              onChange={() =>
+                                setSelectedPriceVariationIndex(index)
+                              }
+                              className="h-4 w-4 text-primary"
+                            />
+                            <span className="text-sm">
+                              {variation.quantity} - ৳{variation.discountPrice}
+                              {variation.price &&
+                                variation.price !== variation.discountPrice && (
+                                  <span className="ml-2 text-gray-500 line-through">
+                                    ৳{variation.price}
+                                  </span>
+                                )}
+                            </span>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <p className="text-red-500 font-bengali text-sm">
+                        কোনো পণ্য উপলব্ধ নেই।
+                      </p>
+                    )}
+                    {formErrors.variation && (
+                      <p className="text-red-500 text-sm mt-1">
+                        কোনো পণ্য উপলব্ধ নেই। যোগাযোগ করুন
+                      </p>
+                    )}
                   </div>
 
                   {/* Quantity Selector */}
-                  <div className="flex items-center">
-                    <div className="flex items-center border rounded-md overflow-hidden">
-                      <button
-                        type="button"
-                        className="p-2 bg-gray-100 hover:bg-gray-200 transition-colors"
-                        onClick={handleQuantityDecrement}
-                      >
-                        <MinusIcon className="h-4 w-4" />
-                      </button>
-                      <input
-                        type="number"
-                        value={quantity}
-                        min="1"
-                        className="w-12 text-center border-x p-2"
-                        readOnly
-                      />
-                      <button
-                        type="button"
-                        className="p-2 bg-gray-100 hover:bg-gray-200 transition-colors"
-                        onClick={handleQuantityIncrement}
-                      >
-                        <PlusIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Price */}
-                  <div>
-                    <div className="font-bold text-lg">
-                      <span>৳{product?.discountPrice || 0}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Size and Color Selection */}
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Size Selection */}
-
-              {product?.size && product.size.length > 0 && (
-                <div>
-                  <Label className="font-bengali mb-2 block">
-                    সাইজ নির্বাচন করুন <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    value={selectedSize}
-                    onValueChange={setSelectedSize}
-                    required
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="সাইজ নির্বাচন করুন" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {product.size.map((size: any) => (
-                        <SelectItem
-                          key={typeof size === "object" ? size._id : size}
-                          value={typeof size === "object" ? size.name : size}
-                        >
-                          {typeof size === "object" ? size.name : size}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {hasSizes && !selectedSize && (
-                    <p className="text-red-500 text-sm mt-1">
-                      সাইজ নির্বাচন করুন
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Color Selection */}
-              {product?.colors && product.colors.length > 0 && (
-                <div>
-                  <Label className="font-bengali mb-2 block">
-                    কালার নির্বাচন করুন <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    value={selectedColor}
-                    onValueChange={setSelectedColor}
-                    required
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="কালার নির্বাচন করুন" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {product.colors.map((color: any) => (
-                        <SelectItem
-                          key={typeof color === "object" ? color._id : color}
-                          value={typeof color === "object" ? color.name : color}
-                        >
-                          {typeof color === "object" ? color.name : color}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {hasColors && !selectedColor && (
-                    <p className="text-red-500 text-sm mt-1">
-                      কালার নির্বাচন করুন
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Customer Details Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-            <div>
-              <div>
-                <h3 className="text-xl font-bold mb-6 font-bengali">
-                  আপনার তথ্য
-                </h3>
-
-                <div className="space-y-4">
-                  <div className="form-row">
-                    <Label
-                      htmlFor="billing_first_name"
-                      className="font-bengali mb-2 block"
-                    >
-                      আপনার নাম <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      type="text"
-                      name="name"
-                      id="billing_first_name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className={`w-full ${showValidation && !formData.name ? "border-red-500" : ""}`}
-                      required
-                    />
-                    {showValidation && !formData.name && (
-                      <p className="text-red-500 text-sm mt-1">আপনার নাম দিন</p>
-                    )}
-                  </div>
-
-                  <div className="form-row">
-                    <Label
-                      htmlFor="billing_phone"
-                      className="font-bengali mb-2 block"
-                    >
-                      আপনার মোবাইল নাম্বার{" "}
-                      <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      type="tel"
-                      name="phone"
-                      id="billing_phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className={`w-full ${showValidation && !formData.phone ? "border-red-500" : ""}`}
-                      required
-                    />
-                    {showValidation && !formData.phone && (
-                      <p className="text-red-500 text-sm mt-1">
-                        আপনার মোবাইল নাম্বার দিন
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="form-row">
-                    <Label
-                      htmlFor="billing_address_1"
-                      className="font-bengali mb-2 block"
-                    >
-                      গ্রাম, থানা, জেলা পূর্ণ ঠিকানা লিখুন{" "}
-                      <span className="text-red-500">*</span>
-                    </Label>
-                    <Textarea
-                      name="address"
-                      id="billing_address_1"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      className={`w-full ${showValidation && !formData.address ? "border-red-500" : ""}`}
-                      rows={4}
-                      required
-                    />
-                    {showValidation && !formData.address && (
-                      <p className="text-red-500 text-sm mt-1">
-                        আপনার ঠিকানা দিন
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Delivery Location Selection */}
-                  <div className="form-row">
-                    <Label className="font-bengali mb-2 block">
-                      ডেলিভারি লোকেশন <span className="text-red-500">*</span>
-                    </Label>
-                    <RadioGroup
-                      onValueChange={handleShippingChange}
-                      defaultValue={shippingLocation}
-                      className="flex flex-col space-y-1"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <RadioGroupItem value="inside" id="inside" />
-                        <Label
-                          htmlFor="inside"
-                          className="font-normal font-bengali"
-                        >
-                          ঢাকার ভিতরে (৳{product?.insideDhaka || 60})
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <RadioGroupItem value="outside" id="outside" />
-                        <Label
-                          htmlFor="outside"
-                          className="font-normal font-bengali"
-                        >
-                          ঢাকার বাইরে (৳{product?.outsideDhaka || 120})
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Order Summary */}
-            <div>
-              <div>
-                <h3 className="text-xl font-bold mb-6 font-bengali">
-                  আপনার অর্ডার
-                </h3>
-
-                <div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="font-bengali font-medium">পণ্য</span>
-                      <span className="font-bengali font-medium">মূল্য</span>
-                    </div>
-
-                    <div className="flex justify-between py-3 border-b">
-                      <span className="font-bengali">
-                        {product?.name} <strong>× {quantity}</strong>
-                        {selectedSize && <span> - {selectedSize}</span>}
-                        {selectedColor && <span> - {selectedColor}</span>}
-                      </span>
-                      <span>৳{(product?.discountPrice || 0) * quantity}</span>
-                    </div>
-
-                    {/* Removed duplicate product entry */}
-
-                    <div className="flex justify-between py-3 border-b">
-                      <span className="font-bengali">ডেলিভারি চার্জ</span>
-                      <span>৳{shippingPrice}</span>
-                    </div>
-
-                    <div className="flex justify-between py-3 font-bold text-lg">
-                      <span className="font-bengali">সর্বমোট</span>
-                      <span>
-                        ৳
-                        {(product?.discountPrice || 0) * quantity +
-                          shippingPrice}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 space-y-2 text-sm text-gray-500">
-                    <p className="font-bengali">
-                      * ঢাকার ভিতরে ডেলিভারি চার্জ ৳{product?.insideDhaka || 60}
-                    </p>
-                    <p className="font-bengali">
-                      * ঢাকার বাইরে ডেলিভারি চার্জ ৳
-                      {product?.outsideDhaka || 120}
-                    </p>
-                    <p className="font-bengali">
-                      * ক্যাশ অন ডেলিভারি সুবিধা উপলব্ধ
-                    </p>
-                  </div>
-
-                  <div className="mt-6">
+                  <div className="flex items-center gap-2 mt-4">
                     <Button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full py-6 text-lg font-bengali bg-primary hover:bg-primary/90"
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleQuantityDecrement}
+                      disabled={quantity <= 1}
                     >
-                      {isLoading ? (
-                        <span className="flex items-center justify-center">
-                          <svg
-                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          অর্ডার প্রসেসিং...
-                        </span>
-                      ) : (
-                        "অর্ডার কনফার্ম করুন"
-                      )}
+                      <MinusIcon className="h-4 w-4" />
+                    </Button>
+                    <span className="w-8 text-center">{quantity}</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleQuantityIncrement}
+                    >
+                      <PlusIcon className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Customer Information Section */}
+          <div className="p-6 border-b">
+            <h3 className="text-xl font-bold mb-6 text-center font-bengali">
+              আপনার তথ্য দিন
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name" className="font-bengali">
+                  নাম <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="আপনার নাম লিখুন"
+                  className={`mt-1 ${formErrors.name ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                />
+                {formErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">নাম দেওয়া আবশ্যক</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="phone" className="font-bengali">
+                  ফোন নাম্বার <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="আপনার ফোন নাম্বার লিখুন"
+                  className={`mt-1 ${formErrors.phone ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                />
+                {formErrors.phone && (
+                  <p className="text-red-500 text-sm mt-1">
+                    ফোন নাম্বার দেওয়া আবশ্যক
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="address" className="font-bengali">
+                  ঠিকানা <span className="text-red-500">*</span>
+                </Label>
+                <Textarea
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  placeholder="আপনার পূর্ণ ঠিকানা লিখুন"
+                  className={`mt-1 ${formErrors.address ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                />
+                {formErrors.address && (
+                  <p className="text-red-500 text-sm mt-1">
+                    ঠিকানা দেওয়া আবশ্যক
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label className="font-bengali mb-2 block">
+                  ডেলিভারি লোকেশন
+                </Label>
+                <RadioGroup
+                  value={shippingLocation}
+                  onValueChange={handleShippingChange}
+                  className="flex gap-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="inside" id="inside" />
+                    <Label htmlFor="inside" className="font-bengali">
+                      ঢাকার ভিতরে
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="outside" id="outside" />
+                    <Label htmlFor="outside" className="font-bengali">
+                      ঢাকার বাইরে
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          </div>
+
+          {/* Order Summary Section */}
+          <div className="p-6 border-t bg-gray-50">
+            <h3 className="text-xl font-bold mb-6 text-center font-bengali">
+              অর্ডার সারসংক্ষেপ
+            </h3>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="font-bengali">
+                  পণ্যের মূল্য ({quantity}টি):
+                </span>
+                <span>
+                  ৳
+                  {product?.priceVariation?.[selectedPriceVariationIndex]
+                    ?.discountPrice * quantity || 0}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-bengali">শিপিং চার্জ:</span>
+                <span>৳{shippingPrice}</span>
+              </div>
+              <div className="flex justify-between border-t pt-2 font-bold">
+                <span className="font-bengali">সর্বমোট:</span>
+                <span>
+                  ৳
+                  {product?.priceVariation?.[selectedPriceVariationIndex]
+                    ?.discountPrice *
+                    quantity +
+                    shippingPrice || 0}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full text-lg py-6 font-bengali bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary shadow-lg hover:shadow-xl transition-all"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin" />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  <span>
+                    <ShoppingBag className="inline-block mr-2 h-5 w-5" /> অর্ডার
+                    কনফার্ম করুন
+                  </span>
+                )}
+              </Button>
             </div>
           </div>
         </form>

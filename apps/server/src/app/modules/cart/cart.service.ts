@@ -2,13 +2,13 @@ import httpStatus from "http-status";
 import { Types } from "mongoose";
 import ApiError from "../../errorHandlers/ApiError";
 import { generateOrderId } from "../../helpers/generateId";
+import catchAsync from "../../middlewares/catchAsync";
 import ProductModel from "../product/product.model";
 import CartModel from "./cart.model";
 
 export const addCartItemService = async (
   productId: string,
-  colors: string,
-  size: string,
+  priceVariationIndex: number,
   cartSession?: string
 ) => {
   const product = await ProductModel.findById(productId);
@@ -21,8 +21,7 @@ export const addCartItemService = async (
       return await handleExistingCart(
         cartSession,
         productId,
-        colors,
-        size,
+        priceVariationIndex,
         product
       );
     } catch (error) {
@@ -31,20 +30,19 @@ export const addCartItemService = async (
         error instanceof ApiError &&
         error.statusCode === httpStatus.NOT_FOUND
       ) {
-        return await createNewCart(productId, colors, size, product);
+        return await createNewCart(productId, priceVariationIndex, product);
       }
       throw error;
     }
   }
 
-  return await createNewCart(productId, colors, size, product);
+  return await createNewCart(productId, priceVariationIndex, product);
 };
 
 export const handleExistingCart = async (
   cartSession: string,
   productId: string,
-  colors: string,
-  size: string,
+  priceVariationIndex: number,
   product: any
 ) => {
   // Find the existing cart
@@ -59,12 +57,25 @@ export const handleExistingCart = async (
   const existingItem = cart.cartItem.find(
     (item) =>
       item.productId.toString() === productId &&
-      item.colors === colors &&
-      item.size === size
+      item.priceVariationIndex === priceVariationIndex
   );
 
   if (existingItem) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Product Already In Cart");
+  }
+
+  // Get the price information based on the price variation index
+  const priceVariation =
+    product.priceVariation &&
+    product.priceVariation.length >= priceVariationIndex
+      ? product.priceVariation[priceVariationIndex - 1]
+      : null;
+
+  if (!priceVariation || !priceVariation.available) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Selected variation is not available"
+    );
   }
 
   const updatedCart = await CartModel.findOneAndUpdate(
@@ -73,12 +84,12 @@ export const handleExistingCart = async (
       $push: {
         cartItem: {
           productId: new Types.ObjectId(productId),
-          colors,
-          size,
-          price: product.price,
-          discountPrice: product.discountPrice
-            ? parseInt(product.discountPrice.toString())
-            : "0",
+          priceVariationIndex,
+          price: priceVariation.price || product.price,
+          discountPrice:
+            priceVariation.discountPrice ||
+            product.discountPrice ||
+            priceVariation.price,
           selected: true,
           quantity: 1,
         },
@@ -96,23 +107,36 @@ export const handleExistingCart = async (
 
 const createNewCart = async (
   productId: string,
-  colors: string,
-  size: string,
+  priceVariationIndex: number,
   product: any
 ) => {
   const sessionId = generateOrderId();
+
+  // Get the price information based on the price variation index
+  const priceVariation =
+    product.priceVariation &&
+    product.priceVariation.length >= priceVariationIndex
+      ? product.priceVariation[priceVariationIndex - 1]
+      : null;
+
+  if (!priceVariation || !priceVariation.available) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Selected variation is not available"
+    );
+  }
 
   const newCart = await CartModel.create({
     sessionId,
     cartItem: [
       {
         productId,
-        colors,
-        size,
-        price: product.price,
-        discountPrice: product.discountPrice
-          ? parseInt(product.discountPrice.toString())
-          : product.price,
+        priceVariationIndex,
+        price: priceVariation.price || product.price,
+        discountPrice:
+          priceVariation.discountPrice ||
+          product.discountPrice ||
+          priceVariation.price,
         quantity: 1,
         selected: true,
       },
@@ -121,6 +145,7 @@ const createNewCart = async (
 
   return { cart: newCart, sessionId };
 };
+
 export const getCartItemService = async (sessionId?: string) => {
   if (!sessionId) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid cart session");
@@ -142,32 +167,20 @@ export const getCartItemService = async (sessionId?: string) => {
       },
     },
     {
+      $addFields: {
+        "cartItem.product": { $arrayElemAt: ["$product", 0] },
+      },
+    },
+    {
       $project: {
         "cartItem.productId": 1,
         "cartItem.quantity": 1,
         "cartItem.selected": 1,
         "cartItem.price": 1,
         "cartItem.discountPrice": 1,
-        "cartItem.colors": 1,
-        "cartItem.size": 1,
+        "cartItem.priceVariationIndex": 1,
         "cartItem._id": 1,
-
-        "cartItem.product": {
-          name: { $arrayElemAt: ["$product.name", 0] },
-          image: {
-            $arrayElemAt: [{ $arrayElemAt: ["$product.images", 0] }, 0],
-          },
-          colors: {
-            $arrayElemAt: ["$product.colors", 0],
-          },
-          size: {
-            $arrayElemAt: ["$product.size", 0],
-          },
-          // shipping: { $arrayElemAt: ["$product.shipping", 0] },
-          insideDhaka: { $arrayElemAt: ["$product.insideDhaka", 0] },
-          outsideDhaka: { $arrayElemAt: ["$product.outsideDhaka", 0] },
-          slug: { $arrayElemAt: ["$product.slug", 0] },
-        },
+        "cartItem.product": 1,
         selectAll: "$selectAll",
       },
     },
@@ -193,168 +206,153 @@ export const getCartItemService = async (sessionId?: string) => {
   };
 };
 
-export const syncCartService = async (params: {
-  sessionId?: string;
-  isSelect?: string;
-  cartItemId?: string;
-  isSelectAll?: string;
-  cartQuantity?: string;
-  deleteCartItem?: string;
-  colors?: string;
-  size?: string;
-}) => {
-  const { sessionId } = params;
+export const syncCart = catchAsync(async (req, res) => {
+  const {
+    isSelect,
+    cartItemId,
+    isSelectAll,
+    cartQuantity,
+    deleteCartItem,
+    priceVariationIndex,
+  } = req.query;
+  const sessionId = req.cookies.cart_session;
+
   if (!sessionId) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid cart session");
+    throw new ApiError(400, "Invalid Cart Product");
   }
 
-  if (params.isSelect !== undefined && params.cartItemId) {
-    await handleItemSelection(sessionId, params.cartItemId, params.isSelect);
-  }
-
-  if (params.isSelectAll !== undefined) {
-    await handleSelectAll(sessionId, params.isSelectAll);
-  }
-
-  if (params.cartQuantity && params.cartItemId) {
-    await handleQuantityUpdate(
-      sessionId,
-      params.cartItemId,
-      params.cartQuantity
-    );
-  }
-
-  if ((params.colors || params.size) && params.cartItemId) {
-    await handleColorSizeUpdate(
-      sessionId,
-      params.cartItemId,
-      params.colors,
-      params.size
-    );
-  }
-
-  if (params.deleteCartItem !== undefined && params.cartItemId) {
-    await handleItemDeletion(sessionId, params.cartItemId);
-  }
-};
-
-// Helper functions for syncCartService
-const handleItemSelection = async (
-  sessionId: string,
-  cartItemId: string,
-  isSelect: string
-) => {
-  const updatedCart = await CartModel.findOneAndUpdate(
-    { sessionId, "cartItem._id": cartItemId },
-    { $set: { "cartItem.$.selected": isSelect === "true" } },
-    { new: true }
-  );
-
-  if (!updatedCart) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Cart item not found");
-  }
-
-  const allSelected = updatedCart.cartItem.every((item) => item.selected);
-  await CartModel.updateOne(
-    { sessionId },
-    { $set: { selectAll: allSelected } }
-  );
-};
-
-const handleSelectAll = async (sessionId: string, isSelectAll: string) => {
-  await CartModel.updateOne(
-    { sessionId },
-    {
-      $set: {
-        selectAll: isSelectAll === "true",
-        "cartItem.$[].selected": isSelectAll === "true",
+  if (isSelect !== undefined && cartItemId) {
+    // Toggle product selection
+    const updatedCartItem = await CartModel.findOneAndUpdate(
+      {
+        sessionId,
+        "cartItem._id": cartItemId,
       },
+      {
+        $set: {
+          "cartItem.$.selected": isSelect === "false" ? false : true,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedCartItem) {
+      throw new ApiError(404, "cart product not found");
     }
-  );
-};
 
-const handleQuantityUpdate = async (
-  sessionId: string,
-  cartItemId: string,
-  quantity: string
-) => {
-  const parsedQuantity = parseInt(quantity);
-  if (isNaN(parsedQuantity) || parsedQuantity < 1) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid quantity value");
-  }
+    // Check if all items are selected
+    const allItemsSelected = updatedCartItem.cartItem.every(
+      (item) => item.selected
+    );
 
-  const updatedCart = await CartModel.findOneAndUpdate(
-    { sessionId, "cartItem._id": cartItemId },
-    { $set: { "cartItem.$.quantity": parsedQuantity } },
-    { new: true }
-  );
-
-  if (!updatedCart) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Cart item not found");
-  }
-};
-
-const handleColorSizeUpdate = async (
-  sessionId: string,
-  cartItemId: string,
-  colors?: string,
-  size?: string
-) => {
-  const cart = await CartModel.findOne({ sessionId });
-  if (!cart) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Cart not found");
-  }
-
-  const cartItem = cart.cartItem.id(cartItemId);
-  if (!cartItem) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Cart item not found");
-  }
-
-  // Check for existing items with same product, new color/size combination
-  const hasDuplicate = cart.cartItem.some(
-    (item) =>
-      item._id.toString() !== cartItemId &&
-      item.productId.toString() === cartItem.productId.toString() &&
-      item.colors === (colors || cartItem.colors) &&
-      item.size === (size || cartItem.size)
-  );
-
-  if (hasDuplicate) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Product variant already exists in cart"
+    // Update selectAll based on the condition for the specific cartId
+    await CartModel.findOneAndUpdate(
+      {
+        sessionId,
+      },
+      {
+        selectAll: allItemsSelected,
+      },
+      { new: true }
     );
   }
 
-  // Update fields if provided
-  if (colors) cartItem.colors = colors;
-  if (size) cartItem.size = size;
+  if (isSelectAll !== undefined) {
+    // Toggle select all
+    const isSelectedAll = isSelectAll === "false" ? false : true;
 
-  await cart.save();
-};
-
-const handleItemDeletion = async (sessionId: string, cartItemId: string) => {
-  const updatedCart = await CartModel.findOneAndUpdate(
-    { sessionId },
-    { $pull: { cartItem: { _id: cartItemId } } },
-    { new: true }
-  );
-
-  if (!updatedCart) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Cart not found");
+    await CartModel.findOneAndUpdate(
+      {
+        sessionId,
+      },
+      {
+        selectAll: isSelectedAll,
+        $set: { "cartItem.$[].selected": isSelectedAll },
+      },
+      { new: true }
+    );
   }
 
-  // Update selectAll status after deletion
-  const allSelected =
-    updatedCart.cartItem.length > 0
-      ? updatedCart.cartItem.every((item) => item.selected)
-      : false;
+  if (cartQuantity && cartItemId) {
+    // Update product quantity
+    await CartModel.findOneAndUpdate(
+      {
+        sessionId,
+        "cartItem._id": cartItemId,
+      },
+      {
+        $set: { "cartItem.$.quantity": parseInt(cartQuantity as string) },
+      },
+      { new: true }
+    );
+  }
 
-  await CartModel.updateOne(
-    { sessionId },
-    { $set: { selectAll: allSelected } }
-  );
-};
+  if (priceVariationIndex && cartItemId) {
+    // Get the cart
+    const cart = await CartModel.findOne({ sessionId });
+    if (!cart) {
+      throw new ApiError(404, "Cart not found");
+    }
+
+    const updatingItem: any = cart.cartItem.id(cartItemId);
+    if (!updatingItem) {
+      throw new ApiError(404, "Cart item not found");
+    }
+
+    const newPriceVariationIndex = parseInt(priceVariationIndex as string);
+    if (isNaN(newPriceVariationIndex) || newPriceVariationIndex < 1) {
+      throw new ApiError(400, "Invalid price variation index");
+    }
+
+    // Check if a product with the same ID and variation index already exists
+    const existingItem = cart.cartItem.find(
+      (item: any) =>
+        item._id.toString() !== cartItemId &&
+        item.productId.toString() === updatingItem.productId.toString() &&
+        item.priceVariationIndex === newPriceVariationIndex
+    );
+
+    if (existingItem) {
+      throw new ApiError(400, "Product variation already exists in the cart");
+    }
+
+    // Update the price variation index
+    updatingItem.priceVariationIndex = newPriceVariationIndex;
+    await cart.save();
+  }
+
+  if (deleteCartItem !== undefined && cartItemId) {
+    // Delete specific item from the cart
+    const updatedCartItem = await CartModel.findOneAndUpdate(
+      { sessionId },
+      {
+        $pull: {
+          cartItem: { _id: cartItemId },
+        },
+      },
+      { new: true }
+    );
+
+    const allItemsSelected = updatedCartItem?.cartItem.every(
+      (item) => item.selected
+    );
+
+    await CartModel.findOneAndUpdate(
+      { sessionId },
+      {
+        selectAll: allItemsSelected,
+      },
+      {
+        new: true,
+      }
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "cart product was sync",
+  });
+});
 
 export const calculatePriceService = async (sessionId?: string) => {
   if (!sessionId) {
@@ -366,18 +364,19 @@ export const calculatePriceService = async (sessionId?: string) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Cart not found");
   }
 
+  // Use type assertion to fix TypeScript errors
   const selectedProduct = cart.cartItem.filter((item) => item.selected);
   const totalMainPrice = selectedProduct.reduce(
-    (acc, curr) => acc + curr.price * curr.quantity,
+    (acc, curr: any) => acc + curr.price * curr.quantity,
     0
   );
   const totalDiscountPrice = selectedProduct.reduce(
-    (acc, curr) => acc + curr.discountPrice * curr.quantity,
+    (acc, curr: any) => acc + curr.discountPrice * curr.quantity,
     0
   );
 
-  cart.totalMainPrice = totalMainPrice;
-  cart.totalDiscountPrice = totalDiscountPrice;
+  // Fix the property names to match the model
+  cart.totalPrice = totalMainPrice;
   await cart.save();
 
   return { totalMainPrice, totalDiscountPrice };

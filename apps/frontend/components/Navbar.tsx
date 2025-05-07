@@ -72,16 +72,16 @@ const Navbar = async () => {
       )}
 
       {/* Desktop Navigation */}
-      <div className="sticky hidden lg:block top-0 z-50 bg-slate-100">
+      <div className="sticky hidden lg:block top-0 z-50 bg-primary">
         <div
           className={cn(
             styles.paddingX,
-            "flex items-center justify-between py-5 w-full"
+            "flex items-center justify-between py-3 w-full"
           )}
         >
           <div className="flex-shrink-0">
             <Link href="/">
-              <div className="relative w-[150px] h-[40px]">
+              <div className="relative w-[150px] h-[50px]">
                 <Image
                   src="/logo.png"
                   alt="shop logo"
@@ -105,14 +105,14 @@ const Navbar = async () => {
       <div
         className={cn(
           styles.paddingX,
-          "sticky block lg:hidden top-0 z-50 bg-slate-200 w-full py-2"
+          "sticky block lg:hidden top-0 z-50 bg-primary w-full py-1"
         )}
       >
         <div className="flex items-center justify-between">
           <MobileMenu />
           <div className="flex-shrink-0">
             <Link href="/">
-              <div className="relative w-[130px] h-[40px]">
+              <div className="relative w-[130px] h-[50px]">
                 <Image
                   src="/logo.png"
                   alt="shop logo"

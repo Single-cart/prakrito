@@ -46,7 +46,8 @@ const AddPriceVariation: FC<AddPriceVariationProps> = ({ form }) => {
   useEffect(() => {
     if (priceVariationFields.length === 0) {
       appendPriceVariation({
-        price: 0,
+        price: "",
+        discountPrice: 0,
         quantity: "",
         available: true,
       });
@@ -55,8 +56,9 @@ const AddPriceVariation: FC<AddPriceVariationProps> = ({ form }) => {
 
   const addNewPriceVariation = () => {
     appendPriceVariation({
-      price: 0,
+      price: "",
       quantity: "",
+      discountPrice: 0,
       available: true,
     });
   };
@@ -65,9 +67,9 @@ const AddPriceVariation: FC<AddPriceVariationProps> = ({ form }) => {
     <div>
       <Dialog>
         <DialogTrigger className="w-full border border-dashed hover:bg-primary-foreground font-semibold text-sm p-3 rounded-md">
-          Add Sizes & Colors
+          Add Price Variation
         </DialogTrigger>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-[700px] w-full overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Price Variation</DialogTitle>
           </DialogHeader>
@@ -77,6 +79,23 @@ const AddPriceVariation: FC<AddPriceVariationProps> = ({ form }) => {
             <FormLabel>Price Variation</FormLabel>
             {priceVariationFields.map((field, index) => (
               <div key={field.id} className="flex items-center space-x-2 mt-2">
+                <FormField
+                  name={`priceVariation.${index}.discountPrice`}
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          placeholder="Discount Price"
+                          {...field}
+                          type="number"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   name={`priceVariation.${index}.price`}
                   control={form.control}
