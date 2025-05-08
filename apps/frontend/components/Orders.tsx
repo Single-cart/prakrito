@@ -9,11 +9,17 @@ type Props = {
   selectItem: any;
   minShippingPrice: number;
   isLoading: boolean;
+  calculatedAmount: number;
 };
 
-const Orders = ({ selectItem, minShippingPrice, isLoading }: Props) => {
+const Orders = ({
+  selectItem,
+  minShippingPrice,
+  isLoading,
+  calculatedAmount,
+}: Props) => {
   const [subtotal, setSubtotal] = useState(0);
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(calculatedAmount);
   const [currentShippingPrice, setCurrentShippingPrice] =
     useState(minShippingPrice);
 
@@ -37,9 +43,8 @@ const Orders = ({ selectItem, minShippingPrice, isLoading }: Props) => {
 
   // Update total whenever subtotal or shipping price changes
   useEffect(() => {
-    const newTotal = subtotal + currentShippingPrice;
-    setTotal(newTotal);
-  }, [subtotal, currentShippingPrice]);
+    setTotal(calculatedAmount);
+  }, [calculatedAmount]);
 
   return (
     <div>

@@ -19,9 +19,7 @@ const CustomerReview = async () => {
     <div className="">
       {data?.data?.customerReview && data?.data?.customerReview?.length > 0 && (
         <div className="">
-          <h1 className={cn(styles.headingText, "text-center")}>
-            Customer Review
-          </h1>
+          <h1 className={cn(styles.headingText, "text-center")}>Highlights</h1>
           <div className="flex flex-col items-center justify-center mt-5">
             <Carousel
               opts={{

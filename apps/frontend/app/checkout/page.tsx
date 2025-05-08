@@ -61,7 +61,7 @@ const Checkout = () => {
   const { refetch } = useGetCartItemQuery({});
   const { refetch: orderStatusRefetch } = useGetOrderStatusQuery({});
   const [selectedShippingPrice, setSelectedShippingPrice] = useState(0);
-  const [, setCalculatedAmount] = useState(0);
+  const [calculatedAmount, setCalculatedAmount] = useState(0);
 
   useTotalPriceQuery({});
   const [createOrder, { isLoading, error, isError, isSuccess, data }] =
@@ -163,12 +163,8 @@ const Checkout = () => {
   };
 
   useEffect(() => {
-    // Set initial shipping price to outside Dhaka by default
-    const initialShippingPrice = finalOutsidePrice;
-    setSelectedShippingPrice(initialShippingPrice);
-
-    // Calculate initial total amount
-    const initialSubtotal =
+    // Calculate subtotal from selected items
+    const subtotal =
       selectItem?.reduce((acc: number, item: any) => {
         const selectedVariation =
           item?.product?.priceVariation?.[item?.priceVariationIndex - 1];
@@ -176,13 +172,20 @@ const Checkout = () => {
         return acc + discountPrice * item.quantity;
       }, 0) || 0;
 
-    const initialTotal = initialSubtotal + initialShippingPrice;
-    setCalculatedAmount(initialTotal);
-  }, [finalOutsidePrice, selectItem]);
+    // Calculate total with current shipping price
+    const total = subtotal + selectedShippingPrice;
+    setCalculatedAmount(total);
+  }, [selectedShippingPrice, selectItem]);
 
   const handleShippingChange = (shippingPrice: number) => {
     setSelectedShippingPrice(shippingPrice);
   };
+
+  // Set initial shipping price
+  useEffect(() => {
+    const initialShippingPrice = finalOutsidePrice;
+    setSelectedShippingPrice(initialShippingPrice);
+  }, [finalOutsidePrice]);
 
   useEffect(() => {
     if (isSuccess && data?.order) {
@@ -330,6 +333,7 @@ const Checkout = () => {
                   minShippingPrice={selectedShippingPrice}
                   selectItem={selectItem}
                   isLoading={isLoading}
+                  calculatedAmount={calculatedAmount}
                 />
               </Suspense>
             </div>

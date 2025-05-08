@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { cn } from "@workspace/ui/lib/utils";
-import { SearchIcon } from "lucide-react";
+import { BookOpen, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Cart from "./Cart";
@@ -95,6 +95,15 @@ const Navbar = async () => {
             <Search searchRoute="/products" />
           </div>
           <div className="flex items-center gap-7">
+            <Link href="/blogs">
+              <Button
+                variant="secondary"
+                className="flex items-center gap-2 bg-white hover:bg-white/90 text-primary"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span>Blogs</span>
+              </Button>
+            </Link>
             <Cart />
             <Profile />
           </div>

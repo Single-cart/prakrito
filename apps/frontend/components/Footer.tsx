@@ -75,7 +75,7 @@ const Footer = () => {
                 className="transform hover:scale-105 transition-transform"
               />
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <p className="text-gray-300 text-sm leading-relaxed text-justify">
               At Prakrito.com, we strive to ensure your complete satisfaction
               with every purchase. If, for any reason, you are not entirely
               satisfied with your order due to receiving a broken or

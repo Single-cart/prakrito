@@ -58,8 +58,8 @@ const MobileMenu = () => {
     { icon: <Info className="h-4 w-4" />, label: "About Us", href: "/about" },
     {
       icon: <MessageCircle className="h-4 w-4" />,
-      label: "Blog",
-      href: "/blog",
+      label: "Blogs",
+      href: "/blogs",
     },
     { icon: <Phone className="h-4 w-4" />, label: "Contact", href: "/contact" },
   ];
