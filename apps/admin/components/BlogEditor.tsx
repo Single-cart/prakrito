@@ -1,6 +1,6 @@
 "use client";
 
-import EditorJS, { OutputData, ToolConstructable } from "@editorjs/editorjs";
+import EditorJS, { ToolConstructable } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import LinkTool from "@editorjs/link";
 import List from "@editorjs/list";
@@ -13,50 +13,47 @@ interface BlogEditorProps {
   initialContent?: string;
   onChange: (content: string) => void;
   placeholder?: string;
+  editorId?: string;
 }
 
 const BlogEditor: React.FC<BlogEditorProps> = ({
   initialContent = "",
   onChange,
   placeholder = "Enter blog content...",
+  editorId = "blog-editorjs",
 }) => {
   const editorRef = useRef<EditorJS | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [editorReady, setEditorReady] = useState(false);
-
-  // Parse initial content
-  const getInitialData = (): OutputData => {
-    try {
-      return initialContent ? JSON.parse(initialContent) : { blocks: [] };
-    } catch (error) {
-      console.error("Error parsing initial content:", error);
-      return { blocks: [] };
-    }
-  };
 
   // Initialize editor
   useEffect(() => {
-    // Clean up existing editor if any
-    if (editorRef.current) {
-      editorRef.current.destroy();
-      editorRef.current = null;
-    }
+    if (!containerRef.current || editorRef.current) return;
 
-    // Initialize after a small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
+    const initEditor = async () => {
       try {
+        const parsedContent = initialContent
+          ? JSON.parse(initialContent)
+          : { blocks: [] };
+
         const editor = new EditorJS({
-          holder: "editorjs",
+          holder: containerRef.current!,
           tools: {
             header: {
               class: Header as unknown as ToolConstructable,
-              inlineToolbar: ["link"],
+              inlineToolbar: true,
               config: {
                 placeholder: "Enter a header",
+                levels: [2, 3, 4],
+                defaultLevel: 2,
               },
             },
             list: {
               class: List,
               inlineToolbar: true,
+              config: {
+                defaultStyle: "unordered",
+              },
             },
             paragraph: {
               class: Paragraph,
@@ -64,66 +61,80 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
             },
             linkTool: {
               class: LinkTool as unknown as ToolConstructable,
+              config: {
+                endpoint: "/api/fetch-link",
+              },
             },
             table: {
               class: Table as unknown as ToolConstructable,
               inlineToolbar: true,
+              config: {
+                rows: 2,
+                cols: 3,
+              },
             },
             marker: {
               class: Marker as unknown as ToolConstructable,
               shortcut: "CMD+SHIFT+M",
             },
           },
-          data: getInitialData(),
+          data: parsedContent,
           placeholder,
-          onChange: async () => {
+          onChange: debounce(async () => {
             try {
-              const content = await editor.save();
-              onChange(JSON.stringify(content));
+              const outputData = await editor.save();
+              onChange(JSON.stringify(outputData));
             } catch (error) {
               console.error("Error saving editor content:", error);
             }
-          },
+          }, 250),
           onReady: () => {
-            console.log("Editor is ready");
             setEditorReady(true);
           },
         });
 
         editorRef.current = editor;
-      } catch (error) {
-        console.error("Failed to initialize editor:", error);
-      }
-    }, 100);
 
-    return () => {
-      clearTimeout(timer);
-      // Add more robust error handling for editor destruction
-      try {
-        if (editorRef.current) {
-          if (typeof editorRef.current.destroy === "function") {
-            editorRef.current.destroy();
-          } else {
-            console.warn("Editor instance has no destroy method");
+        return () => {
+          if (editor && typeof editor.destroy === "function") {
+            editor.destroy();
+            editorRef.current = null;
+            setEditorReady(false);
           }
-          editorRef.current = null;
-        }
+        };
       } catch (error) {
-        console.error("Error destroying editor:", error);
+        console.error("Error initializing editor:", error);
       }
     };
+
+    initEditor();
   }, [initialContent, onChange, placeholder]);
 
+  // Debounce function
+  function debounce(func: Function, wait: number) {
+    let timeout: NodeJS.Timeout;
+    return function executedFunction(...args: any[]) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
   return (
-    <div>
+    <div className="relative">
       <div
-        id="editorjs"
+        ref={containerRef}
         className={`min-h-[300px] border rounded-md p-4 bg-white ${
           editorReady ? "cursor-text" : "cursor-wait"
         }`}
       />
       {!editorReady && (
-        <p className="text-xs text-gray-500 mt-1">Editor is initializing...</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-50">
+          <p className="text-sm text-gray-500">Loading editor...</p>
+        </div>
       )}
     </div>
   );

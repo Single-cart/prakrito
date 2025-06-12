@@ -24,10 +24,10 @@ import {
 } from "@workspace/ui/components/select";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
-import { useEffect } from "react";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -89,10 +89,8 @@ const CreateBlog = () => {
     } catch (error: any) {
       console.error("Blog creation error:", error);
       if (error.data && Array.isArray(error.data)) {
-        // Handle array of errors
         toast.error(error.data[0]?.message || "Failed to create blog");
       } else if (error.error) {
-        // RTK Query error format
         toast.error(error.error || "Failed to create blog");
       } else {
         toast.error(error.data?.message || "Failed to create blog");
@@ -104,11 +102,10 @@ const CreateBlog = () => {
   useEffect(() => {
     if (isSuccess) {
       toast.success("Blog created successfully");
-      // Add timeout to ensure proper cleanup before navigation
       const redirectTimer = setTimeout(() => {
         router.push("/blogs");
       }, 300);
-      
+
       return () => clearTimeout(redirectTimer);
     }
   }, [isSuccess, router]);
@@ -188,11 +185,17 @@ const CreateBlog = () => {
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-                  <BlogEditor
-                    initialContent={field.value}
-                    onChange={field.onChange}
-                    placeholder="Write your blog content here..."
-                  />
+                  <div className="min-h-[300px]">
+                    <BlogEditor
+                      key="create-blog-editor"
+                      editorId="create-blog-editor"
+                      initialContent={field.value}
+                      onChange={(content) => {
+                        field.onChange(content);
+                      }}
+                      placeholder="Write your blog content here..."
+                    />
+                  </div>
                 </FormControl>
                 <FormDescription>
                   Write your blog content using the rich text editor. You can
@@ -207,7 +210,6 @@ const CreateBlog = () => {
             control={form.control}
             name="category"
             render={({ field }) => {
-              // Find the selected category name
               const selectedCategory = categories?.find(
                 (c: { _id: string; name: string }) => c._id === field.value
               );
@@ -215,12 +217,7 @@ const CreateBlog = () => {
               return (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                    }}
-                    value={field.value}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category">
@@ -253,7 +250,6 @@ const CreateBlog = () => {
                   <FormLabel>Status</FormLabel>
                   <Select
                     onValueChange={(value) => {
-                      // Convert string value to boolean
                       const boolValue = value === "true";
                       field.onChange(boolValue);
                     }}

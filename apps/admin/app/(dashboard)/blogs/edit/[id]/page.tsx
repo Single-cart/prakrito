@@ -110,7 +110,6 @@ const EditBlog = () => {
 
       const formValues = {
         ...values,
-
         isPublished:
           typeof values.isPublished === "boolean"
             ? values.isPublished
@@ -143,7 +142,6 @@ const EditBlog = () => {
   useEffect(() => {
     if (isSuccess) {
       toast.success("Blog updated successfully");
-      // Add timeout to ensure proper cleanup before navigation
       const redirectTimer = setTimeout(() => {
         router.push("/blogs");
       }, 300);
@@ -297,14 +295,21 @@ const EditBlog = () => {
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-                  <BlogEditor
-                    initialContent={field.value}
-                    onChange={field.onChange}
-                    placeholder="Enter blog content here..."
-                  />
+                  <div className="min-h-[300px]">
+                    <BlogEditor
+                      key={`edit-blog-${id}`}
+                      editorId={`edit-blog-${id}`}
+                      initialContent={field.value}
+                      onChange={(content) => {
+                        field.onChange(content);
+                      }}
+                      placeholder="Write your blog content here..."
+                    />
+                  </div>
                 </FormControl>
                 <FormDescription>
-                  Edit your blog content using the rich text editor.
+                  Write your blog content using the rich text editor. You can
+                  add headers, lists, links, and more.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -315,23 +320,15 @@ const EditBlog = () => {
             control={form.control}
             name="category"
             render={({ field }) => {
-              // Find the selected category name
               const selectedCategory = categories?.find(
                 (c: { _id: string; name: string }) => c._id === field.value
               );
-
-              // Fallback to blog category if field value is empty
               const effectiveValue = field.value || blog?.category?._id || "";
 
               return (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                    }}
-                    value={effectiveValue}
-                  >
+                  <Select onValueChange={field.onChange} value={effectiveValue}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category">
@@ -364,7 +361,6 @@ const EditBlog = () => {
             control={form.control}
             name="isPublished"
             render={({ field }) => {
-              // Initialize with blog value but update when field value changes
               const valueToUse =
                 field.value === undefined
                   ? blog?.isPublished === true
@@ -378,7 +374,6 @@ const EditBlog = () => {
                       const boolValue = value === "true";
                       field.onChange(boolValue);
                     }}
-                    // Use the computed value
                     value={valueToUse ? "true" : "false"}
                   >
                     <FormControl>

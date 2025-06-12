@@ -63,6 +63,8 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
 export const updateProduct = catchAsync(async (req: Request, res: Response) => {
   // Check if priceVariation is a string that needs parsing or already an object
   let parsedPriceVariation;
+
+  console.log(req.body);
   if (req.body.priceVariation) {
     try {
       // If it's a string (from FormData), parse it

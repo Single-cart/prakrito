@@ -91,62 +91,49 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
 
   const handleSubmit = async (value: any) => {
     try {
-      // Instead of FormData, let's send a regular object
-      const requestData: product.IUpdateProductInput = {
-        id: product?._id,
-        name: value.name,
-        insideDhaka: Number(value.insideDhaka),
-        outsideDhaka: Number(value.outsideDhaka),
-        stock: Number(value.stock),
-        description: value.description,
-        category: value.category,
-        subcategory: value.subcategory,
-        order: Number(value.order),
-        priceVariation: value.priceVariation.map((price: any) => ({
-          price: price.price,
-          discountPrice: price.discountPrice,
-          quantity: price.quantity,
-          available: Boolean(price.available),
-        })),
-      };
+      const formData = new FormData();
 
-      // Only handle images with FormData if there are new images
+      // Add all the regular data
+      formData.append("id", product?._id);
+      formData.append("name", value.name);
+      formData.append("insideDhaka", value.insideDhaka);
+      formData.append("outsideDhaka", value.outsideDhaka);
+      formData.append("stock", value.stock);
+      formData.append("description", value.description);
+      formData.append("category", value.category);
+      formData.append("subcategory", value.subcategory);
+      formData.append("order", value.order);
+
+      // Add price variation as a JSON string
+      formData.append(
+        "priceVariation",
+        JSON.stringify(
+          value.priceVariation.map((price: any) => ({
+            price: price.price,
+            discountPrice: price.discountPrice,
+            quantity: price.quantity,
+            available: Boolean(price.available),
+          }))
+        )
+      );
+
+      // Add images if there are any new ones
       if (images && images.length > 0) {
-        const formData = new FormData();
-
-        // Add all the regular data
-        Object.keys(requestData).forEach((key) => {
-          if (key === "colors" || key === "size") {
-            formData.append(key, JSON.stringify(requestData[key]));
-          } else {
-            formData.append(key, requestData[key]);
-          }
-        });
-
-        // Add images
         Array.from(images).forEach((file) => {
           formData.append("images", file);
         });
-
-        await updateProduct({ data: formData });
-      } else {
-        // If no new images, send regular JSON
-        await updateProduct({
-          data: requestData,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
       }
 
+      await updateProduct({ data: formData });
       await Promise.all([
-        await customRevalidate("getAllProducts"),
-        await refetch(),
-        await totalPriceRefetch(),
+        customRevalidate("getAllProducts"),
+        refetch(),
+        totalPriceRefetch(),
       ]);
       router.refresh();
     } catch (error) {
       console.error("Error updating product:", error);
+      toast.error("Something went wrong while updating the product");
     }
   };
 
