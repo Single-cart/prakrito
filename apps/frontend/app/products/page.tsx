@@ -1,6 +1,6 @@
 import { styles } from "@/app/styles";
 import Cart from "@/components/Cart";
-import SubCategoryFilters from "@/components/CategoryFilters";
+import CategoryFilters from "@/components/CategoryFilters";
 import ClearFilter from "@/components/ClearFilter";
 import MobileFilter from "@/components/MobileFilter";
 import PriceFilters from "@/components/PriceFilters";
@@ -45,7 +45,7 @@ const Products = async (props: Props) => {
         >
           <h1 className="font-semibold uppercase text-xl mb-4">Filters</h1>
           <div className="space-y-5">
-            <SubCategoryFilters subcategory={data?.data?.allSubcategory} />
+            <CategoryFilters categories={data?.data?.allCategories} />
             <PriceFilters />
             <RatingsFilters />
             <ClearFilter />
@@ -58,7 +58,7 @@ const Products = async (props: Props) => {
 
             {/* mobile filters */}
             <div className="lg:hidden block">
-              <MobileFilter subcategory={data?.data?.allSubcategory} />
+              <MobileFilter categories={data?.data?.allCategories} />
             </div>
           </div>
           {data?.data ? (
