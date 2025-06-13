@@ -1,9 +1,10 @@
 import { product } from "@workspace/shared/index";
+import mongoose from "mongoose";
 import ApiError from "../../errorHandlers/ApiError";
 import { deleteMultipleImages } from "../../helpers/deleteFile";
 import { slugify } from "../../helpers/slugify";
-import { SubCategoryModel } from "../category/category.model";
-import { FilterQuery } from "./product.interface";
+import { CategoryModel } from "../category/category.model";
+import { FilterQuery, PopulatedCategory } from "./product.interface";
 import ProductModel from "./product.model";
 
 // Create product service
@@ -82,16 +83,15 @@ export const deleteProductService = async (id: string): Promise<void> => {
 // Get single product service
 export const getSingleProductService = async (slug: string) => {
   const product = await ProductModel.findOne({ slug })
-    .populate("category subcategory")
+    .populate<{ category: PopulatedCategory }>("category", "_id name")
     .select("-reviews");
-
   if (!product) {
     throw new ApiError(404, "Product not found!");
   }
 
   const relatedProducts = await ProductModel.find(
     {
-      subcategory: product.subcategory,
+      category: product.category._id,
       _id: { $ne: product._id },
     },
     {
@@ -101,8 +101,11 @@ export const getSingleProductService = async (slug: string) => {
       priceVariation: 1,
       images: 1,
       slug: 1,
+      createdAt: 1,
     }
-  ).limit(6);
+  )
+    .sort({ ratings: -1, createdAt: -1 })
+    .limit(6);
 
   return { product, relatedProducts };
 };
@@ -132,12 +135,15 @@ export const getAllProductsService = async (
   }
 
   if (category) {
-    filter.category = category;
+    filter.category = new mongoose.Types.ObjectId(category);
   }
 
   if (subcategory) {
-    filter.subcategory = subcategory;
+    // Convert string ID to ObjectId for subcategory
+    filter.subcategory = new mongoose.Types.ObjectId(subcategory);
   }
+
+  console.log("first", filter);
 
   if (minPrice !== undefined || maxPrice !== undefined) {
     const priceFilter: any[] = [];
@@ -185,7 +191,7 @@ export const getAllProductsService = async (
     filter.ratings = { $gte: ratings };
   }
 
-  const [products, productCount, categories] = await Promise.all([
+  const [products, productCount] = await Promise.all([
     ProductModel.find(filter)
       .select("-reviews")
       .populate(["category", "subcategory"])
@@ -193,20 +199,17 @@ export const getAllProductsService = async (
       .limit(adjustedLimit)
       .sort({ order: 1 }),
     ProductModel.countDocuments(filter),
-    ProductModel.distinct("category", filter),
   ]);
 
-  if (!products?.length) {
-    throw new ApiError(404, "No products available");
-  }
+  // if (!products?.length) {
+  //   throw new ApiError(404, "No products available");
+  // }
 
-  const allSubcategory = await SubCategoryModel.find({
-    category: { $in: categories },
-  });
+  const allCategories = await CategoryModel.find({});
 
   return {
     products,
-    allSubcategory,
+    allCategories,
     pagination: {
       numberOfProducts: productCount,
       totalPage: Math.ceil(productCount / adjustedLimit),

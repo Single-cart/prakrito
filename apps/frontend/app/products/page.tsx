@@ -1,11 +1,11 @@
 import { styles } from "@/app/styles";
 import Cart from "@/components/Cart";
+import SubCategoryFilters from "@/components/CategoryFilters";
 import ClearFilter from "@/components/ClearFilter";
 import MobileFilter from "@/components/MobileFilter";
 import PriceFilters from "@/components/PriceFilters";
 import ProductCard from "@/components/ProductCard";
 import RatingsFilters from "@/components/RatingsFilters";
-import SubCategoryFilters from "@/components/SubCategoryFilters";
 import BannerSlider from "@/components/bannerSlider";
 import Paginations from "@/components/pagination";
 import { getBanners } from "@/lib/fetch/banner.data";

@@ -225,6 +225,9 @@ importers:
       react-dropzone:
         specifier: ^14.3.5
         version: 14.3.5(react@19.0.0)
+      react-error-boundary:
+        specifier: ^6.0.0
+        version: 6.0.0(react@19.0.0)
       recharts:
         specifier: ^2.15.0
         version: 2.15.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -5089,6 +5092,11 @@ packages:
   react-easy-swipe@0.0.21:
     resolution: {integrity: sha512-OeR2jAxdoqUMHIn/nS9fgreI5hSpgGoL5ezdal4+oO7YSSgJR8ga+PkYGJrSrJ9MKlPcQjMQXnketrD7WNmNsg==}
     engines: {node: '>= 6'}
+
+  react-error-boundary@6.0.0:
+    resolution: {integrity: sha512-gdlJjD7NWr0IfkPlaREN2d9uUZUlksrfOx7SX62VRerwXbMY6ftGCIZua1VG1aXFNOimhISsTq+Owp725b9SiA==}
+    peerDependencies:
+      react: '>=16.13.1'
 
   react-hook-form@7.54.2:
     resolution: {integrity: sha512-eHpAUgUjWbZocoQYUHposymRb4ZP6d0uwUnooL2uOybA9/3tPUvoAKqEWK1WaSiTxxOfTpffNZP7QwlnM3/gEg==}
@@ -10903,6 +10911,11 @@ snapshots:
   react-easy-swipe@0.0.21:
     dependencies:
       prop-types: 15.8.1
+
+  react-error-boundary@6.0.0(react@19.0.0):
+    dependencies:
+      '@babel/runtime': 7.26.7
+      react: 19.0.0
 
   react-hook-form@7.54.2(react@19.0.0):
     dependencies:

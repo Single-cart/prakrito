@@ -1,10 +1,10 @@
 import { Button } from "@workspace/ui/components/button";
 import { Filter } from "lucide-react";
 import { FC } from "react";
+import CategoryFilters from "./CategoryFilters";
 import ClearFilter from "./ClearFilter";
 import PriceFilters from "./PriceFilters";
 import RatingsFilters from "./RatingsFilters";
-import SubCategoryFilters from "./SubCategoryFilters";
 
 import { categoryType } from "@workspace/shared/index";
 import {
@@ -16,9 +16,10 @@ import {
 } from "@workspace/ui/components/sheet";
 
 type Props = {
-  subcategory: categoryType.ISubCategory[];
+  categories: categoryType.ICategory[];
 };
-const MobileFilter: FC<Props> = ({ subcategory }) => {
+
+const MobileFilter: FC<Props> = ({ categories }) => {
   return (
     <div>
       <Sheet>
@@ -34,7 +35,7 @@ const MobileFilter: FC<Props> = ({ subcategory }) => {
 
           <div className="">
             <div className="my-5">
-              <SubCategoryFilters subcategory={subcategory} />
+              <CategoryFilters categories={categories} />
             </div>
             <div className="my-5">
               <PriceFilters />

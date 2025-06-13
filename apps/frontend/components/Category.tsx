@@ -36,12 +36,16 @@ const Category = () => {
             onMouseEnter={() => handleCategoryHover(item._id)}
             onMouseLeave={() => handleCategoryHover(null)}
           >
-            <span className="flex items-center justify-between">
-              {item.name}
-              {item.subcategory?.length > 0 && hoveredCategory === item._id && (
-                <ChevronRight />
-              )}
-            </span>
+            <Link
+              href={`/category/${item._id}?type=category`}
+              className="block"
+            >
+              <span className="flex items-center justify-between">
+                {item.name}
+                {item.subcategory?.length > 0 &&
+                  hoveredCategory === item._id && <ChevronRight />}
+              </span>
+            </Link>
 
             {item.subcategory?.length > 0 && (
               <ul
@@ -54,8 +58,10 @@ const Category = () => {
                     className="py-1 px-4 hover:bg-white hover:underline"
                     key={subItem._id}
                   >
-                    <Link href={`/category/${subItem._id}`} className="block">
-                      {" "}
+                    <Link
+                      href={`/category/${subItem._id}?type=subcategory`}
+                      className="block"
+                    >
                       {subItem.name}
                     </Link>
                   </li>

@@ -1,12 +1,12 @@
 import { styles } from "@/app/styles";
 import Cart from "@/components/Cart";
+import CategoryFilters from "@/components/CategoryFilters";
 import ClearFilter from "@/components/ClearFilter";
 import ComponentLoader from "@/components/ComponentLoader";
 import MobileFilter from "@/components/MobileFilter";
 import PriceFilters from "@/components/PriceFilters";
 import ProductCard from "@/components/ProductCard";
 import RatingsFilters from "@/components/RatingsFilters";
-import SubCategoryFilters from "@/components/SubCategoryFilters";
 import BannerSlider from "@/components/bannerSlider";
 import Paginations from "@/components/pagination";
 import { getBanners } from "@/lib/fetch/banner.data";
@@ -17,14 +17,17 @@ import { Suspense } from "react";
 
 type Props = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-const CategoryProducts = async ({ params }: Props) => {
+const CategoryProducts = async ({ params, searchParams }: Props) => {
   const id = (await params).id;
-  const data = await getAllProducts({ subcategory: id });
+  const myParams = await searchParams;
+  const type = myParams?.type as string;
+  const data = await getAllProducts({ [type]: id });
   const products = data?.data?.products as product.IProductRes[];
   const banners = await getBanners("categoryBanner", id);
-
+  console.log(data);
   return (
     <div className={cn(styles.paddingX)}>
       <div className="fixed top-[90%] z-40 right-5 lg:hidden">
@@ -51,7 +54,7 @@ const CategoryProducts = async ({ params }: Props) => {
                 <div className="p-4 bg-white rounded-lg animate-pulse h-40"></div>
               }
             >
-              <SubCategoryFilters subcategory={data?.data?.allSubcategory} />
+              <CategoryFilters categories={data?.data?.allCategories} />
               <PriceFilters />
               <RatingsFilters key={`ratings-${id}`} />
               <ClearFilter />
@@ -63,11 +66,11 @@ const CategoryProducts = async ({ params }: Props) => {
           <div className="flex justify-between items-center">
             <h1 className={cn(styles.headingText)}>All Products</h1>
             <div className="lg:hidden block">
-              <MobileFilter subcategory={data?.data?.allSubcategory} />
+              <MobileFilter categories={data?.data?.allCategories} />
             </div>
           </div>
 
-          {products ? (
+          {products?.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 text-center items-center justify-center place-content-center flex-wrap mt-5 gap-3 md:gap-4">
               {products?.map((item) => (
                 <Suspense key={item._id} fallback={<ComponentLoader />}>

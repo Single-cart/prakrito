@@ -24,6 +24,8 @@ const Page: FC<Props> = async ({ params }) => {
   const product = await singleProduct(slug);
   const productInfo = product?.data?.product;
 
+  console.log("productInfo", product);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const priceVariation = productInfo?.priceVariation?.map((item: any) => ({
     price: item.price,

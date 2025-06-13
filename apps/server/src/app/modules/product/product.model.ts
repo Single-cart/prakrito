@@ -102,17 +102,16 @@ const productSchema: Schema<product.IProduct> = new Schema(
       type: Number,
       default: 0,
     },
-    subcategory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "SubCategory",
-      required: [true, "subCategory id is required"],
-    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: [true, "Category id is required"],
+      index: true,
     },
-
+    subcategory: {
+      type: String,
+      required: false,
+    },
     ratings: {
       type: Number,
       default: 0,
