@@ -111,6 +111,7 @@ const productSchema: Schema<product.IProduct> = new Schema(
     subcategory: {
       type: String,
       required: false,
+      index: true,
     },
     ratings: {
       type: Number,

@@ -31,15 +31,12 @@ const Category = () => {
           <li
             key={item._id}
             className={`relative w-full py-1 px-4 cursor-pointer ${
-              hoveredCategory === item._id ? "bg-white" : ""
+              hoveredCategory === item._id ? "bg-white underline" : ""
             }`}
             onMouseEnter={() => handleCategoryHover(item._id)}
             onMouseLeave={() => handleCategoryHover(null)}
           >
-            <Link
-              href={`/category/${item._id}?type=category`}
-              className="block"
-            >
+            <Link href={`/category/${item._id}/category`} className="block">
               <span className="flex items-center justify-between">
                 {item.name}
                 {item.subcategory?.length > 0 &&
@@ -59,7 +56,7 @@ const Category = () => {
                     key={subItem._id}
                   >
                     <Link
-                      href={`/category/${subItem._id}?type=subcategory`}
+                      href={`/category/${subItem._id}/subcategory`}
                       className="block"
                     >
                       {subItem.name}

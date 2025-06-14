@@ -16,18 +16,18 @@ import { cn } from "@workspace/ui/lib/utils";
 import { Suspense } from "react";
 
 type Props = {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: Promise<{ id: string; type: string }>;
 };
 
-const CategoryProducts = async ({ params, searchParams }: Props) => {
-  const id = (await params).id;
-  const myParams = await searchParams;
-  const type = myParams?.type as string;
+const CategoryProducts = async ({ params }: Props) => {
+  const AllParams = await params;
+  const id = AllParams.id;
+  const type = AllParams.type;
+
   const data = await getAllProducts({ [type]: id });
   const products = data?.data?.products as product.IProductRes[];
   const banners = await getBanners("categoryBanner", id);
-  console.log(data);
+
   return (
     <div className={cn(styles.paddingX)}>
       <div className="fixed top-[90%] z-40 right-5 lg:hidden">

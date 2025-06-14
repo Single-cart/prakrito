@@ -20,7 +20,7 @@ const CategoryFilters = ({ categories }: Props) => {
         {categories?.map((item) => (
           <Link
             className="py-1.5 px-2 rounded-md font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-            href={`/category/${item._id}`}
+            href={`/category/${item._id}/ctegory`}
             key={item._id}
           >
             {item.name}

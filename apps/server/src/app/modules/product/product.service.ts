@@ -139,11 +139,8 @@ export const getAllProductsService = async (
   }
 
   if (subcategory) {
-    // Convert string ID to ObjectId for subcategory
-    filter.subcategory = new mongoose.Types.ObjectId(subcategory);
+    filter.subcategory = subcategory;
   }
-
-  console.log("first", filter);
 
   if (minPrice !== undefined || maxPrice !== undefined) {
     const priceFilter: any[] = [];
@@ -194,16 +191,12 @@ export const getAllProductsService = async (
   const [products, productCount] = await Promise.all([
     ProductModel.find(filter)
       .select("-reviews")
-      .populate(["category", "subcategory"])
+      .populate("category") // Only populate category, remove subcategory
       .skip((adjustedPage - 1) * adjustedLimit)
       .limit(adjustedLimit)
       .sort({ order: 1 }),
     ProductModel.countDocuments(filter),
   ]);
-
-  // if (!products?.length) {
-  //   throw new ApiError(404, "No products available");
-  // }
 
   const allCategories = await CategoryModel.find({});
 

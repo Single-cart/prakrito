@@ -122,7 +122,12 @@ const MobileMenu = () => {
                                 : "bg-gray-50"
                             )}
                           >
-                            <span className="font-medium">{category.name}</span>
+                            <Link
+                              href={`/category/${category._id}/category`}
+                              className="font-medium"
+                            >
+                              {category.name}
+                            </Link>
                             <ChevronDown
                               className={cn(
                                 "h-4 w-4 transition-transform",
@@ -137,7 +142,7 @@ const MobileMenu = () => {
                             (sub: categoryType.ISubCategory) => (
                               <Link
                                 key={sub._id}
-                                href={`/category/${sub._id}`}
+                                href={`/category/${sub._id}/subcategory`}
                                 className="block p-2 rounded-md hover:bg-primary/5 transition-colors"
                               >
                                 {sub.name}
