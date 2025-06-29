@@ -62,7 +62,7 @@ const Products = async (props: Props) => {
             </div>
           </div>
           {data?.data ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 text-center items-center justify-center place-content-center flex-wrap mt-5 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 text-center items-center justify-center place-content-center flex-wrap mt-5 gap-3 md:gap-4">
               {products?.map((item) => (
                 <ProductCard key={item._id} product={item} />
               ))}
