@@ -12,10 +12,13 @@ interface QueryProps {
 }
 
 export const mixProduct = async () => {
-  const res = await fetch(`${env.NEXT_PUBLIC_API_URL}/product/all-products`, {
-    next: { tags: ["getAllProducts"] },
-    cache: "force-cache",
-  });
+  const res = await fetch(
+    `${env.NEXT_PUBLIC_API_URL}/product/all-products?limit=15`,
+    {
+      next: { tags: ["getAllProducts"] },
+      cache: "force-cache",
+    }
+  );
   const data = await res.json();
 
   return data;
@@ -33,7 +36,7 @@ export const resentSold = async () => {
 
 export const getAllProducts = async ({
   page = "1",
-  limit = "10",
+  limit = "15",
   category = "",
   subcategory = "",
   search = "",
