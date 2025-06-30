@@ -13,10 +13,36 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/production' && (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true))
+    if: |
+      (
+        github.event_name == 'push' && 
+        github.ref == 'refs/heads/production'
+      ) || 
+      (
+        github.event_name == 'pull_request' && 
+        github.event.pull_request.merged == true &&
+        github.event.pull_request.base.ref == 'production'
+      )
     
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet HEAD~1 HEAD; then
+            echo "No changes detected"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+          
       - name: Deploy to VPS
+        if: steps.changes.outputs.has_changes == 'true'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -24,6 +50,13 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd prakrito/
-            git pull -u origin production
-            pnpm run build
-            pm2 restart 7
+            # Check if there are changes on the server
+            git fetch origin production
+            if [ $(git rev-parse HEAD) != $(git rev-parse origin/production) ]; then
+              echo "Deploying changes..."
+              git pull -u origin production
+              pnpm run build
+              pm2 restart 7
+            else
+              echo "No changes to deploy"
+            fi
