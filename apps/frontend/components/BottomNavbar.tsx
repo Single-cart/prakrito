@@ -3,7 +3,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { RootState } from "@/redux/store";
 import { cn } from "@workspace/ui/lib/utils";
-import { Home, LayoutGrid, ShoppingBag, User } from "lucide-react";
+import { BookOpen, Home, LayoutGrid, ShoppingBag, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,6 +36,12 @@ const BottomNavbar = () => {
       icon: LayoutGrid,
       href: "/products",
       active: pathname === "/products" || pathname.startsWith("/products/"),
+    },
+    {
+      label: "Blogs",
+      icon: BookOpen,
+      href: "/blogs",
+      active: pathname === "/blogs" || pathname.startsWith("/blogs/"),
     },
     {
       label: "Cart",

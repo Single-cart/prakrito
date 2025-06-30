@@ -42,6 +42,7 @@ import Profile from "./Profile";
 
 const MobileMenu = () => {
   const [openCategories, setOpenCategories] = useState<string[]>([]);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { data, isLoading } = useGetAllCategoryQuery({});
   const { isAuthenticated } = useAuth();
 
@@ -64,8 +65,12 @@ const MobileMenu = () => {
     { icon: <Phone className="h-4 w-4" />, label: "Contact", href: "/contact" },
   ];
 
+  const handleCloseSheet = () => {
+    setIsSheetOpen(false);
+  };
+
   return (
-    <Sheet>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <Button size="icon" variant="outline" className="hover:bg-primary/10">
           <Menu className="h-5 w-5" />
@@ -125,6 +130,7 @@ const MobileMenu = () => {
                             <Link
                               href={`/category/${category._id}/category`}
                               className="font-medium"
+                              onClick={handleCloseSheet}
                             >
                               {category.name}
                             </Link>
@@ -144,6 +150,7 @@ const MobileMenu = () => {
                                 key={sub._id}
                                 href={`/category/${sub._id}/subcategory`}
                                 className="block p-2 rounded-md hover:bg-primary/5 transition-colors"
+                                onClick={handleCloseSheet}
                               >
                                 {sub.name}
                               </Link>

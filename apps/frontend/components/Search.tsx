@@ -10,9 +10,10 @@ import { FC, useState } from "react";
 type Props = {
   searchRoute: string;
   className?: string;
+  onSearch?: () => void;
 };
 
-const Search: FC<Props> = ({ searchRoute, className }) => {
+const Search: FC<Props> = ({ searchRoute, className, onSearch }) => {
   const [name, setName] = useState("");
   const router = useRouter();
 
@@ -20,6 +21,7 @@ const Search: FC<Props> = ({ searchRoute, className }) => {
     if (name) {
       router.push(`${searchRoute}?search=${name}`);
       setName("");
+      onSearch?.(); // Call the onSearch callback if provided
     }
   };
 

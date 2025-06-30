@@ -1,19 +1,13 @@
 import { styles } from "@/app/styles";
 import { getBanners } from "@/lib/fetch/banner.data";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@workspace/ui/components/dialog";
 import { cn } from "@workspace/ui/lib/utils";
-import { BookOpen, SearchIcon } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Cart from "./Cart";
 import MobileMenu from "./MobileMenu";
+import MobileSearchDialog from "./MobileSearchDialog";
 import Profile from "./Profile";
 import Search from "./Search";
 
@@ -131,19 +125,7 @@ const Navbar = async () => {
               </div>
             </Link>
           </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <SearchIcon className="h-5 w-5" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Search Your Product</DialogTitle>
-              </DialogHeader>
-              <Search searchRoute="/products" />
-            </DialogContent>
-          </Dialog>
+          <MobileSearchDialog />
         </div>
       </div>
     </div>

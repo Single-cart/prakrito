@@ -1,6 +1,8 @@
+"use client";
+
 import { Button } from "@workspace/ui/components/button";
 import { Filter } from "lucide-react";
-import { FC } from "react";
+import { FC, useState } from "react";
 import CategoryFilters from "./CategoryFilters";
 import ClearFilter from "./ClearFilter";
 import PriceFilters from "./PriceFilters";
@@ -20,30 +22,36 @@ type Props = {
 };
 
 const MobileFilter: FC<Props> = ({ categories }) => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleCloseSheet = () => {
+    setIsSheetOpen(false);
+  };
+
   return (
     <div>
-      <Sheet>
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetTrigger asChild>
           <Button variant={"outline"}>
             <Filter /> Filters
           </Button>
         </SheetTrigger>
-        <SheetContent>
+        <SheetContent className="w-full h-screen max-w-[350px] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Filters</SheetTitle>
           </SheetHeader>
 
           <div className="">
-            <div className="my-5">
+            <div className="my-5" onClick={handleCloseSheet}>
               <CategoryFilters categories={categories} />
             </div>
-            <div className="my-5">
+            <div className="my-5" onClick={handleCloseSheet}>
               <PriceFilters />
             </div>
-            <div className="my-5">
+            <div className="my-5" onClick={handleCloseSheet}>
               <RatingsFilters />
             </div>
-            <div className="my-5">
+            <div className="my-5" onClick={handleCloseSheet}>
               <ClearFilter />
             </div>
           </div>
