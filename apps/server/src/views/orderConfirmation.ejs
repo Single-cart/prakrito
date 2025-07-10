@@ -78,13 +78,16 @@
       <% 
         const product = item.product;
         const variation = product?.priceVariation?.[item.priceVariationIndex - 1];
-        const productImage = product?.images?.[0];
+        // Use populated product image first, then stored image as fallback
+        const productImage = product?.images?.[0] || item.image;
+        // Use populated product name first, then stored productName as fallback
+        const productName = product?.name || item.productName || `Product ID: ${product?._id || 'Unknown'}`;
       %>
       <div class="item">
         <% if (productImage) { %>
         <img src="<%= productImage %>" alt="Product image" class="image" />
         <% } %>
-        <h3><%= product?.name || `Product #${orderItems.indexOf(item) + 1}` %></h3>
+        <h3><%= productName %></h3>
         <p><strong>Price:</strong> ৳<%= item.price %></p>
         <p><strong>Quantity:</strong> <%= item.quantity %></p>
         <% if (variation?.color) { %>
@@ -101,6 +104,21 @@
         <% } %>
         <% if (!variation) { %>
         <p><strong>Variation Index:</strong> <%= item.priceVariationIndex %></p>
+        <% } %>
+        
+        <!-- Debug information (remove in production) -->
+        <% if (process.env.NODE_ENV === 'development') { %>
+        <div style="font-size: 11px; color: #666; margin-top: 5px; padding: 5px; background: #f9f9f9;">
+          <strong>Debug Info:</strong><br>
+          Product ID: <%= product?._id || 'No ID' %><br>
+          Product Object: <%= typeof product %><br>
+          Populated Name: <%= product?.name || 'None' %><br>
+          Stored Name: <%= item.productName || 'None' %><br>
+          Final Name: <%= productName %><br>
+          Populated Image: <%= product?.images?.[0] || 'None' %><br>
+          Stored Image: <%= item.image || 'None' %><br>
+          Variation Available: <%= !!variation %><br>
+        </div>
         <% } %>
       </div>
       <% }); %>

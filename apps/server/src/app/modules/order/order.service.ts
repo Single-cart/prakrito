@@ -63,12 +63,20 @@ export const orderService = {
       );
     }
 
+    // Populate product information for email template
+    const populatedOrder = await OrderModel.findById(order._id)
+      .populate({
+        path: "orderItems.product",
+        select: "name images priceVariation category description",
+      })
+      .populate("user", "fullName email");
+
     // Send order confirmation email
     await sendMail({
       email: config.smtp.smtpMail!,
       subject: "New Order Notification",
       templete: "orderConfirmation.ejs",
-      data: order,
+      data: populatedOrder,
     });
 
     return order;

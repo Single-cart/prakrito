@@ -68,6 +68,7 @@ const orderApi = apiSlice.injectEndpoints({
           orderStatus,
           page,
           search,
+          limit: 20, // Default limit for pagination
         },
         method: "GET",
         credentials: "include",

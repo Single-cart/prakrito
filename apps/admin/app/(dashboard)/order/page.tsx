@@ -75,6 +75,8 @@ const OrdersTable = () => {
     search: filters.search,
   });
 
+  console.log(data);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns: ColumnDef<any>[] = [
     {

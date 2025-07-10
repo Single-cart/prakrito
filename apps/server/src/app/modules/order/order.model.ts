@@ -22,6 +22,14 @@ export const orderSchema = new Schema(
 
     orderItems: [
       {
+        productName: {
+          type: String,
+          required: [true, "Product name is required"],
+        },
+        image: {
+          type: String,
+          required: [true, "Product image is required"],
+        },
         quantity: {
           type: Number,
           required: [true, "Product quantity is required"],

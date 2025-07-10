@@ -5,11 +5,13 @@ import {
   RiskFactor,
 } from "./order-risk.interface";
 import { OrderRiskHistoryModel } from "./order-risk.model";
+import { ipGeolocationService } from "./ip-geolocation.service";
 
 class OrderRiskService {
   private calculateRiskScore(
     history: OrderRiskHistory,
-    orderValue: number
+    orderValue: number,
+    geoData?: any
   ): number {
     if (history.totalOrders === 0) return 0;
 
@@ -36,6 +38,13 @@ class OrderRiskService {
     ).length;
     if (recentOrders > 3) riskScore += 20;
 
+    // Add geolocation-based risk scoring
+    if (geoData) {
+      if (geoData.isVpn) riskScore += 25;
+      if (geoData.isProxy) riskScore += 20;
+      riskScore += geoData.riskScore || 0;
+    }
+
     return Math.min(riskScore, 100);
   }
 
@@ -50,7 +59,8 @@ class OrderRiskService {
 
   private generateRiskReasons(
     history: OrderRiskHistory,
-    orderValue: number
+    orderValue: number,
+    geoData?: any
   ): string[] {
     const reasons: string[] = [];
     const cancellationRate =
@@ -77,12 +87,26 @@ class OrderRiskService {
       reasons.push("Multiple orders placed in a short time.");
     }
 
+    // Add geolocation-based reasons
+    if (geoData) {
+      if (geoData.isVpn) {
+        reasons.push("Order placed through VPN connection.");
+      }
+      if (geoData.isProxy) {
+        reasons.push("Order placed through proxy connection.");
+      }
+      if (geoData.country === "Unknown") {
+        reasons.push("Unable to determine geographic location.");
+      }
+    }
+
     return reasons;
   }
 
   private generateRiskFactors(
     history: OrderRiskHistory,
-    orderValue: number
+    orderValue: number,
+    geoData?: any
   ): RiskFactor[] {
     const factors: RiskFactor[] = [];
     const cancellationRate =
@@ -119,6 +143,39 @@ class OrderRiskService {
         description: "Order placed during unusual hours",
         severity: "LOW",
       });
+    }
+
+    // Add geolocation-based risk factors
+    if (geoData) {
+      if (geoData.isVpn) {
+        factors.push({
+          category: "DEVICE",
+          factor: "VPN_USAGE",
+          impact: 25,
+          description: `Order placed through VPN from ${geoData.country || "Unknown"}`,
+          severity: "HIGH",
+        });
+      }
+
+      if (geoData.isProxy) {
+        factors.push({
+          category: "DEVICE",
+          factor: "PROXY_USAGE",
+          impact: 20,
+          description: `Order placed through proxy from ${geoData.country || "Unknown"}`,
+          severity: "MEDIUM",
+        });
+      }
+
+      if (geoData.riskScore > 50) {
+        factors.push({
+          category: "DEVICE",
+          factor: "HIGH_RISK_LOCATION",
+          impact: geoData.riskScore,
+          description: `High-risk location detected: ${geoData.city}, ${geoData.country}`,
+          severity: geoData.riskScore > 75 ? "HIGH" : "MEDIUM",
+        });
+      }
     }
 
     return factors;
@@ -188,6 +245,11 @@ class OrderRiskService {
       throw new Error("IP address is required for risk assessment");
     }
 
+    // Get geolocation data for the IP
+    const geoData = await ipGeolocationService.getGeolocationData(
+      identifiers.ip
+    );
+
     const searchCriteria: Record<string, any>[] = [
       { "identifiers.ip": identifiers.ip },
     ];
@@ -214,26 +276,39 @@ class OrderRiskService {
         frequentAccountChanges: 0,
         suspiciousActivities: [],
         velocityPatterns: [],
-        geolocationHistory: [],
+        geolocationHistory: [geoData],
         paymentMethodHistory: [],
         deviceHistory: [],
       });
+    } else {
+      // Update geolocation history
+      const existingGeoIndex = history.geolocationHistory.findIndex(
+        (g) => g.ip === identifiers.ip
+      );
+      if (existingGeoIndex >= 0) {
+        history.geolocationHistory[existingGeoIndex] = geoData;
+      } else {
+        history.geolocationHistory.push(geoData);
+      }
     }
 
     const riskScore = this.calculateRiskScore(
       history,
-      identifiers.orderValue || 0
+      identifiers.orderValue || 0,
+      geoData
     );
     const riskLevel = this.getRiskLevel(riskScore);
     const reasons = this.generateRiskReasons(
       history,
-      identifiers.orderValue || 0
+      identifiers.orderValue || 0,
+      geoData
     );
 
     // Generate risk factors based on assessment
     const riskFactors: RiskFactor[] = this.generateRiskFactors(
       history,
-      identifiers.orderValue || 0
+      identifiers.orderValue || 0,
+      geoData
     );
 
     // Generate recommendations based on risk level
@@ -253,7 +328,7 @@ class OrderRiskService {
       riskFactors,
       recommendations,
       confidence,
-      modelVersion: "1.0.0",
+      modelVersion: "1.1.0", // Updated version with geolocation
     };
   }
 
