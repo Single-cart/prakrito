@@ -24,11 +24,11 @@ export const orderSchema = new Schema(
       {
         productName: {
           type: String,
-          required: [true, "Product name is required"],
+          required: false, // Make optional to avoid breaking existing orders
         },
         image: {
           type: String,
-          required: [true, "Product image is required"],
+          required: false, // Make optional to avoid breaking existing orders
         },
         quantity: {
           type: Number,

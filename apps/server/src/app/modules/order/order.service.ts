@@ -20,6 +20,20 @@ import OrderModel from "./order.model";
 
 export const orderService = {
   async createOrder(orderData: OrderData, sessionId?: string) {
+    // Debug logging
+    console.log("Order Data Received:", JSON.stringify(orderData, null, 2));
+
+    // Validate product IDs in order items
+    if (orderData.orderItems) {
+      orderData.orderItems.forEach((item: any, index: number) => {
+        if (item.product && !mongoose.Types.ObjectId.isValid(item.product)) {
+          console.error(`Invalid product ID at index ${index}:`, item.product);
+          throw new Error(
+            `Invalid product ID at index ${index}: ${item.product}`
+          );
+        }
+      });
+    }
     // Calculate item prices from order items if needed
     const calculatedItemsPrice =
       orderData.orderItems?.reduce((total, item: any) => {
