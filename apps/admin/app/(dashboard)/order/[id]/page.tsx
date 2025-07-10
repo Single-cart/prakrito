@@ -102,6 +102,7 @@ const SingleOrder = () => {
       LOW: "bg-green-500",
       MEDIUM: "bg-yellow-500",
       HIGH: "bg-red-500",
+      CRITICAL: "bg-red-700",
     };
     return colors[level as keyof typeof colors] || "bg-gray-500";
   };
@@ -111,6 +112,7 @@ const SingleOrder = () => {
       LOW: CheckCircle,
       MEDIUM: AlertTriangle,
       HIGH: XCircle,
+      CRITICAL: XCircle,
     };
     return icons[level as keyof typeof icons] || Shield;
   };
@@ -155,7 +157,8 @@ const SingleOrder = () => {
           </Select>
         </div>
 
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {/* Top Row - Order and Shipping Info */}
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mb-6">
           {/* Order Details Card */}
           <Card className="shadow-md">
             <CardHeader>
@@ -278,133 +281,224 @@ const SingleOrder = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          {/* Risk Assessment Card */}
-          <Card className="shadow-md">
-            <CardHeader>
+        {/* Risk Assessment Section - Full Width Horizontal Layout */}
+        <Card className="shadow-md mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-blue-500" />
                 Risk Assessment
               </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleRefreshRiskAssessment}
-                    size="sm"
-                    className="bg-blue-500 hover:bg-blue-600"
-                  >
-                    Refresh Assessment
-                  </Button>
-                </div>
+              <Button
+                onClick={handleRefreshRiskAssessment}
+                size="sm"
+                className="bg-blue-500 hover:bg-blue-600"
+              >
+                Refresh Assessment
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!data?.order?.shippingInfo && (
+              <div className="p-3 bg-yellow-50 rounded-lg mb-4">
+                <p className="text-sm text-yellow-700">
+                  Order shipping information is required for risk assessment.
+                </p>
+              </div>
+            )}
 
-                {!data?.order?.shippingInfo && (
-                  <div className="p-3 bg-yellow-50 rounded-lg">
-                    <p className="text-sm text-yellow-700">
-                      Order shipping information is required for risk
-                      assessment.
-                    </p>
-                  </div>
-                )}
+            {!riskAssessment && data?.order && (
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">
+                  Risk assessment not available. Click Refresh Assessment to generate.
+                </p>
+              </div>
+            )}
 
-                {!riskAssessment && data?.order && (
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">
-                      Risk assessment not available. Click Refresh Assessment to
-                      generate.
-                    </p>
-                  </div>
-                )}
-
-                {riskAssessment && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        {(() => {
-                          const RiskIcon = getRiskLevelIcon(
-                            riskAssessment.riskLevel
-                          );
-                          return <RiskIcon className="h-5 w-5" />;
-                        })()}
-                        <div>
-                          <p className="text-sm text-gray-500">Risk Level</p>
-                          <p className="font-semibold">
-                            {riskAssessment.riskLevel}
-                          </p>
-                        </div>
+            {riskAssessment && (
+              <div className="space-y-6">
+                {/* Risk Overview - Horizontal Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Risk Level */}
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3 mb-3">
+                      {(() => {
+                        const RiskIcon = getRiskLevelIcon(riskAssessment.riskLevel);
+                        return <RiskIcon className="h-6 w-6" />;
+                      })()}
+                      <div>
+                        <p className="text-sm text-gray-500">Risk Level</p>
+                        <p className="text-lg font-semibold">{riskAssessment.riskLevel}</p>
                       </div>
-                      <Badge
-                        className={`${getRiskLevelColor(riskAssessment.riskLevel)}`}
-                      >
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className={`${getRiskLevelColor(riskAssessment.riskLevel)}`}>
                         {riskAssessment.riskScore}/100
                       </Badge>
-                    </div>
-
-                    {riskAssessment.reasons &&
-                      riskAssessment.reasons.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-gray-700">
-                            Risk Factors:
-                          </p>
-                          <ul className="text-sm text-gray-600 space-y-1">
-                            {riskAssessment.reasons.map(
-                              (reason: string, index: number) => (
-                                <li
-                                  key={index}
-                                  className="flex items-start gap-2"
-                                >
-                                  <span className="text-red-500 mt-1">•</span>
-                                  {reason}
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
+                      {riskAssessment.confidence && (
+                        <Badge variant="outline">
+                          {riskAssessment.confidence}% confidence
+                        </Badge>
                       )}
+                    </div>
                   </div>
-                )}
 
-                {riskHistory && (
-                  <div className="space-y-3">
-                    <Separator />
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-700">
-                        Order History:
-                      </p>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="bg-gray-50 p-2 rounded">
+                  {/* Order History Stats */}
+                  {riskHistory && (
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Order History</h4>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
                           <p className="text-gray-500">Total Orders</p>
-                          <p className="font-medium">
-                            {riskHistory.totalOrders}
+                          <p className="font-semibold">{riskHistory.totalOrders}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Success Rate</p>
+                          <p className="font-semibold text-green-600">
+                            {riskHistory.totalOrders > 0 
+                              ? Math.round((riskHistory.successfulOrders / riskHistory.totalOrders) * 100)
+                              : 0}%
                           </p>
                         </div>
-                        <div className="bg-gray-50 p-2 rounded">
+                        <div>
                           <p className="text-gray-500">Cancelled</p>
-                          <p className="font-medium text-red-600">
-                            {riskHistory.cancelledOrders}
-                          </p>
+                          <p className="font-semibold text-red-600">{riskHistory.cancelledOrders}</p>
                         </div>
-                        <div className="bg-gray-50 p-2 rounded">
-                          <p className="text-gray-500">Successful</p>
-                          <p className="font-medium text-green-600">
-                            {riskHistory.successfulOrders}
-                          </p>
-                        </div>
-                        <div className="bg-gray-50 p-2 rounded">
+                        <div>
                           <p className="text-gray-500">Last Status</p>
-                          <p className="font-medium">
-                            {riskHistory.lastOrderStatus || "N/A"}
-                          </p>
+                          <p className="font-semibold">{riskHistory.lastOrderStatus || "N/A"}</p>
                         </div>
                       </div>
                     </div>
+                  )}
+
+                  {/* Quick Actions */}
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <h4 className="text-sm font-medium text-blue-700 mb-3">Quick Actions</h4>
+                    <div className="space-y-2">
+                      {riskAssessment.riskLevel === 'CRITICAL' && (
+                        <div className="p-2 bg-red-100 border border-red-200 rounded text-xs text-red-700">
+                          🚨 Manual review required
+                        </div>
+                      )}
+                      {riskAssessment.riskLevel === 'HIGH' && (
+                        <div className="p-2 bg-orange-100 border border-orange-200 rounded text-xs text-orange-700">
+                          ⚠️ Additional verification needed
+                        </div>
+                      )}
+                      {riskAssessment.riskLevel === 'MEDIUM' && (
+                        <div className="p-2 bg-yellow-100 border border-yellow-200 rounded text-xs text-yellow-700">
+                          📋 Review order details
+                        </div>
+                      )}
+                      {riskAssessment.riskLevel === 'LOW' && (
+                        <div className="p-2 bg-green-100 border border-green-200 rounded text-xs text-green-700">
+                          ✅ Process normally
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Risk Details - Horizontal Sections */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Risk Factors */}
+                  {riskAssessment.riskFactors && riskAssessment.riskFactors.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Risk Factors</h4>
+                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                        {riskAssessment.riskFactors.map((factor: any, index: number) => (
+                          <div
+                            key={index}
+                            className={`p-3 rounded border-l-4 ${
+                              factor.severity === 'CRITICAL'
+                                ? 'border-red-700 bg-red-50'
+                                : factor.severity === 'HIGH'
+                                ? 'border-red-500 bg-red-50'
+                                : factor.severity === 'MEDIUM'
+                                ? 'border-yellow-500 bg-yellow-50'
+                                : 'border-gray-500 bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">
+                                  {factor.category}: {factor.factor}
+                                </p>
+                                <p className="text-xs text-gray-600 mt-1">
+                                  {factor.description}
+                                </p>
+                              </div>
+                              <Badge
+                                variant="outline"
+                                className={`text-xs ml-2 ${
+                                  factor.severity === 'CRITICAL'
+                                    ? 'border-red-700 text-red-700'
+                                    : factor.severity === 'HIGH'
+                                    ? 'border-red-500 text-red-500'
+                                    : factor.severity === 'MEDIUM'
+                                    ? 'border-yellow-500 text-yellow-500'
+                                    : 'border-gray-500 text-gray-500'
+                                }`}
+                              >
+                                {factor.severity}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Recommendations */}
+                  {riskAssessment.recommendations && riskAssessment.recommendations.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-blue-700 mb-3">Recommendations</h4>
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <ul className="text-sm text-blue-600 space-y-2">
+                          {riskAssessment.recommendations.map(
+                            (recommendation: string, index: number) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <span className="text-blue-500 mt-1 flex-shrink-0">→</span>
+                                <span>{recommendation}</span>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Additional Risk Information */}
+                {riskAssessment.reasons && riskAssessment.reasons.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Additional Risk Factors</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {riskAssessment.reasons.map((reason: string, index: number) => (
+                        <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-start gap-2">
+                            <span className="text-red-500 mt-1 flex-shrink-0">•</span>
+                            <span className="text-sm text-gray-600">{reason}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Model Version */}
+                {riskAssessment.modelVersion && (
+                  <div className="text-xs text-gray-500 pt-4 border-t">
+                    Risk Model Version: {riskAssessment.modelVersion} | Last Updated: {new Date().toLocaleString()}
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Order Items Table Card */}
         <Card className="shadow-md">
