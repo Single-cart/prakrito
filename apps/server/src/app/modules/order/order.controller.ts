@@ -4,21 +4,13 @@ import { orderRiskService } from "../order-risk/order-risk.service";
 import { orderAnalyticsService, orderService } from "./order.service";
 
 export const createOrder = catchAsync(async (req: Request, res: Response) => {
-  // First assess the risk
-  const riskAssessment = await orderRiskService.assessOrderRisk({
-    phone: req.body.phone,
-    address: req.body.address,
-    ip: req.ip || "Unknown",
-    email: req.body.email,
-  });
-
-  // Add risk assessment to response
+  // Create the order first
   const order = await orderService.createOrder(
     req.body,
     req.cookies.cart_session
   );
 
-  // Update risk history with new order
+  // Update risk history with new order (this also calculates risk assessment)
   await orderRiskService.updateOrderStatus(
     order.orderId,
     {
@@ -29,6 +21,14 @@ export const createOrder = catchAsync(async (req: Request, res: Response) => {
     },
     "Pending"
   );
+
+  // Get the updated risk assessment after adding this order
+  const riskAssessment = await orderRiskService.assessOrderRisk({
+    phone: req.body.phone,
+    address: req.body.address,
+    ip: req.ip || "Unknown",
+    email: req.body.email,
+  });
 
   if (!req.body.user) {
     res.cookie(`orders-${order.orderId}`, JSON.stringify(order.orderId), {
@@ -51,10 +51,26 @@ export const getSingleOrder = catchAsync(
   async (req: Request, res: Response) => {
     const order = await orderService.getSingleOrder(req.params.id);
 
+    // Get risk assessment for this order
+    let riskAssessment = null;
+    if (order?.shippingInfo) {
+      try {
+        riskAssessment = await orderRiskService.assessOrderRisk({
+          phone: order.shippingInfo.phone,
+          address: order.shippingInfo.address,
+          ip: req.ip || "Unknown",
+          email: order.shippingInfo.email ?? undefined,
+        });
+      } catch (error) {
+        console.log("Risk assessment failed:", error);
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Order retrieved successfully",
       order,
+      riskAssessment,
     });
   }
 );
@@ -74,19 +90,27 @@ export const getUserOrders = catchAsync(async (req: Request, res: Response) => {
 
 export const updateOrderStatus = catchAsync(
   async (req: Request, res: Response) => {
+    // Get the current order to know the old status
+    const currentOrder = await orderService.getSingleOrder(req.params.id);
+    const oldStatus = currentOrder.orderStatus;
+
+    // Update the order status
     const order = await orderService.updateOrderStatus(
       req.params.id,
       req.body.orderStatus
     );
 
     // Update risk history when order status changes
-    await orderRiskService.updateOrderStatus(
+    // Use the appropriate method based on whether this is an existing order
+    await orderRiskService.updateExistingOrderStatus(
       order.orderId,
       {
         phone: order?.shippingInfo?.phone,
         address: order?.shippingInfo?.address,
         ip: req.ip || "Unknown",
+        email: order?.shippingInfo?.email ?? undefined,
       },
+      oldStatus,
       req.body.orderStatus
     );
 

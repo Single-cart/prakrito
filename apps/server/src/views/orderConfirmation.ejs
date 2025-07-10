@@ -58,8 +58,9 @@
       <p><strong>Order Status:</strong> <%= orderStatus %></p>
       <p><strong>Payment Type:</strong> <%= paymentType %></p>
       <% if (user) { %>
-      <p><strong>User ID:</strong> <%= user %></p>
-      <% } %> <% if (orderNots) { %>
+      <p><strong>User Email:</strong> <%= user.email %></p>
+      <% } %>
+      <% if (orderNots) { %>
       <p><strong>Order Notes:</strong> <%= orderNots %></p>
       <% } %>
     </div>
@@ -74,12 +75,33 @@
     <div class="order-items">
       <h2>Order Items</h2>
       <% orderItems.forEach(function(item) { %>
+      <% 
+        const product = item.product;
+        const variation = product?.priceVariation?.[item.priceVariationIndex - 1];
+        const productImage = product?.images?.[0];
+      %>
       <div class="item">
-        <h3><%= item.productName %></h3>
-        <p><strong>Price:</strong> $<%= item.price.toFixed(2) %></p>
+        <% if (productImage) { %>
+        <img src="<%= productImage %>" alt="Product image" class="image" />
+        <% } %>
+        <h3><%= product?.name || `Product #${orderItems.indexOf(item) + 1}` %></h3>
+        <p><strong>Price:</strong> ৳<%= item.price %></p>
         <p><strong>Quantity:</strong> <%= item.quantity %></p>
-        <p><strong>Color:</strong> <%= item.colors %></p>
-        <p><strong>Size:</strong> <%= item.size %></p>
+        <% if (variation?.color) { %>
+        <p><strong>Color:</strong> <%= variation.color %></p>
+        <% } %>
+        <% if (variation?.size) { %>
+        <p><strong>Size:</strong> <%= variation.size %></p>
+        <% } %>
+        <% if (variation?.weight) { %>
+        <p><strong>Weight:</strong> <%= variation.weight %></p>
+        <% } %>
+        <% if (variation?.quantity) { %>
+        <p><strong>Variation Quantity:</strong> <%= variation.quantity %></p>
+        <% } %>
+        <% if (!variation) { %>
+        <p><strong>Variation Index:</strong> <%= item.priceVariationIndex %></p>
+        <% } %>
       </div>
       <% }); %>
 

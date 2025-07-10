@@ -9,7 +9,7 @@ export const assessOrderRisk = catchAsync(
     const assessment = await orderRiskService.assessOrderRisk({
       phone,
       address,
-      ip: ip || req.ip,
+      ip: ip || req.ip || req.connection.remoteAddress || "127.0.0.1",
       email,
     });
 
@@ -29,7 +29,7 @@ export const updateOrderRiskStatus = catchAsync(
       {
         phone,
         address,
-        ip: ip || req.ip,
+        ip: ip || req.ip || req.connection.remoteAddress || "127.0.0.1",
         email,
       },
       status
@@ -49,7 +49,7 @@ export const getOrderRiskHistory = catchAsync(
     const history = await orderRiskService.getOrderHistory({
       phone,
       address,
-      ip: ip || req.ip,
+      ip: ip || req.ip || req.connection.remoteAddress || "127.0.0.1",
       email,
     });
 

@@ -60,18 +60,31 @@ class OrderRiskService {
   async assessOrderRisk(
     identifiers: OrderRiskIdentifiers
   ): Promise<RiskAssessment> {
+    // Validate required fields
+    if (!identifiers.ip) {
+      throw new Error("IP address is required for risk assessment");
+    }
+
     // Find existing history or create new one
+    const searchCriteria: Record<string, any>[] = [
+      { "identifiers.ip": identifiers.ip },
+    ];
+
+    if (identifiers.phone) {
+      searchCriteria.push({ "identifiers.phone": identifiers.phone });
+    }
+
+    if (identifiers.phone && identifiers.address) {
+      searchCriteria.push({
+        $and: [
+          { "identifiers.phone": identifiers.phone },
+          { "identifiers.address": identifiers.address },
+        ],
+      });
+    }
+
     let history = await OrderRiskHistoryModel.findOne({
-      $or: [
-        { "identifiers.phone": identifiers.phone },
-        { "identifiers.ip": identifiers.ip },
-        {
-          $and: [
-            { "identifiers.phone": identifiers.phone },
-            { "identifiers.address": identifiers.address },
-          ],
-        },
-      ],
+      $or: searchCriteria,
     });
 
     if (!history) {
@@ -121,13 +134,61 @@ class OrderRiskService {
         riskScore: 0,
       });
     } else {
-      // Update existing history
-      history.totalOrders += 1;
-      if (status === "Cancelled") history.cancelledOrders += 1;
-      if (status === "Delivered") history.successfulOrders += 1;
+      // Check if this order already exists in history
+      const orderExists = history.orderIds.includes(orderId);
+
+      if (!orderExists) {
+        // New order - increment totals
+        history.totalOrders += 1;
+        history.orderIds.push(orderId);
+      }
+
+      // Update status counts (remove old status counts if order exists)
+      if (orderExists) {
+        // If updating existing order, we need to adjust counts
+        // This is a simplified approach - in production you might want to store
+        // individual order statuses to handle this more accurately
+        if (status === "Cancelled") history.cancelledOrders += 1;
+        if (status === "Delivered") history.successfulOrders += 1;
+      } else {
+        // New order
+        if (status === "Cancelled") history.cancelledOrders += 1;
+        if (status === "Delivered") history.successfulOrders += 1;
+      }
+
       history.lastOrderDate = new Date();
       history.lastOrderStatus = status;
-      history.orderIds.push(orderId);
+      history.riskScore = this.calculateRiskScore(history);
+      await history.save();
+    }
+  }
+
+  async updateExistingOrderStatus(
+    orderId: string,
+    identifiers: OrderRiskIdentifiers,
+    oldStatus: string,
+    newStatus: string
+  ): Promise<void> {
+    let history = await OrderRiskHistoryModel.findOne({
+      $or: [
+        { "identifiers.phone": identifiers.phone },
+        { "identifiers.ip": identifiers.ip },
+      ],
+    });
+
+    if (history && history.orderIds.includes(orderId)) {
+      // Remove old status count
+      if (oldStatus === "Cancelled")
+        history.cancelledOrders = Math.max(0, history.cancelledOrders - 1);
+      if (oldStatus === "Delivered")
+        history.successfulOrders = Math.max(0, history.successfulOrders - 1);
+
+      // Add new status count
+      if (newStatus === "Cancelled") history.cancelledOrders += 1;
+      if (newStatus === "Delivered") history.successfulOrders += 1;
+
+      history.lastOrderDate = new Date();
+      history.lastOrderStatus = newStatus;
       history.riskScore = this.calculateRiskScore(history);
       await history.save();
     }

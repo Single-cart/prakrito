@@ -15,6 +15,9 @@ export const orderSchema = new Schema(
         type: String,
         required: [true, "Phone number is required"],
       },
+      email: {
+        type: String,
+      },
     },
 
     orderItems: [

@@ -9,6 +9,7 @@ import {
   useUpdateOrderStatusMutation,
 } from "@/redux/features/orders/orderApi";
 import { Badge } from "@workspace/ui/components/badge";
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
@@ -31,7 +32,16 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
-import { Clock, CreditCard, FileText, Package } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  CreditCard,
+  FileText,
+  Package,
+  Shield,
+  XCircle,
+} from "lucide-react";
 import { revalidateTag } from "next/cache";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -45,11 +55,23 @@ const SingleOrder = () => {
   const [updateOrderStatus, { isSuccess, error }] =
     useUpdateOrderStatusMutation();
 
+  // Get risk assessment data from the order API response
+  const riskAssessment = data?.riskAssessment;
+  const riskHistory = riskAssessment?.history;
+
+  // Refresh order data to get updated risk assessment
+  const handleRefreshRiskAssessment = async () => {
+    await refetch();
+    toast.success("Risk assessment refreshed");
+  };
+
   const handleChange = async (value: string) => {
     await updateOrderStatus({
       id: params.id,
       data: { orderStatus: value },
     });
+
+    // Refresh data to get updated risk assessment
     await revalidateTag("getAllProducts");
     await refetch();
     await orderStatusRefetch();
@@ -73,6 +95,24 @@ const SingleOrder = () => {
       Cancelled: "bg-red-500",
     };
     return colors[status as keyof typeof colors] || "bg-gray-500";
+  };
+
+  const getRiskLevelColor = (level: string) => {
+    const colors = {
+      LOW: "bg-green-500",
+      MEDIUM: "bg-yellow-500",
+      HIGH: "bg-red-500",
+    };
+    return colors[level as keyof typeof colors] || "bg-gray-500";
+  };
+
+  const getRiskLevelIcon = (level: string) => {
+    const icons = {
+      LOW: CheckCircle,
+      MEDIUM: AlertTriangle,
+      HIGH: XCircle,
+    };
+    return icons[level as keyof typeof icons] || Shield;
   };
 
   const bread = [
@@ -115,7 +155,7 @@ const SingleOrder = () => {
           </Select>
         </div>
 
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {/* Order Details Card */}
           <Card className="shadow-md">
             <CardHeader>
@@ -235,6 +275,132 @@ const SingleOrder = () => {
                     </p>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Risk Assessment Card */}
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-blue-500" />
+                Risk Assessment
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleRefreshRiskAssessment}
+                    size="sm"
+                    className="bg-blue-500 hover:bg-blue-600"
+                  >
+                    Refresh Assessment
+                  </Button>
+                </div>
+
+                {!data?.order?.shippingInfo && (
+                  <div className="p-3 bg-yellow-50 rounded-lg">
+                    <p className="text-sm text-yellow-700">
+                      Order shipping information is required for risk
+                      assessment.
+                    </p>
+                  </div>
+                )}
+
+                {!riskAssessment && data?.order && (
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600">
+                      Risk assessment not available. Click Refresh Assessment to
+                      generate.
+                    </p>
+                  </div>
+                )}
+
+                {riskAssessment && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const RiskIcon = getRiskLevelIcon(
+                            riskAssessment.riskLevel
+                          );
+                          return <RiskIcon className="h-5 w-5" />;
+                        })()}
+                        <div>
+                          <p className="text-sm text-gray-500">Risk Level</p>
+                          <p className="font-semibold">
+                            {riskAssessment.riskLevel}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge
+                        className={`${getRiskLevelColor(riskAssessment.riskLevel)}`}
+                      >
+                        {riskAssessment.riskScore}/100
+                      </Badge>
+                    </div>
+
+                    {riskAssessment.reasons &&
+                      riskAssessment.reasons.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-gray-700">
+                            Risk Factors:
+                          </p>
+                          <ul className="text-sm text-gray-600 space-y-1">
+                            {riskAssessment.reasons.map(
+                              (reason: string, index: number) => (
+                                <li
+                                  key={index}
+                                  className="flex items-start gap-2"
+                                >
+                                  <span className="text-red-500 mt-1">•</span>
+                                  {reason}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+                      )}
+                  </div>
+                )}
+
+                {riskHistory && (
+                  <div className="space-y-3">
+                    <Separator />
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-700">
+                        Order History:
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="bg-gray-50 p-2 rounded">
+                          <p className="text-gray-500">Total Orders</p>
+                          <p className="font-medium">
+                            {riskHistory.totalOrders}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 p-2 rounded">
+                          <p className="text-gray-500">Cancelled</p>
+                          <p className="font-medium text-red-600">
+                            {riskHistory.cancelledOrders}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 p-2 rounded">
+                          <p className="text-gray-500">Successful</p>
+                          <p className="font-medium text-green-600">
+                            {riskHistory.successfulOrders}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 p-2 rounded">
+                          <p className="text-gray-500">Last Status</p>
+                          <p className="font-medium">
+                            {riskHistory.lastOrderStatus || "N/A"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
