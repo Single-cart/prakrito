@@ -1,10 +1,10 @@
-import { Express } from "express";
+import { Application } from "express";
 
 /**
  * Configure Express to properly handle proxy headers
  * This is essential for getting real client IPs when behind a proxy/load balancer
  */
-export const configureProxySupport = (app: Express): void => {
+export const configureProxySupport = (app: Application): void => {
   // Trust proxy settings
   // In production, set this to the number of proxy layers or specific IP ranges
   if (process.env.NODE_ENV === "production") {

@@ -10,6 +10,10 @@ import hpp from "hpp";
 import morgan from "morgan";
 import path from "path";
 import requestIp from "request-ip";
+import {
+  configureProxySupport,
+  ipLoggingMiddleware,
+} from "../config/proxy.config";
 import enableCrossOriginResourcePolicy from "../middlewares/enableCrossOriginResourcePolicy";
 import sendResponse from "../utils/sendResponse";
 import config from "./config";
@@ -25,9 +29,8 @@ const middlewares = (app: Application) => {
     allowedHeaders: "Content-Type, Authorization",
   };
 
-  if (config.app.env === "production") {
-    app.set("trust proxy", 1);
-  }
+  // Configure enhanced proxy support for better IP detection
+  configureProxySupport(app);
 
   // Middlewares
   app.set("view engine", ejs);
@@ -52,7 +55,10 @@ const middlewares = (app: Application) => {
   app.use(cookieParser());
   app.use(userAgent.express());
   app.use(requestIp.mw());
+
+  // Add IP logging middleware for debugging (development only)
   if (config.app.env === "development") {
+    app.use(ipLoggingMiddleware);
     app.use(morgan("dev"));
   }
 
@@ -66,7 +72,26 @@ const middlewares = (app: Application) => {
   app.get("/", (_, res) => {
     sendResponse(res, {
       statusCode: 200,
-      message: "Server sunning successfully.",
+      message: "Server running successfully.",
+    });
+  });
+
+  // IP detection test endpoint (useful for debugging)
+  app.get("/test-ip", (req, res) => {
+    res.json({
+      "req.ip": req.ip,
+      "req.connection.remoteAddress": req.connection.remoteAddress,
+      "x-forwarded-for": req.headers["x-forwarded-for"],
+      "x-real-ip": req.headers["x-real-ip"],
+      "cf-connecting-ip": req.headers["cf-connecting-ip"],
+      "user-agent": req.headers["user-agent"],
+      "request-ip": (req as any).clientIp, // from request-ip middleware
+      "all-headers": Object.keys(req.headers)
+        .filter((h) => h.includes("ip") || h.includes("forward"))
+        .reduce((obj: any, key) => {
+          obj[key] = req.headers[key];
+          return obj;
+        }, {}),
     });
   });
 
