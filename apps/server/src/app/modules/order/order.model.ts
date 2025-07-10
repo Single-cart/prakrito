@@ -55,8 +55,9 @@ export const orderSchema = new Schema(
     },
 
     user: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: false, // Optional for guest orders
     },
 
     orderStatus: {

@@ -20,20 +20,6 @@ import OrderModel from "./order.model";
 
 export const orderService = {
   async createOrder(orderData: OrderData, sessionId?: string) {
-    // Debug logging
-    console.log("Order Data Received:", JSON.stringify(orderData, null, 2));
-
-    // Validate product IDs in order items
-    if (orderData.orderItems) {
-      orderData.orderItems.forEach((item: any, index: number) => {
-        if (item.product && !mongoose.Types.ObjectId.isValid(item.product)) {
-          console.error(`Invalid product ID at index ${index}:`, item.product);
-          throw new Error(
-            `Invalid product ID at index ${index}: ${item.product}`
-          );
-        }
-      });
-    }
     // Calculate item prices from order items if needed
     const calculatedItemsPrice =
       orderData.orderItems?.reduce((total, item: any) => {
@@ -47,7 +33,8 @@ export const orderService = {
     const totalAmount =
       Number(orderData.totalAmount) || itemsPrice + shippingPrice;
 
-    const order = await OrderModel.create({
+    // Prepare order data
+    const orderPayload: any = {
       shippingInfo: {
         phone: orderData.phone,
         fullName: orderData.fullName,
@@ -59,9 +46,15 @@ export const orderService = {
       itemsPrice: itemsPrice,
       shippingPrice: shippingPrice,
       totalAmount: totalAmount,
-      user: orderData.user,
       orderId: generateOrderId(),
-    });
+    };
+
+    // Only add user if it's a valid ObjectId
+    if (orderData.user && mongoose.Types.ObjectId.isValid(orderData.user)) {
+      orderPayload.user = orderData.user;
+    }
+
+    const order = await OrderModel.create(orderPayload);
 
     // Clear cart items if they exist
     if (sessionId && orderData.orderItems?.length > 0) {
