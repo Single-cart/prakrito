@@ -198,9 +198,9 @@ const BuyNowCheckout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-primary">Full Name</Label>
+                      <Label className="text-primary">আপনার নাম</Label>
                       <FormControl>
-                        <Input placeholder="Enter Your Name" {...field} />
+                        <Input placeholder="আপনার নাম লিখুন..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -211,9 +211,9 @@ const BuyNowCheckout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-primary">Email (Optional)</Label>
+                      <Label className="text-primary">ইমেইল (Optional)</Label>
                       <FormControl>
-                        <Input placeholder="Enter Your Email" {...field} />
+                        <Input placeholder="আপনার ইমেইল লিখুন..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -224,12 +224,9 @@ const BuyNowCheckout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-primary">Phone Number</Label>
+                      <Label className="text-primary">মোবাইল নাম্বার</Label>
                       <FormControl>
-                        <Input
-                          placeholder="Enter Your Phone Number"
-                          {...field}
-                        />
+                        <Input placeholder="আপনার ফোন নাম্বার দিন" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -240,12 +237,9 @@ const BuyNowCheckout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-primary">Address</Label>
+                      <Label className="text-primary">আপনার ঠিকানা</Label>
                       <FormControl>
-                        <Input
-                          placeholder="Enter Your Full Address"
-                          {...field}
-                        />
+                        <Input placeholder="আপনার ঠিকানা লিখুন" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -256,8 +250,8 @@ const BuyNowCheckout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label>Order Notes (Optional)</Label>
-                      <Input placeholder="Enter Your Order Notes" {...field} />
+                      <Label>অর্ডার নোট (Optional)</Label>
+                      <Input placeholder="আপনার অর্ডার নোট লিখুন" {...field} />
                     </FormItem>
                   )}
                 />

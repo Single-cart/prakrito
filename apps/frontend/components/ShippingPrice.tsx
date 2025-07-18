@@ -75,13 +75,13 @@ const ShippingPriceSelection = ({
               <div className="flex items-center space-x-3">
                 <RadioGroupItem value="inside" id="inside" />
                 <Label htmlFor="inside" className="font-normal">
-                  Inside Dhaka (৳{insideDhaka})
+                  ঢাকার ভিতরে (৳{insideDhaka})
                 </Label>
               </div>
               <div className="flex items-center space-x-3">
                 <RadioGroupItem value="outside" id="outside" />
                 <Label htmlFor="outside" className="font-normal">
-                  Outside Dhaka (৳{outsideDhaka})
+                  ঢাকার বাহিরে (৳{outsideDhaka})
                 </Label>
               </div>
             </RadioGroup>

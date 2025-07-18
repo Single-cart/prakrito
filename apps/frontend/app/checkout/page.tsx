@@ -238,11 +238,11 @@ const Checkout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-primary">Full Name</Label>
+                      <Label className="text-primary">আপনার নাম</Label>
                       <FormControl>
                         <Input
                           // disabled={isLoading}
-                          placeholder="Enter Your Name"
+                          placeholder="আপনার নাম লিখুন..."
                           {...field}
                         />
                       </FormControl>
@@ -255,11 +255,11 @@ const Checkout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-primary">Email (Optional)</Label>
+                      <Label className="text-primary">ইমেইল (Optional)</Label>
                       <FormControl>
                         <Input
                           // disabled={isLoading}
-                          placeholder="Enter Your Email"
+                          placeholder="আপনার ইমেইল লিখুন..."
                           {...field}
                         />
                       </FormControl>
@@ -272,11 +272,11 @@ const Checkout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-primary">Phone Number</Label>
+                      <Label className="text-primary">মোবাইল নাম্বার</Label>
                       <FormControl>
                         <Input
                           // disabled={isLoading}
-                          placeholder="Enter Your Phone Number"
+                          placeholder="আপনার ফোন নাম্বার দিন"
                           {...field}
                         />
                       </FormControl>
@@ -289,11 +289,11 @@ const Checkout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-primary">Address</Label>
+                      <Label className="text-primary">আপনার ঠিকানা</Label>
                       <FormControl>
                         <Input
                           // disabled={isLoading}
-                          placeholder="Enter Your Full Address"
+                          placeholder="আপনার ঠিকানা লিখুন"
                           {...field}
                         />
                       </FormControl>
@@ -307,8 +307,8 @@ const Checkout = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <Label>Order Nots (Optional)</Label>
-                      <Input placeholder="Enter Your Order Nots" {...field} />
+                      <Label>অর্ডার নোট (Optional)</Label>
+                      <Input placeholder="আপনার অর্ডার নোট লিখুন" {...field} />
                     </FormItem>
                   )}
                 />
