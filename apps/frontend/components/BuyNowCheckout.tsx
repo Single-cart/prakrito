@@ -206,7 +206,7 @@ const BuyNowCheckout = () => {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   name="email"
                   control={form.control}
                   render={({ field }) => (
@@ -218,7 +218,7 @@ const BuyNowCheckout = () => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   name="phone"
                   control={form.control}
