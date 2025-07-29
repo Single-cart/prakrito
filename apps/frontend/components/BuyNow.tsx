@@ -1,6 +1,5 @@
 "use client";
 
-import PageViewTracker from "@/components/gtm/PageViewTracker";
 import { byNowItem } from "@/redux/features/cart/cartSlice";
 import { product } from "@workspace/shared/index";
 import { Button } from "@workspace/ui/components/button";
@@ -12,6 +11,7 @@ import {
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import BuyNowCheckout from "./BuyNowCheckout";
+import { customEvent } from "./gtm/customEvent";
 
 interface BuyNowProps {
   product: product.IProductRes;
@@ -47,27 +47,22 @@ const BuyNow = ({
         priceVariationIndex,
       })
     );
+
+    customEvent({
+      event: "initiate_checkout",
+      ecommerce: {
+        currencyCode: "BDT",
+        productName: product?.name,
+        price: productPrice,
+        image: product?.images?.[0],
+        id: product._id,
+        priceVariationIndex: priceVariationIndex,
+      },
+    });
   };
 
   return (
     <Sheet>
-      <PageViewTracker
-        event="initiate_checkout"
-        pageData={{
-          title: "Checkout",
-          type: "checkout",
-        }}
-        productData={[
-          {
-            productName: product?.name,
-            price: productPrice,
-            image: product?.images?.[0],
-            id: product._id,
-            priceVariationIndex: priceVariationIndex,
-          },
-        ]}
-      />
-      ;
       <SheetTrigger asChild>
         <Button
           variant="outline"
