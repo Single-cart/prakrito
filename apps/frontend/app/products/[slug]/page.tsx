@@ -12,7 +12,6 @@ import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 import { RefreshCcw, X } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { FC } from "react";
 
 type Props = {
@@ -23,8 +22,6 @@ const Page: FC<Props> = async ({ params }) => {
   const { slug } = await params;
   const product = await singleProduct(slug);
   const productInfo = product?.data?.product;
-
-  console.log("productInfo", product);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const priceVariation = productInfo?.priceVariation?.map((item: any) => ({
@@ -74,7 +71,7 @@ const Page: FC<Props> = async ({ params }) => {
 
             <PriceVariations product={productInfo} />
 
-            <h1>
+            {/* <h1>
               <span className="font-[500]">Category:</span>{" "}
               <Link
                 className="text-blue-400"
@@ -82,7 +79,7 @@ const Page: FC<Props> = async ({ params }) => {
               >
                 {productInfo?.subcategory?.name}
               </Link>
-            </h1>
+            </h1> */}
 
             <div className="space-y-2">
               {productInfo?.stock > 0 ? (

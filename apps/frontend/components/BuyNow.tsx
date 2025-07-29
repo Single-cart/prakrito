@@ -1,5 +1,6 @@
 "use client";
 
+import PageViewTracker from "@/components/gtm/PageViewTracker";
 import { byNowItem } from "@/redux/features/cart/cartSlice";
 import { product } from "@workspace/shared/index";
 import { Button } from "@workspace/ui/components/button";
@@ -29,6 +30,10 @@ const BuyNow = ({
     priceVariationIndex === 0
       ? (product.stock ?? 0) > 0
       : (product.priceVariation?.[priceVariationIndex - 1]?.available ?? false);
+  const productPrice =
+    (product.priceVariation &&
+      product.priceVariation[priceVariationIndex]?.discountPrice) ||
+    0;
 
   const handleClick = () => {
     if (!isAvailable) {
@@ -42,6 +47,23 @@ const BuyNow = ({
         priceVariationIndex,
       })
     );
+
+    <PageViewTracker
+      event="initiate_checkout"
+      pageData={{
+        title: "Checkout",
+        type: "checkout",
+      }}
+      productData={[
+        {
+          productName: product?.name,
+          price: productPrice,
+          image: product?.images?.[0],
+          id: product._id,
+          priceVariationIndex: priceVariationIndex,
+        },
+      ]}
+    />;
   };
 
   return (
