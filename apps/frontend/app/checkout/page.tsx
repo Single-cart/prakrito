@@ -155,6 +155,9 @@ const Checkout = () => {
           price: item.price,
           quantity: item.quantity,
         })),
+        userData: {
+          ...value,
+        },
       },
     });
 
