@@ -47,27 +47,27 @@ const BuyNow = ({
         priceVariationIndex,
       })
     );
-
-    <PageViewTracker
-      event="initiate_checkout"
-      pageData={{
-        title: "Checkout",
-        type: "checkout",
-      }}
-      productData={[
-        {
-          productName: product?.name,
-          price: productPrice,
-          image: product?.images?.[0],
-          id: product._id,
-          priceVariationIndex: priceVariationIndex,
-        },
-      ]}
-    />;
   };
 
   return (
     <Sheet>
+      <PageViewTracker
+        event="initiate_checkout"
+        pageData={{
+          title: "Checkout",
+          type: "checkout",
+        }}
+        productData={[
+          {
+            productName: product?.name,
+            price: productPrice,
+            image: product?.images?.[0],
+            id: product._id,
+            priceVariationIndex: priceVariationIndex,
+          },
+        ]}
+      />
+      ;
       <SheetTrigger asChild>
         <Button
           variant="outline"
