@@ -158,6 +158,9 @@ const BuyNowCheckout = () => {
               quantity: 1,
             },
           ],
+           userData: {
+          ...value,
+        },
         },
       });
 
