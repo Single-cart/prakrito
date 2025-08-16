@@ -14,7 +14,6 @@ export const createLanding = catchAsync(async (req: Request, res: Response) => {
     phone,
     order,
     isActive,
-    youtubeLink,
     youtubeLinks,
     description,
     certificateTitle,
@@ -34,7 +33,6 @@ export const createLanding = catchAsync(async (req: Request, res: Response) => {
     | "phone"
     | "order"
     | "isActive"
-    | "youtubeLink"
     | "youtubeLinks"
     | "description"
     | "certificateTitle"
@@ -49,7 +47,6 @@ export const createLanding = catchAsync(async (req: Request, res: Response) => {
     product,
     name,
     phone,
-    youtubeLink,
     youtubeLinks,
     description,
     certificateTitle,

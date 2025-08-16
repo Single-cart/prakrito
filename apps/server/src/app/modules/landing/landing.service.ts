@@ -13,7 +13,6 @@ export const createLandingService = async (
     | "phone"
     | "order"
     | "isActive"
-    | "youtubeLink"
     | "youtubeLinks"
     | "description"
     | "certificateTitle"
