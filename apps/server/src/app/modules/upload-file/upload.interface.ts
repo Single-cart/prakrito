@@ -7,7 +7,7 @@ export interface IUpload {
   mimeType: string;
   size: number;
   userId: Schema.Types.ObjectId;
-  purpose: "product" | "user" | "category" | "brand";
+  purpose: "product" | "user" | "category" | "brand" | "landing";
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

@@ -22,9 +22,42 @@ const landingSchema = new mongoose.Schema<landing.ILanding>({
     type: Number,
     default: 0,
   },
-  youtubeLink: {
+
+  youtubeLinks: {
+    type: [String],
+    default: [],
+  },
+  description: {
     type: String,
     default: "",
+  },
+  certificateTitle: {
+    type: String,
+    default: "",
+  },
+  certificates: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Upload" }],
+    default: [],
+  },
+  heroBtnText: {
+    type: String,
+    default: "",
+  },
+  offerTitle: {
+    type: String,
+    default: "",
+  },
+  offerDescription: {
+    type: String,
+    default: "",
+  },
+  reviews: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Upload" }],
+    default: [],
+  },
+  productGallery: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Upload" }],
+    default: [],
   },
   isActive: {
     type: Boolean,

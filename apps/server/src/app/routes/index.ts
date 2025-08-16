@@ -10,6 +10,7 @@ import customerReviewRoute from "../modules/customar-review/review.route";
 import landingRoutes from "../modules/landing/landing.route";
 import orderRoute from "../modules/order/order.route";
 import productRoute from "../modules/product/product.route";
+import uploadRouter from "../modules/upload-file/upload.route";
 import authRouter from "../modules/user-management/auth/auth.route";
 import userRouter from "../modules/user-management/users/user.route";
 
@@ -59,6 +60,10 @@ const moduleRoutes = [
   {
     path: "/blog",
     route: blogRoute,
+  },
+  {
+    path: "/upload",
+    route: uploadRouter,
   },
 ];
 

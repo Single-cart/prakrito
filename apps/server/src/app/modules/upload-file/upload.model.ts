@@ -30,7 +30,7 @@ const uploadSchema = new Schema<IUpload>(
     },
     purpose: {
       type: String,
-      enum: ["product", "user", "category", "brand"],
+      enum: ["product", "user", "category", "brand", "landing"],
       required: true,
     },
     isActive: {

@@ -14,6 +14,15 @@ export const createLandingService = async (
     | "order"
     | "isActive"
     | "youtubeLink"
+    | "youtubeLinks"
+    | "description"
+    | "certificateTitle"
+    | "certificates"
+    | "heroBtnText"
+    | "offerTitle"
+    | "offerDescription"
+    | "reviews"
+    | "productGallery"
   >
 ): Promise<landing.ILanding> => {
   const nameExists = await LandingModel.findOne({ name: landingData.name });
@@ -34,6 +43,9 @@ export const getAllLandingsService = async (): Promise<{
 
   const result = await LandingModel.find()
     .populate("product")
+    .populate("certificates")
+    .populate("reviews")
+    .populate("productGallery")
     .sort(sortConditions);
 
   return {
@@ -45,7 +57,11 @@ export const getAllLandingsService = async (): Promise<{
 export const getSingleLandingService = async (
   id: string
 ): Promise<landing.ILanding | null> => {
-  const result = await LandingModel.findById(id).populate("product");
+  const result = await LandingModel.findById(id)
+    .populate("product")
+    .populate("certificates")
+    .populate("reviews")
+    .populate("productGallery");
 
   return result;
 };
@@ -68,7 +84,11 @@ export const updateLandingService = async (
 
   const result = await LandingModel.findByIdAndUpdate(id, payload, {
     new: true,
-  }).populate("product");
+  })
+    .populate("product")
+    .populate("certificates")
+    .populate("reviews")
+    .populate("productGallery");
 
   return result;
 };

@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import ApiError from "../errorHandlers/ApiError";
 
-type UploadPurpose = "product" | "user" | "category" | "brand";
+type UploadPurpose = "product" | "user" | "category" | "brand" | "landing";
 
 const createStorage = (purpose: UploadPurpose) => {
   return multer.diskStorage({

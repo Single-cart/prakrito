@@ -75,6 +75,7 @@ export const apiSlice = createApi({
     "Category",
     "Landing",
     "Blog",
+    "Upload",
   ],
   endpoints: (builder) => ({
     userInfo: builder.query({
