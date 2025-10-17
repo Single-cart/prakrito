@@ -56,8 +56,6 @@ const Page: FC<Props> = async ({ params }) => {
   const landingData = landing?.data;
   const productData = landingData?.product;
 
-  console.log(landingData);
-
   if (!landingData) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -435,11 +433,9 @@ const Page: FC<Props> = async ({ params }) => {
               <div className="mb-8 flex justify-center">
                 <div className="relative w-full max-w-2xl aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                   {landingData?.productGallery &&
-                    landingData?.productGallery.length > 1 &&
-                    landingData?.productGallery[1] &&
-                    landingData?.productGallery[1].path && (
+                    landingData?.productGallery.length > 0 && (
                       <Image
-                        src={getImgUrl(landingData?.productGallery[1].path)}
+                        src={getImgUrl(landingData?.productGallery[1]?.path)}
                         alt={productData.name || "Offer Product Image"}
                         fill
                         className="object-cover transform hover:scale-105 transition-transform duration-500"
@@ -485,27 +481,24 @@ const Page: FC<Props> = async ({ params }) => {
               {/* Centered Grid Layout */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
                 {landingData.certificates.map(
-                  (certificate: any, index: number) => {
-                    if (!certificate || !certificate.path) return null;
-                    return (
-                      <ImageLightbox
-                        key={index}
-                        imageUrl={getImgUrl(certificate.path)}
-                        altText={`Certificate ${index + 1}`}
-                      >
-                        <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer mx-auto">
-                          <div className="aspect-[4/3] relative">
-                            <Image
-                              src={getImgUrl(certificate.path)}
-                              alt={`Certificate ${index + 1}`}
-                              fill
-                              className="object-cover hover:scale-105 transition-transform duration-500"
-                            />
-                          </div>
-                        </Card>
-                      </ImageLightbox>
-                    );
-                  }
+                  (certificate: any, index: number) => (
+                    <ImageLightbox
+                      key={index}
+                      imageUrl={getImgUrl(certificate?.path)}
+                      altText={`Certificate ${index + 1}`}
+                    >
+                      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer mx-auto">
+                        <div className="aspect-[4/3] relative">
+                          <Image
+                            src={getImgUrl(certificate?.path)}
+                            alt={`Certificate ${index + 1}`}
+                            fill
+                            className="object-cover hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                      </Card>
+                    </ImageLightbox>
+                  )
                 )}
               </div>
             </div>
@@ -528,31 +521,28 @@ const Page: FC<Props> = async ({ params }) => {
                   className="w-full"
                 >
                   <CarouselContent className="-ml-2 md:-ml-4">
-                    {landingData.reviews.map((review: any, index: number) => {
-                      if (!review || !review.path) return null;
-                      return (
-                        <CarouselItem
-                          key={index}
-                          className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
+                    {landingData.reviews.map((review: any, index: number) => (
+                      <CarouselItem
+                        key={index}
+                        className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
+                      >
+                        <ImageLightbox
+                          imageUrl={getImgUrl(review?.path)}
+                          altText={`Customer Review ${index + 1}`}
                         >
-                          <ImageLightbox
-                            imageUrl={getImgUrl(review.path)}
-                            altText={`Customer Review ${index + 1}`}
-                          >
-                            <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer mx-auto">
-                              <div className="aspect-square relative">
-                                <Image
-                                  src={getImgUrl(review.path)}
-                                  alt={`Customer Review ${index + 1}`}
-                                  fill
-                                  className="object-cover hover:scale-105 transition-transform duration-500"
-                                />
-                              </div>
-                            </Card>
-                          </ImageLightbox>
-                        </CarouselItem>
-                      );
-                    })}
+                          <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer mx-auto">
+                            <div className="aspect-square relative">
+                              <Image
+                                src={getImgUrl(review?.path)}
+                                alt={`Customer Review ${index + 1}`}
+                                fill
+                                className="object-cover hover:scale-105 transition-transform duration-500"
+                              />
+                            </div>
+                          </Card>
+                        </ImageLightbox>
+                      </CarouselItem>
+                    ))}
                   </CarouselContent>
                   <CarouselPrevious className="hidden md:flex -left-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
                   <CarouselNext className="hidden md:flex -right-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
@@ -579,29 +569,26 @@ const Page: FC<Props> = async ({ params }) => {
                 >
                   <CarouselContent className="-ml-2 md:-ml-4">
                     {landingData.productGallery.map(
-                      (image: any, index: number) => {
-                        if (!image || !image.path) return null;
-                        return (
-                          <CarouselItem
-                            key={index}
-                            className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4"
+                      (image: any, index: number) => (
+                        <CarouselItem
+                          key={index}
+                          className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4"
+                        >
+                          <ImageLightbox
+                            imageUrl={getImgUrl(image?.path)}
+                            altText={`Gallery image ${index + 1}`}
                           >
-                            <ImageLightbox
-                              imageUrl={getImgUrl(image.path)}
-                              altText={`Gallery image ${index + 1}`}
-                            >
-                              <div className="aspect-square relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer mx-auto">
-                                <Image
-                                  src={getImgUrl(image.path)}
-                                  alt={`Gallery image ${index + 1}`}
-                                  fill
-                                  className="object-cover hover:scale-105 transition-transform duration-500"
-                                />
-                              </div>
-                            </ImageLightbox>
-                          </CarouselItem>
-                        );
-                      }
+                            <div className="aspect-square relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer mx-auto">
+                              <Image
+                                src={getImgUrl(image?.path)}
+                                alt={`Gallery image ${index + 1}`}
+                                fill
+                                className="object-cover hover:scale-105 transition-transform duration-500"
+                              />
+                            </div>
+                          </ImageLightbox>
+                        </CarouselItem>
+                      )
                     )}
                   </CarouselContent>
                   <CarouselPrevious className="hidden md:flex -left-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
