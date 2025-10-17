@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import ImageLightbox from "@/components/ImageLightbox";
 import LandingCheckout from "@/components/LandingCheckout";
 import ProductDesc from "@/components/ProductDesc";
 import { getSingleLanding } from "@/lib/fetch/landing.data";
@@ -25,7 +26,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { FC } from "react";
-import ImageLightbox from "@/components/ImageLightbox";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -56,6 +56,8 @@ const Page: FC<Props> = async ({ params }) => {
   const landingData = landing?.data;
   const productData = landingData?.product;
 
+  console.log(landingData);
+
   if (!landingData) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -72,6 +74,7 @@ const Page: FC<Props> = async ({ params }) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       {/* Hero Section */}
+      {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50"></div>
@@ -84,8 +87,8 @@ const Page: FC<Props> = async ({ params }) => {
           <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-4xl mx-auto text-center">
               <div className="mb-4 animate-fade-in-down">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-bengali">
-                  <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 py-2 px-1 leading-normal sm:leading-normal md:leading-normal lg:leading-normal">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-noto">
+                  <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 py-2 px-1 leading-normal sm:leading-normal md:leading-normal lg:leading-normal font-noto">
                     {landingData?.heading}
                   </span>
                 </h1>
@@ -95,7 +98,7 @@ const Page: FC<Props> = async ({ params }) => {
               </div>
               {landingData?.description && (
                 <div className="mb-6 animate-fade-in-up delay-200">
-                  <p className="text-base sm:text-lg md:text-xl font-bengali leading-relaxed text-gray-600 max-w-2xl mx-auto">
+                  <p className="text-base sm:text-lg md:text-xl font-noto leading-relaxed text-gray-600 max-w-2xl mx-auto">
                     {landingData.description}
                   </p>
                 </div>
@@ -104,7 +107,7 @@ const Page: FC<Props> = async ({ params }) => {
                 <Link href="#order">
                   <Button
                     size="lg"
-                    className="text-base sm:text-lg md:text-xl py-4 px-8 sm:px-10 font-bengali font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 rounded-full"
+                    className="text-base sm:text-lg md:text-xl py-4 px-8 sm:px-10 font-noto font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-pink-600 hover:via-purple-600 hover:to-blue-60 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 rounded-full"
                   >
                     <ShoppingBag className="inline-block mr-2 h-5 w-5" />
                     {landingData?.heroBtnText || "অর্ডার করতে চাই"}
@@ -116,8 +119,6 @@ const Page: FC<Props> = async ({ params }) => {
         </div>
       </div>
 
-     
-
       {/* Product Display Section */}
       <div className="relative py-12 sm:py-20">
         <div className="absolute inset-0 bg-gradient-to-b from-white via-gray-50 to-white"></div>
@@ -126,7 +127,7 @@ const Page: FC<Props> = async ({ params }) => {
             <span className="inline-block px-4 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4">
               Featured Product
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-bengali">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-noto">
               আমাদের প্রিমিয়াম প্রোডাক্ট
             </h2>
           </div>
@@ -185,14 +186,14 @@ const Page: FC<Props> = async ({ params }) => {
             </div>
             <div className="space-y-6">
               <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 font-bengali">
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 font-noto">
                   {productData?.name || "Premium Product"}
                 </h1>
               </div>
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1 font-bengali">
+                    <p className="text-sm text-gray-600 mb-1 font-noto">
                       বিশেষ অফার মূল্য
                     </p>
                     <div className="flex items-end gap-3">
@@ -267,7 +268,7 @@ const Page: FC<Props> = async ({ params }) => {
                       <Phone className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-bengali">
+                      <p className="text-xs text-gray-500 font-noto">
                         দ্রুত অর্ডারের জন্য কল করুন
                       </p>
                       <a
@@ -316,10 +317,10 @@ const Page: FC<Props> = async ({ params }) => {
       <div className="py-12 sm:py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-bengali">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-noto">
               এখনই অর্ডার করুন!
             </h2>
-            <p className="mt-4 text-lg text-gray-600 font-bengali">
+            <p className="mt-4 text-lg text-gray-600 font-noto">
               এই অফার মিস করবেন না। আপনার অর্ডার দেওয়ার জন্য এখনই আমাদের সাথে
               যোগাযোগ করুন!
             </p>
@@ -338,7 +339,7 @@ const Page: FC<Props> = async ({ params }) => {
               <Link href="#order">
                 <Button
                   size="lg"
-                  className="text-base font-bengali bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
+                  className="text-base font-noto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
                 >
                   <ShoppingBag className="mr-2 h-5 w-5" />
                   অর্ডার করতে চাই
@@ -358,7 +359,7 @@ const Page: FC<Props> = async ({ params }) => {
                 <div className="inline-flex items-center justify-center p-2 bg-red-100 rounded-full mb-3">
                   <Play className="h-6 w-6 text-red-600" />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold mb-2 font-bengali bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-pink-600">
+                <h2 className="text-xl sm:text-2xl font-bold mb-2 font-noto bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-pink-600">
                   প্রোডাক্ট ভিডিও দেখুন
                 </h2>
               </div>
@@ -402,7 +403,7 @@ const Page: FC<Props> = async ({ params }) => {
       )}
 
       {productData?.description && (
-        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 font-bengali">
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 font-noto">
           <div className="bg-white rounded-lg sm:rounded-xl shadow-md overflow-hidden">
             <div className="p-4 sm:p-6">
               <h2 className="text-xl sm:text-3xl font-bold mb-2 text-center">
@@ -415,89 +416,97 @@ const Page: FC<Props> = async ({ params }) => {
         </div>
       )}
 
-       {/* New Offer Section */}
+      {/* New Offer Section - Centered Layout */}
       {landingData?.offerTitle && landingData?.offerDescription && (
         <div className="py-12 sm:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-bengali">
-                {landingData.offerTitle}
-              </h2>
-              <div className="mt-4 flex justify-center">
-                <div className="h-1 w-20 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
+            <div className="max-w-4xl mx-auto">
+              {/* Title */}
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-noto">
+                  {landingData.offerTitle}
+                </h2>
+                <div className="mt-4 flex justify-center">
+                  <div className="h-1 w-20 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div className="space-y-4">
-                {landingData.offerDescription.split(",").map((item:any, index:number) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <Check className="h-5 w-5 text-green-600" />
+
+              {/* Centered Image */}
+              <div className="mb-8 flex justify-center">
+                <div className="relative w-full max-w-2xl aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                  {landingData?.productGallery &&
+                    landingData?.productGallery.length > 1 &&
+                    landingData?.productGallery[1] &&
+                    landingData?.productGallery[1].path && (
+                      <Image
+                        src={getImgUrl(landingData?.productGallery[1].path)}
+                        alt={productData.name || "Offer Product Image"}
+                        fill
+                        className="object-cover transform hover:scale-105 transition-transform duration-500"
+                      />
+                    )}
+                </div>
+              </div>
+
+              {/* Centered Benefits List */}
+              <div className="space-y-4 max-w-2xl mx-auto">
+                {landingData.offerDescription
+                  .split(",")
+                  .map((item: any, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-4 justify-center"
+                    >
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <Check className="h-5 w-5 text-green-600" />
+                      </div>
+                      <p className="text-gray-700 font-noto text-lg flex-1 max-w-xl">
+                        {item.trim()}
+                      </p>
                     </div>
-                    <p className="text-gray-700 font-bengali text-lg">
-                      {item.trim()}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div className="relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
-                {landingData?.productGallery && landingData?.productGallery.length > 0 && (
-                  <Image
-                    src={getImgUrl(landingData?.productGallery[1].path)}
-                    alt={productData.name || "Offer Product Image"}
-                    fill
-                    className="object-cover transform hover:scale-105 transition-transform duration-500"
-                  />
-                )}
+                  ))}
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Certificates Section */}
+      {/* Certificates Section - Centered Layout */}
       {landingData?.certificates && landingData.certificates.length > 0 && (
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
-            <div className="p-4 sm:p-6">
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center font-bengali bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden max-w-5xl mx-auto">
+            <div className="p-4 sm:p-6 flex flex-col items-center">
+              {/* Centered Title */}
+              <h2 className="text-xl sm:text-2xl font-bold mb-8 text-center font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
                 <Award className="inline-block mr-2 h-6 w-6" />
                 {landingData?.certificateTitle || "আমাদের সার্টিফিকেট"}
               </h2>
-              <div className="relative max-w-6xl mx-auto">
-                <Carousel
-                  opts={{ align: "start", loop: true }}
-                  className="w-full"
-                >
-                  <CarouselContent className="-ml-2 md:-ml-4">
-                    {landingData.certificates.map(
-                      (certificate: any, index: number) => (
-                        <CarouselItem
-                          key={index}
-                          className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
-                        >
-                          <ImageLightbox
-                            imageUrl={getImgUrl(certificate?.path)}
-                            altText={`Certificate ${index + 1}`}
-                          >
-                            <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-                              <div className="aspect-[4/3] relative">
-                                <Image
-                                  src={getImgUrl(certificate?.path)}
-                                  alt={`Certificate ${index + 1}`}
-                                  fill
-                                  className="object-cover hover:scale-105 transition-transform duration-500"
-                                />
-                              </div>
-                            </Card>
-                          </ImageLightbox>
-                        </CarouselItem>
-                      )
-                    )}
-                  </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex -left-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
-                  <CarouselNext className="hidden md:flex -right-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
-                </Carousel>
+
+              {/* Centered Grid Layout */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
+                {landingData.certificates.map(
+                  (certificate: any, index: number) => {
+                    if (!certificate || !certificate.path) return null;
+                    return (
+                      <ImageLightbox
+                        key={index}
+                        imageUrl={getImgUrl(certificate.path)}
+                        altText={`Certificate ${index + 1}`}
+                      >
+                        <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer mx-auto">
+                          <div className="aspect-[4/3] relative">
+                            <Image
+                              src={getImgUrl(certificate.path)}
+                              alt={`Certificate ${index + 1}`}
+                              fill
+                              className="object-cover hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                        </Card>
+                      </ImageLightbox>
+                    );
+                  }
+                )}
               </div>
             </div>
           </div>
@@ -508,8 +517,8 @@ const Page: FC<Props> = async ({ params }) => {
       {landingData?.reviews && landingData.reviews.length > 0 && (
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-xl shadow-xl overflow-hidden">
-            <div className="p-4 sm:p-6">
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center font-bengali bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
+            <div className="p-4 sm:p-6 flex flex-col items-center">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
                 <Users className="inline-block mr-2 h-6 w-6" />
                 কাস্টমার রিভিউ
               </h2>
@@ -519,28 +528,31 @@ const Page: FC<Props> = async ({ params }) => {
                   className="w-full"
                 >
                   <CarouselContent className="-ml-2 md:-ml-4">
-                    {landingData.reviews.map((review: any, index: number) => (
-                      <CarouselItem
-                        key={index}
-                        className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
-                      >
-                        <ImageLightbox
-                          imageUrl={getImgUrl(review?.path)}
-                          altText={`Customer Review ${index + 1}`}
+                    {landingData.reviews.map((review: any, index: number) => {
+                      if (!review || !review.path) return null;
+                      return (
+                        <CarouselItem
+                          key={index}
+                          className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
                         >
-                          <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-                            <div className="aspect-square relative">
-                              <Image
-                                src={getImgUrl(review?.path)}
-                                alt={`Customer Review ${index + 1}`}
-                                fill
-                                className="object-cover hover:scale-105 transition-transform duration-500"
-                              />
-                            </div>
-                          </Card>
-                        </ImageLightbox>
-                      </CarouselItem>
-                    ))}
+                          <ImageLightbox
+                            imageUrl={getImgUrl(review.path)}
+                            altText={`Customer Review ${index + 1}`}
+                          >
+                            <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer mx-auto">
+                              <div className="aspect-square relative">
+                                <Image
+                                  src={getImgUrl(review.path)}
+                                  alt={`Customer Review ${index + 1}`}
+                                  fill
+                                  className="object-cover hover:scale-105 transition-transform duration-500"
+                                />
+                              </div>
+                            </Card>
+                          </ImageLightbox>
+                        </CarouselItem>
+                      );
+                    })}
                   </CarouselContent>
                   <CarouselPrevious className="hidden md:flex -left-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
                   <CarouselNext className="hidden md:flex -right-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
@@ -555,8 +567,8 @@ const Page: FC<Props> = async ({ params }) => {
       {landingData?.productGallery && landingData.productGallery.length > 0 && (
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-xl shadow-xl overflow-hidden">
-            <div className="p-4 sm:p-6">
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center font-bengali bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
+            <div className="p-4 sm:p-6 flex flex-col items-center">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
                 <Shield className="inline-block mr-2 h-6 w-6" />
                 প্রোডাক্ট গ্যালারী
               </h2>
@@ -566,26 +578,31 @@ const Page: FC<Props> = async ({ params }) => {
                   className="w-full"
                 >
                   <CarouselContent className="-ml-2 md:-ml-4">
-                    {landingData.productGallery.map((image: any, index: number) => (
-                      <CarouselItem
-                        key={index}
-                        className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4"
-                      >
-                        <ImageLightbox
-                          imageUrl={getImgUrl(image?.path)}
-                          altText={`Gallery image ${index + 1}`}
-                        >
-                          <div className="aspect-square relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer">
-                            <Image
-                              src={getImgUrl(image?.path)}
-                              alt={`Gallery image ${index + 1}`}
-                              fill
-                              className="object-cover hover:scale-105 transition-transform duration-500"
-                            />
-                          </div>
-                        </ImageLightbox>
-                      </CarouselItem>
-                    ))}
+                    {landingData.productGallery.map(
+                      (image: any, index: number) => {
+                        if (!image || !image.path) return null;
+                        return (
+                          <CarouselItem
+                            key={index}
+                            className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4"
+                          >
+                            <ImageLightbox
+                              imageUrl={getImgUrl(image.path)}
+                              altText={`Gallery image ${index + 1}`}
+                            >
+                              <div className="aspect-square relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer mx-auto">
+                                <Image
+                                  src={getImgUrl(image.path)}
+                                  alt={`Gallery image ${index + 1}`}
+                                  fill
+                                  className="object-cover hover:scale-105 transition-transform duration-500"
+                                />
+                              </div>
+                            </ImageLightbox>
+                          </CarouselItem>
+                        );
+                      }
+                    )}
                   </CarouselContent>
                   <CarouselPrevious className="hidden md:flex -left-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
                   <CarouselNext className="hidden md:flex -right-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
