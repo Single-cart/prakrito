@@ -467,39 +467,58 @@ const Page: FC<Props> = async ({ params }) => {
         </div>
       )}
 
-      {/* Certificates Section - Centered Layout */}
+      {/* Certificates Section */}
       {landingData?.certificates && landingData.certificates.length > 0 && (
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden max-w-5xl mx-auto">
-            <div className="p-4 sm:p-6 flex flex-col items-center">
-              {/* Centered Title */}
-              <h2 className="text-xl sm:text-2xl font-bold mb-8 text-center font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
-                <Award className="inline-block mr-2 h-6 w-6" />
-                {landingData?.certificateTitle || "আমাদের সার্টিফিকেট"}
-              </h2>
+          <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl shadow-2xl overflow-hidden border border-blue-100">
+            <div className="p-6 sm:p-8">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-blue-600 rounded-full mb-4 shadow-lg">
+                  <Award className="h-8 w-8 text-white" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-600 to-indigo-600">
+                  {landingData?.certificateTitle || "আমাদের সার্টিফিকেট"}
+                </h2>
+                <div className="w-24 h-1 bg-gradient-to-r from-primary to-blue-600 mx-auto mt-3 rounded-full"></div>
+              </div>
 
-              {/* Centered Grid Layout */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
-                {landingData.certificates.map(
-                  (certificate: any, index: number) => (
-                    <ImageLightbox
-                      key={index}
-                      imageUrl={getImgUrl(certificate?.path)}
-                      altText={`Certificate ${index + 1}`}
-                    >
-                      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer mx-auto">
-                        <div className="aspect-[4/3] relative">
-                          <Image
-                            src={getImgUrl(certificate?.path)}
-                            alt={`Certificate ${index + 1}`}
-                            fill
-                            className="object-cover hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                      </Card>
-                    </ImageLightbox>
-                  )
-                )}
+              <div className="relative max-w-6xl mx-auto">
+                <Carousel
+                  opts={{ align: "center", loop: true }}
+                  className="w-full"
+                >
+                  <CarouselContent className="-ml-2 md:-ml-4 ">
+                    {landingData.certificates.map(
+                      (certificate: any, index: number) => (
+                        <CarouselItem
+                          key={index}
+                          className="pl-2 md:pl-4 flex items-center justify-center"
+                        >
+                          <ImageLightbox
+                            imageUrl={getImgUrl(certificate?.path)}
+                            altText={`Certificate ${index + 1}`}
+                          >
+                            <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-300 group w-full">
+                              <div className="aspect-[4/3] relative bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+                                <div className="relative w-full h-full p-4">
+                                  <Image
+                                    src={getImgUrl(certificate?.path)}
+                                    alt={`Certificate ${index + 1}`}
+                                    fill
+                                    className="object-contain group-hover:scale-105 transition-transform duration-500"
+                                  />
+                                </div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              </div>
+                            </Card>
+                          </ImageLightbox>
+                        </CarouselItem>
+                      )
+                    )}
+                  </CarouselContent>
+                  <CarouselPrevious className="hidden md:flex -left-12 bg-gradient-to-r from-primary to-blue-600 text-white hover:from-blue-600 hover:to-primary border-none shadow-lg" />
+                  <CarouselNext className="hidden md:flex -right-12 bg-gradient-to-r from-primary to-blue-600 text-white hover:from-blue-600 hover:to-primary border-none shadow-lg" />
+                </Carousel>
               </div>
             </div>
           </div>
@@ -509,43 +528,52 @@ const Page: FC<Props> = async ({ params }) => {
       {/* Customer Reviews Section */}
       {landingData?.reviews && landingData.reviews.length > 0 && (
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-xl shadow-xl overflow-hidden">
-            <div className="p-4 sm:p-6 flex flex-col items-center">
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
-                <Users className="inline-block mr-2 h-6 w-6" />
-                কাস্টমার রিভিউ
-              </h2>
+          <div className="bg-gradient-to-br from-purple-50 via-white to-pink-50 rounded-2xl shadow-2xl overflow-hidden border border-purple-100">
+            <div className="p-6 sm:p-8">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-full mb-4 shadow-lg">
+                  <Users className="h-8 w-8 text-white" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-600 to-pink-600">
+                  কাস্টমার রিভিউ
+                </h2>
+                <div className="w-24 h-1 bg-gradient-to-r from-primary to-purple-600 mx-auto mt-3 rounded-full"></div>
+              </div>
+
               <div className="relative max-w-6xl mx-auto">
                 <Carousel
-                  opts={{ align: "start", loop: true }}
+                  opts={{ align: "center", loop: true }}
                   className="w-full"
                 >
-                  <CarouselContent className="-ml-2 md:-ml-4">
+                  <CarouselContent className="-ml-2 md:-ml-4 mx-auto flex items-center justify-center">
                     {landingData.reviews.map((review: any, index: number) => (
                       <CarouselItem
                         key={index}
-                        className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
+                        className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 flex items-center justify-center"
                       >
                         <ImageLightbox
                           imageUrl={getImgUrl(review?.path)}
                           altText={`Customer Review ${index + 1}`}
                         >
-                          <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer mx-auto">
-                            <div className="aspect-square relative">
-                              <Image
-                                src={getImgUrl(review?.path)}
-                                alt={`Customer Review ${index + 1}`}
-                                fill
-                                className="object-cover hover:scale-105 transition-transform duration-500"
-                              />
+                          <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-purple-300 group w-full">
+                            <div className="aspect-square relative bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+                              <div className="relative w-full h-full p-4">
+                                <Image
+                                  src={getImgUrl(review?.path)}
+                                  alt={`Customer Review ${index + 1}`}
+                                  fill
+                                  className="object-contain group-hover:scale-105 transition-transform duration-500"
+                                />
+                              </div>
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             </div>
                           </Card>
                         </ImageLightbox>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex -left-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
-                  <CarouselNext className="hidden md:flex -right-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
+                  <CarouselPrevious className="hidden md:flex -left-12 bg-gradient-to-r from-primary to-purple-600 text-white hover:from-purple-600 hover:to-primary border-none shadow-lg" />
+                  <CarouselNext className="hidden md:flex -right-12 bg-gradient-to-r from-primary to-purple-600 text-white hover:from-purple-600 hover:to-primary border-none shadow-lg" />
                 </Carousel>
               </div>
             </div>
@@ -556,43 +584,52 @@ const Page: FC<Props> = async ({ params }) => {
       {/* Product Gallery Section */}
       {landingData?.productGallery && landingData.productGallery.length > 0 && (
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-xl shadow-xl overflow-hidden">
-            <div className="p-4 sm:p-6 flex flex-col items-center">
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
-                <Shield className="inline-block mr-2 h-6 w-6" />
-                প্রোডাক্ট গ্যালারী
-              </h2>
+          <div className="bg-gradient-to-br from-green-50 via-white to-emerald-50 rounded-2xl shadow-2xl overflow-hidden border border-green-100">
+            <div className="p-6 sm:p-8">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-green-600 rounded-full mb-4 shadow-lg">
+                  <Shield className="h-8 w-8 text-white" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold font-noto bg-clip-text text-transparent bg-gradient-to-r from-primary via-green-600 to-emerald-600">
+                  প্রোডাক্ট গ্যালারী
+                </h2>
+                <div className="w-24 h-1 bg-gradient-to-r from-primary to-green-600 mx-auto mt-3 rounded-full"></div>
+              </div>
+
               <div className="relative max-w-6xl mx-auto">
                 <Carousel
-                  opts={{ align: "start", loop: true }}
+                  opts={{ align: "center", loop: true }}
                   className="w-full"
                 >
-                  <CarouselContent className="-ml-2 md:-ml-4">
+                  <CarouselContent className="-ml-2 md:-ml-4 flex items-center justify-center">
                     {landingData.productGallery.map(
                       (image: any, index: number) => (
                         <CarouselItem
                           key={index}
-                          className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4"
+                          className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 flex items-center justify-center"
                         >
                           <ImageLightbox
                             imageUrl={getImgUrl(image?.path)}
                             altText={`Gallery image ${index + 1}`}
                           >
-                            <div className="aspect-square relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer mx-auto">
-                              <Image
-                                src={getImgUrl(image?.path)}
-                                alt={`Gallery image ${index + 1}`}
-                                fill
-                                className="object-cover hover:scale-105 transition-transform duration-500"
-                              />
+                            <div className="aspect-square relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-green-300 group bg-gradient-to-br from-gray-50 to-gray-100 w-full flex items-center justify-center">
+                              <div className="relative w-full h-full p-3">
+                                <Image
+                                  src={getImgUrl(image?.path)}
+                                  alt={`Gallery image ${index + 1}`}
+                                  fill
+                                  className="object-contain group-hover:scale-105 transition-transform duration-500"
+                                />
+                              </div>
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             </div>
                           </ImageLightbox>
                         </CarouselItem>
                       )
                     )}
                   </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex -left-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
-                  <CarouselNext className="hidden md:flex -right-12 bg-white/90 backdrop-blur-sm hover:bg-white" />
+                  <CarouselPrevious className="hidden md:flex -left-12 bg-gradient-to-r from-primary to-green-600 text-white hover:from-green-600 hover:to-primary border-none shadow-lg" />
+                  <CarouselNext className="hidden md:flex -right-12 bg-gradient-to-r from-primary to-green-600 text-white hover:from-green-600 hover:to-primary border-none shadow-lg" />
                 </Carousel>
               </div>
             </div>

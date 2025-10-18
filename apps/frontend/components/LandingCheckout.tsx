@@ -180,7 +180,7 @@ const LandingCheckout = ({ product }: { product: any }) => {
         >
           {/* Product Selection Section */}
           <div className="p-6 border-b">
-            <h3 className="text-xl font-bold mb-6 text-center font-bengali">
+            <h3 className="text-xl font-bold mb-6 text-center font-noto">
               কোনটা নিবেন নিচ থেকে পছন্দ করুন
             </h3>
 
@@ -246,7 +246,7 @@ const LandingCheckout = ({ product }: { product: any }) => {
                         )
                       )
                     ) : (
-                      <p className="text-red-500 font-bengali text-sm">
+                      <p className="text-red-500 font-noto text-sm">
                         কোনো পণ্য উপলব্ধ নেই।
                       </p>
                     )}
@@ -285,13 +285,13 @@ const LandingCheckout = ({ product }: { product: any }) => {
 
           {/* Customer Information Section */}
           <div className="p-6 border-b">
-            <h3 className="text-xl font-bold mb-6 text-center font-bengali">
+            <h3 className="text-xl font-bold mb-6 text-center font-noto">
               আপনার তথ্য দিন
             </h3>
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name" className="font-bengali">
+                <Label htmlFor="name" className="font-noto">
                   নাম <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -303,12 +303,14 @@ const LandingCheckout = ({ product }: { product: any }) => {
                   className={`mt-1 ${formErrors.name ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                 />
                 {formErrors.name && (
-                  <p className="text-red-500 text-sm mt-1">নাম দেওয়া আবশ্যক</p>
+                  <p className="text-red-500 text-sm mt-1 font-noto">
+                    নাম দেওয়া আবশ্যক
+                  </p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="phone" className="font-bengali">
+                <Label htmlFor="phone" className="font-noto">
                   ফোন নাম্বার <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -327,7 +329,7 @@ const LandingCheckout = ({ product }: { product: any }) => {
               </div>
 
               <div>
-                <Label htmlFor="address" className="font-bengali">
+                <Label htmlFor="address" className="font-noto">
                   ঠিকানা <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
@@ -346,9 +348,7 @@ const LandingCheckout = ({ product }: { product: any }) => {
               </div>
 
               <div>
-                <Label className="font-bengali mb-2 block">
-                  ডেলিভারি লোকেশন
-                </Label>
+                <Label className="font-noto mb-2 block">ডেলিভারি লোকেশন</Label>
                 <RadioGroup
                   value={shippingLocation}
                   onValueChange={handleShippingChange}
@@ -356,13 +356,13 @@ const LandingCheckout = ({ product }: { product: any }) => {
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="inside" id="inside" />
-                    <Label htmlFor="inside" className="font-bengali">
+                    <Label htmlFor="inside" className="font-noto">
                       ঢাকার ভিতরে
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="outside" id="outside" />
-                    <Label htmlFor="outside" className="font-bengali">
+                    <Label htmlFor="outside" className="font-noto">
                       ঢাকার বাইরে
                     </Label>
                   </div>
@@ -373,15 +373,13 @@ const LandingCheckout = ({ product }: { product: any }) => {
 
           {/* Order Summary Section */}
           <div className="p-6 border-t bg-gray-50">
-            <h3 className="text-xl font-bold mb-6 text-center font-bengali">
+            <h3 className="text-xl font-bold mb-6 text-center font-noto">
               অর্ডার সারসংক্ষেপ
             </h3>
 
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="font-bengali">
-                  পণ্যের মূল্য ({quantity}টি):
-                </span>
+                <span className="font-noto">পণ্যের মূল্য ({quantity}টি):</span>
                 <span>
                   ৳
                   {product?.priceVariation?.[selectedPriceVariationIndex]
@@ -389,11 +387,11 @@ const LandingCheckout = ({ product }: { product: any }) => {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="font-bengali">শিপিং চার্জ:</span>
+                <span className="font-noto">শিপিং চার্জ:</span>
                 <span>৳{shippingPrice}</span>
               </div>
               <div className="flex justify-between border-t pt-2 font-bold">
-                <span className="font-bengali">সর্বমোট:</span>
+                <span className="font-noto">সর্বমোট:</span>
                 <span>
                   ৳
                   {product?.priceVariation?.[selectedPriceVariationIndex]
@@ -408,7 +406,7 @@ const LandingCheckout = ({ product }: { product: any }) => {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full text-lg py-6 font-bengali bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary shadow-lg hover:shadow-xl transition-all"
+                className="w-full text-lg py-6 font-noto bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary shadow-lg hover:shadow-xl transition-all"
                 disabled={isLoading}
               >
                 {isLoading ? (
