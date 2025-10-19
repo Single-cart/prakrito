@@ -121,6 +121,10 @@ const productSchema: Schema<product.IProduct> = new Schema(
       type: Number,
       default: 0,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
 
     reviews: [productReviews],
   },

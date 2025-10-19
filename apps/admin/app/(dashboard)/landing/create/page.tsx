@@ -7,8 +7,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { z } from "zod";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -42,7 +42,7 @@ import NavHeader from "@/components/nav-header";
 import { customRevalidate } from "@/lib/fetch/customRevalidate";
 import { getImgUrl } from "@/lib/getImgPath";
 import { useCreateLandingMutation } from "@/redux/features/landing/landingApi";
-import { useGetAllProductsQuery } from "@/redux/features/product/productApi";
+import { useGetAllProductsAdminQuery } from "@/redux/features/product/productApi";
 
 // Form schema
 const formSchema = z.object({
@@ -81,12 +81,12 @@ export default function CreateLanding() {
     data: productsData,
     isLoading: productsLoading,
     refetch,
-  } = useGetAllProductsQuery(
+  } = useGetAllProductsAdminQuery(
     { search: searchTerm },
     {
       refetchOnFocus: false,
       refetchOnReconnect: false,
-    },
+    }
   );
 
   const [createLanding, { isLoading }] = useCreateLandingMutation();
@@ -120,7 +120,7 @@ export default function CreateLanding() {
 
   const handleUploadComplete = (
     fieldName: keyof FormSchemaType,
-    fileIds: string[],
+    fileIds: string[]
   ) => {
     const currentValues = form.getValues(fieldName as any) || [];
     const newValues = fileIds.map((id) => ({ value: id }));
@@ -129,12 +129,12 @@ export default function CreateLanding() {
 
   const handleFileRemoved = (
     fieldName: keyof FormSchemaType,
-    fileIdToRemove: string,
+    fileIdToRemove: string
   ) => {
     const currentValues = form.getValues(fieldName as any) || [];
     form.setValue(
       fieldName as any,
-      currentValues.filter((item: any) => item.value !== fileIdToRemove),
+      currentValues.filter((item: any) => item.value !== fileIdToRemove)
     );
   };
 
@@ -268,13 +268,13 @@ export default function CreateLanding() {
                             aria-expanded={open}
                             className={cn(
                               "justify-between h-auto py-3",
-                              !field.value && "text-muted-foreground",
+                              !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value && productsData?.data ? (
                               <div className="flex items-center gap-2">
                                 {productsData?.data?.products?.find(
-                                  (product: any) => product._id === field.value,
+                                  (product: any) => product._id === field.value
                                 )?.images?.length > 0 && (
                                   <div className="relative w-8 h-8 rounded overflow-hidden">
                                     <Image
@@ -282,8 +282,8 @@ export default function CreateLanding() {
                                         getImgUrl(
                                           productsData?.data?.products.find(
                                             (product: any) =>
-                                              product._id === field.value,
-                                          )?.images?.[0],
+                                              product._id === field.value
+                                          )?.images?.[0]
                                         ) || ""
                                       }
                                       alt="Product thumbnail"
@@ -296,7 +296,7 @@ export default function CreateLanding() {
                                   {
                                     productsData?.data?.products.find(
                                       (product: any) =>
-                                        product._id === field.value,
+                                        product._id === field.value
                                     )?.name
                                   }
                                 </span>
@@ -344,7 +344,7 @@ export default function CreateLanding() {
                                       className={cn(
                                         "flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-accent",
                                         field.value === product._id &&
-                                          "bg-accent",
+                                          "bg-accent"
                                       )}
                                       onClick={() => {
                                         form.setValue("product", product._id);
@@ -369,7 +369,7 @@ export default function CreateLanding() {
                                         <Check className="ml-auto h-4 w-4" />
                                       )}
                                     </div>
-                                  ),
+                                  )
                                 )}
                             </div>
                           )}
@@ -427,10 +427,7 @@ export default function CreateLanding() {
                   <FormItem>
                     <FormLabel>Hero Button Text</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter hero button text"
-                        {...field}
-                      />
+                      <Input placeholder="Enter hero button text" {...field} />
                     </FormControl>
                     <FormDescription>
                       Text for the main call-to-action button
@@ -552,10 +549,7 @@ export default function CreateLanding() {
                     <FormItem>
                       <FormLabel>Offer Title</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter offer title"
-                          {...field}
-                        />
+                        <Input placeholder="Enter offer title" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -594,7 +588,9 @@ export default function CreateLanding() {
                   displayFileIds={
                     form.watch("reviews")?.map((r: any) => r.value) || []
                   }
-                  onFileRemoved={(fileId) => handleFileRemoved("reviews", fileId)}
+                  onFileRemoved={(fileId) =>
+                    handleFileRemoved("reviews", fileId)
+                  }
                 />
               </div>
 

@@ -55,7 +55,7 @@ import {
 
 import NavHeader from "@/components/nav-header";
 import { getImgUrl } from "@/lib/getImgPath";
-import { useGetAllProductsQuery } from "@/redux/features/product/productApi";
+import { useGetAllProductsAdminQuery } from "@/redux/features/product/productApi";
 
 // Dynamically import ProductAction with no SSR
 const ProductAction = dynamic(
@@ -108,7 +108,7 @@ const ProductTable = () => {
     data,
     isLoading,
     error: queryError,
-  } = useGetAllProductsQuery(transformedQuery, {
+  } = useGetAllProductsAdminQuery(transformedQuery, {
     refetchOnFocus: false,
     refetchOnReconnect: false,
   });
@@ -275,6 +275,31 @@ const ProductTable = () => {
             <div className="flex flex-col">
               <span>{formatted}</span>
               <span className="text-xs text-gray-500">{firstQuantity}</span>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "isActive",
+        header: "Status",
+        cell: ({ row }) => {
+          const isActive = row.original?.isActive;
+          return (
+            <div className="flex items-center">
+              <div
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  isActive
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                <div
+                  className={`w-2 h-2 rounded-full mr-2 ${
+                    isActive ? "bg-green-500" : "bg-red-500"
+                  }`}
+                ></div>
+                {isActive ? "Active" : "Inactive"}
+              </div>
             </div>
           );
         },

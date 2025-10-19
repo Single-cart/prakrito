@@ -48,7 +48,7 @@ export interface ICreateProductInput {
   category: Types.ObjectId;
   subcategory: Types.ObjectId;
   description: any;
-
+  isActive?: boolean;
   images: string[];
 }
 
@@ -114,6 +114,7 @@ export interface IProduct extends Document {
   ratings?: number;
   category: mongoose.Schema.Types.ObjectId;
   subcategory?: string;
+  isActive?: boolean;
   reviews?: IPorductReviews[];
 }
 
@@ -140,4 +141,5 @@ export interface IProductRes {
   category: ICategory;
   subcategory?: ISubCategory;
   reviews?: IPorductReviews[];
+  isActive?: boolean;
 }

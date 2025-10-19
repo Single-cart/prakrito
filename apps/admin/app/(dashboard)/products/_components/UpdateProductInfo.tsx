@@ -46,6 +46,7 @@ import {
 } from "@/redux/features/cart/cartApi";
 import { useGetAllCategoryQuery } from "@/redux/features/category/categoryApi";
 import { useUpdateProductMutation } from "@/redux/features/product/productApi";
+import { Switch } from "@workspace/ui/components/switch";
 import { InfoIcon, PackageIcon, TagIcon } from "lucide-react";
 
 const UpdateDescForm = dynamic(() => import("../_components/UpdateDescForm"), {
@@ -86,6 +87,7 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
       subcategory: product?.subcategory?._id || "",
       priceVariation: product?.priceVariation || [],
       order: product?.order.toString() || "0",
+      isActive: product?.isActive ?? true,
     },
   });
 
@@ -103,6 +105,10 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
       formData.append("category", value.category);
       formData.append("subcategory", value.subcategory);
       formData.append("order", value.order);
+      formData.append(
+        "isActive",
+        value.isActive !== undefined ? value.isActive.toString() : "true"
+      );
 
       // Add price variation as a JSON string
       formData.append(
@@ -351,6 +357,29 @@ const UpdateProductInfo: FC<Props> = ({ product }) => {
                     )}
                   />
                 </div>
+
+                <FormField
+                  name="isActive"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          Active Product
+                        </FormLabel>
+                        <FormDescription>
+                          Toggle to show/hide this product from customers
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
               </TabsContent>
 
               <TabsContent value="attributes" className="space-y-4 mt-4">

@@ -68,3 +68,29 @@ export const singleProduct = async (slug: string) => {
     console.log(error);
   }
 };
+
+export const singleProductAdmin = async (slug: string) => {
+  // Import store dynamically to avoid circular dependencies
+  const { store } = await import("@/redux/store");
+  const token = store.getState().auth.token;
+  console.log(token);
+  try {
+    const res = await fetch(
+      `${env.NEXT_PUBLIC_API_URL}/product/single-product/${slug}`,
+      {
+        next: { tags: ["getAllProductsAdmin", "singleProductAdmin"] },
+        cache: "no-store",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await res.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};

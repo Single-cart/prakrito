@@ -26,6 +26,7 @@ import { useDispatch } from "react-redux";
 import { z } from "zod";
 
 import { creactProductData } from "@/redux/features/product/productSlice";
+import { Switch } from "@workspace/ui/components/switch";
 import AddPriceVariation from "./AddPriceVariation";
 
 interface Props {
@@ -64,6 +65,7 @@ const ProductInfoForm: FC<Props> = ({
         outsideDhaka: "",
         priceVariation: [],
         order: "0",
+        isActive: true,
       },
     });
 
@@ -316,6 +318,27 @@ const ProductInfoForm: FC<Props> = ({
               placeholder="Product Image(max 5)"
             />
           </div>
+
+          <FormField
+            name="isActive"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">Active Product</FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Toggle to show/hide this product from customers
+                  </div>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
           <div className="flex items-center justify-end">
             <Button type="submit">Next</Button>

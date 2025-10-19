@@ -20,6 +20,7 @@ export const createProductService = async (
   const product = await ProductModel.create({
     ...productData,
     slug: slugify(productData.name),
+    isActive: productData.isActive !== undefined ? productData.isActive : true,
     reviews: [],
   });
 
@@ -55,6 +56,10 @@ export const updateProductService = async (
     images: updateData.images?.length
       ? updateData.images
       : existingProduct.images,
+    isActive:
+      updateData.isActive !== undefined
+        ? updateData.isActive
+        : existingProduct.isActive,
   };
 
   const updatedProduct = await ProductModel.findByIdAndUpdate(
@@ -93,6 +98,7 @@ export const getSingleProductService = async (slug: string) => {
     {
       category: product.category._id,
       _id: { $ne: product._id },
+      isActive: { $ne: false },
     },
     {
       name: 1,
@@ -102,6 +108,7 @@ export const getSingleProductService = async (slug: string) => {
       images: 1,
       slug: 1,
       createdAt: 1,
+      isActive: 1,
     }
   )
     .sort({ ratings: -1, createdAt: -1 })
@@ -187,6 +194,9 @@ export const getAllProductsService = async (
   if (ratings) {
     filter.ratings = { $gte: ratings };
   }
+
+  // Only show active products
+  filter.isActive = { $ne: false };
 
   const [products, productCount] = await Promise.all([
     ProductModel.find(filter)
@@ -367,6 +377,114 @@ export const getAllProductReviewsService = async (
       currentPage: page,
       nextPage: page + 1,
       prevPage: page - 1,
+    },
+  };
+};
+
+// Get all products admin service (shows both active and inactive)
+export const getAllProductsAdminService = async (
+  filters: product.IProductFilters
+) => {
+  const {
+    page = 1,
+    limit = 10,
+    search = "",
+    category = "",
+    subcategory = "",
+    minPrice,
+    maxPrice,
+    ratings,
+  } = filters;
+
+  const adjustedLimit = Math.min(50, Math.max(1, limit));
+  const adjustedPage = Math.max(1, page);
+
+  const filter: FilterQuery = {};
+
+  if (search) {
+    filter.$text = { $search: search };
+  }
+
+  if (category) {
+    filter.category = new mongoose.Types.ObjectId(category);
+  }
+
+  if (subcategory) {
+    filter.subcategory = subcategory;
+  }
+
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    const priceFilter: any[] = [];
+
+    if (minPrice !== undefined) {
+      priceFilter.push({
+        $gte: [
+          {
+            $convert: {
+              input: "$priceVariation.discountPrice",
+              to: "double",
+              onError: 0,
+              onNull: 0,
+            },
+          },
+          minPrice,
+        ],
+      });
+    }
+
+    if (maxPrice !== undefined) {
+      priceFilter.push({
+        $lte: [
+          {
+            $convert: {
+              input: "$priceVariation.discountPrice",
+              to: "double",
+              onError: 0,
+              onNull: 0,
+            },
+          },
+          maxPrice,
+        ],
+      });
+    }
+
+    if (priceFilter.length > 0) {
+      filter.$expr = {
+        $and: priceFilter,
+      };
+    }
+  }
+
+  if (ratings) {
+    filter.ratings = { $gte: ratings };
+  }
+
+  // Note: No isActive filter here - shows both active and inactive products for admin
+
+  const [products, productCount] = await Promise.all([
+    ProductModel.find(filter)
+      .select("-reviews")
+      .populate("category")
+      .skip((adjustedPage - 1) * adjustedLimit)
+      .limit(adjustedLimit)
+      .sort({ order: 1 }),
+    ProductModel.countDocuments(filter),
+  ]);
+
+  const allCategories = await CategoryModel.find({});
+
+  return {
+    products,
+    allCategories,
+    pagination: {
+      numberOfProducts: productCount,
+      totalPage: Math.ceil(productCount / adjustedLimit),
+      currentPage: adjustedPage,
+      nextPage:
+        adjustedPage < Math.ceil(productCount / adjustedLimit)
+          ? adjustedPage + 1
+          : null,
+      prevPage: adjustedPage > 1 ? adjustedPage - 1 : null,
     },
   };
 };

@@ -29,6 +29,7 @@ export const ProductSchema = z.object({
   }),
   subcategory: z.string().optional(),
   category: z.string({ required_error: "product category is required" }),
+  isActive: z.boolean().optional(),
 });
 
 export const ProductFilterSchema = z.object({

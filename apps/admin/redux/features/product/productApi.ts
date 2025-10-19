@@ -29,6 +29,22 @@ const productApi = apiSlice.injectEndpoints({
       providesTags: ["Products"] as never,
     }),
 
+    getAllProductsAdmin: build.query({
+      query: (params: QueryProps) => {
+        const queryString = Object.entries(params)
+          .filter(([, value]) => value !== "")
+          .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+          .join("&");
+
+        return {
+          url: `/product/all-products-admin?${queryString}`,
+          method: "GET",
+          credentials: "include",
+        };
+      },
+      providesTags: ["Products"] as never,
+    }),
+
     getStockStatus: build.query({
       query: () => ({
         url: "/product/stock-status",
@@ -71,6 +87,7 @@ const productApi = apiSlice.injectEndpoints({
 
 export const {
   useGetAllProductsQuery,
+  useGetAllProductsAdminQuery,
   useGetStockStatusQuery,
   useCreateProductMutation,
   useDeleteProductMutation,

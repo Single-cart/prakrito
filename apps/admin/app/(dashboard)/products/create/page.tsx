@@ -51,6 +51,12 @@ const CreateProduct = () => {
       formData.append("outsideDhaka", productCreateData.outsideDhaka);
       formData.append("description", productCreateData.description);
       formData.append(
+        "isActive",
+        productCreateData.isActive !== undefined
+          ? productCreateData.isActive.toString()
+          : "true"
+      );
+      formData.append(
         "priceVariation",
         JSON.stringify(productCreateData.priceVariation)
       );

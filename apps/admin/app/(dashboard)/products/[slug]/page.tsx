@@ -9,7 +9,7 @@ type Props = {
 const page = async ({ params }: Props) => {
   const slug = (await params).slug;
   const { data } = await singleProduct(slug);
-
+  console.log(data);
   return (
     <div className="p-1 md:p-2 xl:p-4">
       <Card>

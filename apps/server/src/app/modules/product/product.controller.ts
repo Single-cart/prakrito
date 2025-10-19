@@ -20,6 +20,7 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     description,
     priceVariation,
     order,
+    isActive,
   } = req.body;
 
   if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
@@ -44,6 +45,7 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
     category,
     subcategory,
     order: Number(order),
+    isActive: isActive !== undefined ? isActive : true,
     images: (req.files as Express.Multer.File[]).map(
       (file: Express.Multer.File) => file.path
     ),
@@ -160,7 +162,9 @@ export const getAllProducts = catchAsync(
 // Get recent sold products controller
 export const getRecentSoldProducts = catchAsync(
   async (req: Request, res: Response) => {
-    const products = await ProductModel.find().sort({ soldAt: -1 }).limit(10);
+    const products = await ProductModel.find({ isActive: { $ne: false } })
+      .sort({ soldAt: -1 })
+      .limit(10);
 
     if (!products.length) {
       throw new ApiError(httpStatus.NOT_FOUND, "No recent sold products found");
@@ -290,6 +294,31 @@ export const getProductReviews = catchAsync(
   }
 );
 
+// Get all products admin controller
+export const getAllProductsAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const filters = {
+      page: req.query.page ? Number(req.query.page) : undefined,
+      limit: req.query.limit ? Number(req.query.limit) : undefined,
+      search: req.query.search?.toString(),
+      category: req.query.category?.toString(),
+      subcategory: req.query.subcategory?.toString(),
+      minPrice: req.query.minPrice ? Number(req.query.minPrice) : undefined,
+      maxPrice: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
+      ratings: req.query.ratings ? Number(req.query.ratings) : undefined,
+    };
+
+    const result = await productService.getAllProductsAdminService(filters);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Products retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 // Get stock status controller
 export const getStockStatus = catchAsync(
   async (req: Request, res: Response) => {
@@ -316,7 +345,10 @@ export const getCartProducts = catchAsync(
       throw new ApiError(httpStatus.NOT_FOUND, "Cart items not found");
     }
 
-    const products = await ProductModel.find({ _id: { $in: productIdsArray } });
+    const products = await ProductModel.find({
+      _id: { $in: productIdsArray },
+      isActive: { $ne: false },
+    });
     if (!products || products.length === 0) {
       throw new ApiError(httpStatus.NOT_FOUND, "Products not found");
     }

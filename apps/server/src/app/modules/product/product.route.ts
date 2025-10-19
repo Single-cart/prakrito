@@ -14,6 +14,7 @@ import {
   deleteReview,
   getAllProductReviews,
   getAllProducts,
+  getAllProductsAdmin,
   getCartProducts,
   getProductReviews,
   getRecentSoldProducts,
@@ -53,6 +54,13 @@ productRoute.get(
   "/all-products",
   validator(ProductFilterSchema),
   getAllProducts
+);
+productRoute.get(
+  "/all-products-admin",
+  isAuthenticated,
+  authorizeUser("admin"),
+  validator(ProductFilterSchema),
+  getAllProductsAdmin
 );
 productRoute.get("/sold-product", getRecentSoldProducts);
 productRoute.put(

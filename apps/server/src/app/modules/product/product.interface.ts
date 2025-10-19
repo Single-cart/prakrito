@@ -6,6 +6,7 @@ export interface FilterQuery {
   subcategory?: string;
   $expr?: any;
   ratings?: { $gte: number };
+  isActive?: boolean | { $ne: boolean };
 }
 
 export interface PopulatedCategory {
