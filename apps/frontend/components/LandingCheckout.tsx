@@ -16,6 +16,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { customEvent } from "./gtm/customEvent";
 
 const LandingCheckout = ({ product }: { product: any }) => {
   const [createOrder, { isLoading, error, isError, isSuccess }] =
@@ -168,6 +169,21 @@ const LandingCheckout = ({ product }: { product: any }) => {
       totalAmount: totalAmount,
       shippingLocation: shippingLocation,
     };
+
+    customEvent({
+      event: "purchase",
+      ecommerce: {
+        currencyCode: "BDT",
+        value: totalAmount,
+        items: orderItems,
+        userData: {
+          fullName: formData.name,
+          phone: formData.phone,
+          address: formData.address,
+        },
+      },
+    });
+
     await createOrder(orderData);
   };
 
