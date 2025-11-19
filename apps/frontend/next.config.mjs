@@ -17,9 +17,17 @@ const nextConfig = {
         protocol: "https",
         hostname: "server.prakrito.com",
         
-      }
+      } 
     ]
-  }
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/js/:path*',
+        destination: 'https://serverstape.prakrito.com/:path*',
+      },
+    ]
+  },
 }
 
 export default nextConfig
