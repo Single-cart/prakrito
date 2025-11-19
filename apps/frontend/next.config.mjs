@@ -19,15 +19,7 @@ const nextConfig = {
         
       }
     ]
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/js/:path*',
-        destination: 'https://serverstape.prakrito.com/js/:path*',
-      },
-    ]
-  },
+  }
 }
 
 export default nextConfig
