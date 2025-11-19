@@ -6,7 +6,7 @@ export default function GoogleTagManagerNoScript() {
   return (
     <noscript>
       <iframe
-        src={`src="https://serverstape.prakrito.com/ns.html?id=${GTM_ID}`}
+        src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
         height="0"
         width="0"
         style={{ display: "none", visibility: "hidden" }}
