@@ -23,8 +23,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/js/load.js',
-        destination: 'https://serverstape.prakrito.com/js/load.js',
+        source: '/js/:path*',
+        destination: 'https://serverstape.prakrito.com/js/:path*',
       },
     ]
   },
